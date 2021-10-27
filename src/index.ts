@@ -1,4 +1,4 @@
 import { Encrypting } from "./crypt";
-import { fpGetId, getVisitorId } from "./fp";
+import { getGFPId } from "./fp";
 
-export { Encrypting, fpGetId, getVisitorId };
+export { Encrypting, getGFPId };

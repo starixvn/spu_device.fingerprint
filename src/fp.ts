@@ -40,16 +40,17 @@ function getScreenPrint(): Component<Record<string, string>> {
   };
 }
 
-export function fpGetId(): Promise<fpResult> {
+export function getGFPId(): Promise<fpResult> {
   let visitorId: string;
   let properties: string;
 
   const fpPromise = FingerprintJS.load();
 
-  let promise = fpPromise
+  return fpPromise
     .then((fp) => fp.get())
     .then((result) => {
-      const { screenResolution, ...components } = result.components;
+      const { screenResolution, screenFrame, ...components } =
+        result.components;
       const extendedComponents = {
         ...components,
         screenPrint: getScreenPrint(),
@@ -60,20 +61,4 @@ export function fpGetId(): Promise<fpResult> {
 
       return Promise.resolve({ Id: visitorId, Properties: properties });
     });
-
-  return promise.then((res) => {
-    return res;
-  });
-}
-
-export function getVisitorId(): String {
-  let visitorId: string;
-  const fpPromise = FingerprintJS.load();
-  fpPromise
-    .then((fp) => fp.get())
-    .then((result) => {
-      visitorId = result.visitorId;
-    });
-
-  return visitorId;
 }
