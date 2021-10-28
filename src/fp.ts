@@ -1,21 +1,13 @@
-import FingerprintJS, {
-  Component,
-  isGecko,
-  isWebKit,
-  isTrident,
-  isChromium,
-  isEdgeHTML,
-} from "@fingerprintjs/fingerprintjs";
+import FingerprintJS, { sources } from "@fingerprintjs/fingerprintjs";
 
-export interface fpResult {
+interface fpResult {
   Id: string;
   Properties: string;
 }
-
-export interface ScreenData {
-  Name: string;
-  Resolution: [number | null, number | null];
-  PixelDepth: number;
+interface CanvasFingerprint {
+  winding: boolean;
+  geometry: string;
+  text: string;
 }
 
 function getDevicePixelRatio(): number {
@@ -30,13 +22,32 @@ function getPixelDepth(): string {
   return screen.pixelDepth.toString();
 }
 
-function getScreenPrint(): Component<Record<string, string>> {
+function getScreenPrint(): Record<string, string> {
   return {
-    value: {
-      currentResolution: getCurrentResolution(),
-      pixelDepth: getPixelDepth(),
-    },
-    duration: 0,
+    currentResolution: getCurrentResolution(),
+    pixelDepth: getPixelDepth(),
+  };
+}
+
+function getCanvas(): CanvasFingerprint {
+  let canvas = sources.canvas();
+
+  return {
+    winding: canvas.winding,
+    geometry: canvas.geometry,
+    text: "",
+  };
+}
+
+async function getFontPreference(): Promise<Record<string, number>> {
+  let font = await sources.fontPreferences();
+  return {
+    default: font["default"],
+    apple: font["apple"],
+    serif: font["serif"],
+    sans: font["sans"],
+    min: font["min"],
+    system: font["system"],
   };
 }
 
@@ -48,12 +59,23 @@ export function getGFPId(): Promise<fpResult> {
 
   return fpPromise
     .then((fp) => fp.get())
-    .then((result) => {
-      const { screenResolution, screenFrame, ...components } =
-        result.components;
+    .then(async (result) => {
+      const {
+        screenResolution,
+        screenFrame,
+        canvas,
+        fontPreferences,
+        ...components
+      } = result.components;
+
       const extendedComponents = {
         ...components,
-        screenPrint: getScreenPrint(),
+        screenPrint: { value: getScreenPrint(), duration: 0 },
+        canvasPrint: { value: getCanvas(), duration: 0 },
+        fontPreferencePrint: {
+          value: await getFontPreference(),
+          duration: 0,
+        },
       };
 
       visitorId = FingerprintJS.hashComponents(extendedComponents);

@@ -9297,11 +9297,12 @@ var GlobalFingerPrint = (function (exports) {
 
 	var FingerprintJS = index;
 
-	function getCurrentResolution() {
-	    return screen.width + "x" + screen.height;
+	function getDevicePixelRatio() {
+	    return window.devicePixelRatio;
 	}
-	function getAvailableResolution() {
-	    return screen.availWidth + "x" + screen.availHeight;
+	function getCurrentResolution() {
+	    let ratio = getDevicePixelRatio();
+	    return screen.width * ratio + "x" + screen.height * ratio;
 	}
 	function getPixelDepth() {
 	    return screen.pixelDepth.toString();
@@ -9310,32 +9311,28 @@ var GlobalFingerPrint = (function (exports) {
 	    return {
 	        value: {
 	            currentResolution: getCurrentResolution(),
-	            availableResolution: getAvailableResolution(),
 	            pixelDepth: getPixelDepth(),
 	        },
 	        duration: 0,
 	    };
 	}
-	function fpGetId() {
+	function getGFPId() {
 	    let visitorId;
 	    let properties;
 	    const fpPromise = FingerprintJS.load();
-	    fpPromise
+	    return fpPromise
 	        .then((fp) => fp.get())
 	        .then((result) => {
-	        const _a = result.components, components = __rest(_a, ["screenResolution"]);
+	        const _a = result.components, components = __rest(_a, ["screenResolution", "screenFrame"]);
 	        const extendedComponents = Object.assign(Object.assign({}, components), { screenPrint: getScreenPrint() });
 	        visitorId = FingerprintJS.hashComponents(extendedComponents);
 	        properties = FingerprintJS.componentsToDebugString(extendedComponents);
+	        return Promise.resolve({ Id: visitorId, Properties: properties });
 	    });
-	    return {
-	        Id: visitorId,
-	        Properties: properties,
-	    };
 	}
 
 	exports.Encrypting = Encrypting;
-	exports.fpGetId = fpGetId;
+	exports.getGFPId = getGFPId;
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
