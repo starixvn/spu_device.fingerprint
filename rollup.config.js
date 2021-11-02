@@ -3,7 +3,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 const commonOutput = {
-    name: 'GlobalFingerPrint',
+    name: 'globalFP',
     exports: 'named',
   }
 

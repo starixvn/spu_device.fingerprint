@@ -1,4 +1,4 @@
-var GlobalFingerPrint = (function (exports) {
+var globalFP = (function (exports) {
 	'use strict';
 
 	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -9309,30 +9309,86 @@ var GlobalFingerPrint = (function (exports) {
 	}
 	function getScreenPrint() {
 	    return {
-	        value: {
-	            currentResolution: getCurrentResolution(),
-	            pixelDepth: getPixelDepth(),
-	        },
-	        duration: 0,
+	        currentResolution: getCurrentResolution(),
+	        pixelDepth: getPixelDepth(),
 	    };
 	}
-	function getGFPId() {
+	function getCanvas() {
+	    let canvas = sources.canvas();
+	    return {
+	        winding: canvas.winding,
+	        geometry: canvas.geometry,
+	        text: "",
+	    };
+	}
+	function getFontPreference() {
+	    return __awaiter(this, void 0, void 0, function* () {
+	        let font = yield sources.fontPreferences();
+	        return {
+	            default: font["default"],
+	            apple: font["apple"],
+	            serif: font["serif"],
+	            sans: font["sans"],
+	            min: font["min"],
+	            system: font["system"],
+	        };
+	    });
+	}
+	function getDI() {
 	    let visitorId;
 	    let properties;
 	    const fpPromise = FingerprintJS.load();
 	    return fpPromise
 	        .then((fp) => fp.get())
-	        .then((result) => {
-	        const _a = result.components, components = __rest(_a, ["screenResolution", "screenFrame"]);
-	        const extendedComponents = Object.assign(Object.assign({}, components), { screenPrint: getScreenPrint() });
+	        .then((result) => __awaiter(this, void 0, void 0, function* () {
+	        const _a = result.components, components = __rest(_a, ["screenResolution", "screenFrame", "canvas", "fontPreferences"]);
+	        const extendedComponents = Object.assign(Object.assign({}, components), { screenPrint: { value: getScreenPrint(), duration: 0 }, canvasPrint: { value: getCanvas(), duration: 0 }, fontPreferencePrint: {
+	                value: yield getFontPreference(),
+	                duration: 0,
+	            } });
 	        visitorId = FingerprintJS.hashComponents(extendedComponents);
 	        properties = FingerprintJS.componentsToDebugString(extendedComponents);
 	        return Promise.resolve({ Id: visitorId, Properties: properties });
-	    });
+	    }));
 	}
 
-	exports.Encrypting = Encrypting;
-	exports.getGFPId = getGFPId;
+	var key = "__key__";
+	var apiUrl = "__apiUrl__";
+	var token = "__token__";
+	function set(appKey, appAPIUrl, appToken) {
+	    key = appKey;
+	    apiUrl = appAPIUrl;
+	    token = appToken;
+	}
+
+	function config(key, apiUrl, token) {
+	    set(key, apiUrl, token);
+	    return this;
+	}
+	function getFP(isDebug = false) {
+	    return getDI().then((result) => {
+	        if (isDebug) {
+	            console.log(result.Id);
+	            console.log(result.Properties);
+	        }
+	        else {
+	            const data = Encrypting(JSON.stringify({ di: result.Id, attributes: result.Properties }), key);
+	            console.log(data);
+	            post(apiUrl, token, data);
+	        }
+	    });
+	}
+	function post(url, token, data) {
+	    var xhr = new XMLHttpRequest();
+	    xhr.open("POST", url, true);
+	    xhr.setRequestHeader("Accept", "application/json");
+	    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+	    xhr.setRequestHeader("Content-Type", "application/json");
+	    xhr.send(data);
+	}
+
+	exports.config = config;
+	exports.getFP = getFP;
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 

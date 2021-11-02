@@ -13,6 +13,7 @@ interface CanvasFingerprint {
 function getDevicePixelRatio(): number {
   return window.devicePixelRatio;
 }
+
 function getCurrentResolution(): string {
   let ratio = getDevicePixelRatio();
   return screen.width * ratio + "x" + screen.height * ratio;
@@ -51,7 +52,7 @@ async function getFontPreference(): Promise<Record<string, number>> {
   };
 }
 
-export function getGFPId(): Promise<fpResult> {
+export function getDI(): Promise<fpResult> {
   let visitorId: string;
   let properties: string;
 
