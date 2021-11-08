@@ -1,5 +1,9 @@
-import * as globalFP from "../src";
+import * as globalFP from "../src/index";
 
 globalFP
-  .config("wNvK6fr8JX+vVnYI0YrguI/PmrtH6B3fEm8YCMEBhYo=", "", "")
-  .getFP(false);
+  .isDebug(false)
+  .config(
+    "wNvK6fr8JX+vVnYI0YrguI/PmrtH6B3fEm8YCMEBhYo=",
+    "http://localhost:5000/api/fp",
+    "123456"
+  );

@@ -2,34 +2,53 @@ import { Encrypting } from "./crypt";
 import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
 
-export function config(key: string, apiUrl: string, token: string) {
-  appConfig.set(key, apiUrl, token);
+var _isDebug: boolean = false;
 
+export function isDebug(isDebug: boolean) {
+  _isDebug = isDebug;
   return this;
 }
 
-export function getFP(isDebug: boolean = false) {
-  return getDI().then((result) => {
-    if (isDebug) {
+export function config(key: string, apiUrl: string, token: string) {
+  appConfig.set(key, apiUrl, token);
+}
+
+function getFP() {
+  getDI().then((result) => {
+    if (_isDebug) {
       console.log(result.Id);
       console.log(result.Properties);
     } else {
-      const data = Encrypting(
-        JSON.stringify({ di: result.Id, attributes: result.Properties }),
-        appConfig.key
+      appConfig.getKey();
+
+      postData(
+        Encrypting(
+          {
+            di: result.Id,
+            fk: appConfig.fpsKey,
+            attr: result.Properties,
+          },
+          appConfig.key
+        )
       );
-      console.log(data);
-      post(appConfig.apiUrl, appConfig.token, data);
     }
   });
 }
 
-function post(url: string, token: string, data: string) {
-  var xhr = new XMLHttpRequest();
-  xhr.open("POST", url, true);
-
-  xhr.setRequestHeader("Accept", "application/json");
-  xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-  xhr.setRequestHeader("Content-Type", "application/json");
-  xhr.send(data);
+async function postData(data: string) {
+  // Default options are marked with *
+  fetch(appConfig.apiUrl, {
+    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: "include", // include, *same-origin, omit
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + appConfig.token,
+    },
+    redirect: "follow", // manual, *follow, error
+    referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    body: JSON.stringify(data), // body data type must match "Content-Type" header
+  });
 }
+
+getFP();

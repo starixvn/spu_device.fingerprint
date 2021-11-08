@@ -1,8 +1,11 @@
-import FingerprintJS, { sources } from "@fingerprintjs/fingerprintjs";
+import FingerprintJS, {
+  sources,
+  UnknownComponents,
+} from "@fingerprintjs/fingerprintjs";
 
 interface fpResult {
   Id: string;
-  Properties: string;
+  Properties: {};
 }
 interface CanvasFingerprint {
   winding: boolean;
@@ -40,6 +43,21 @@ function getCanvas(): CanvasFingerprint {
   };
 }
 
+function componentsToCanonicalString(components: UnknownComponents): {} {
+  let result = "";
+  for (const componentKey of Object.keys(components).sort()) {
+    const component = components[componentKey];
+    const value = component.error ? "error" : JSON.stringify(component.value);
+
+    result += `${result ? "," : ""}${componentKey.replace(
+      /([:|\\])/g,
+      "\\$1"
+    )}:${value}`;
+  }
+
+  return "{" + result + "}";
+}
+
 async function getFontPreference(): Promise<Record<string, number>> {
   let font = await sources.fontPreferences();
   return {
@@ -54,7 +72,7 @@ async function getFontPreference(): Promise<Record<string, number>> {
 
 export function getDI(): Promise<fpResult> {
   let visitorId: string;
-  let properties: string;
+  let properties: {};
 
   const fpPromise = FingerprintJS.load();
 
@@ -69,7 +87,7 @@ export function getDI(): Promise<fpResult> {
         ...components
       } = result.components;
 
-      const extendedComponents = {
+      const customComponents = {
         ...components,
         screenPrint: { value: getScreenPrint(), duration: 0 },
         canvasPrint: { value: getCanvas(), duration: 0 },
@@ -79,8 +97,9 @@ export function getDI(): Promise<fpResult> {
         },
       };
 
-      visitorId = FingerprintJS.hashComponents(extendedComponents);
-      properties = FingerprintJS.componentsToDebugString(extendedComponents);
+      visitorId = FingerprintJS.hashComponents(customComponents);
+
+      properties = componentsToCanonicalString(customComponents);
 
       return Promise.resolve({ Id: visitorId, Properties: properties });
     });
