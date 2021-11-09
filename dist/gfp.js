@@ -9365,14 +9365,11 @@ var globalFP = (function (exports) {
     var apiUrl = "__apiUrl__";
     var token = "__token__";
     var fpsKey = "__fpsKey__";
-    function set(appKey, appAPIUrl, appToken) {
+    function set(appKey, appAPIUrl, appToken, appFpsKey) {
         key = appKey;
         apiUrl = appAPIUrl;
         token = appToken;
-    }
-    function getKey() {
-        var fpsKeyHtml = document.getElementById("___fk");
-        fpsKey = fpsKeyHtml.value;
+        fpsKey = appFpsKey;
     }
 
     var _isDebug = false;
@@ -9380,8 +9377,8 @@ var globalFP = (function (exports) {
         _isDebug = isDebug;
         return this;
     }
-    function config(key, apiUrl, token) {
-        set(key, apiUrl, token);
+    function config(key, apiUrl, token, fpsKey) {
+        set(key, apiUrl, token, fpsKey);
     }
     function getFP() {
         getDI().then((result) => {
@@ -9390,19 +9387,28 @@ var globalFP = (function (exports) {
                 console.log(result.Properties);
             }
             else {
-                getKey();
                 postData(Encrypting({
                     di: result.Id,
                     fk: fpsKey,
                     attr: result.Properties,
-                }, key));
+                }, key)).then((res) => {
+                    if (res.ok) {
+                        var container = document.forms[0] || document.body;
+                        var fkInput = document.createElement("input");
+                        fkInput.setAttribute("type", "hidden");
+                        fkInput.setAttribute("name", "__fk");
+                        fkInput.setAttribute("id", "__fk");
+                        fkInput.setAttribute("value", fpsKey);
+                        container.appendChild(fkInput);
+                    }
+                });
             }
         });
     }
     function postData(data) {
         return __awaiter(this, void 0, void 0, function* () {
             // Default options are marked with *
-            fetch(apiUrl, {
+            return fetch(apiUrl, {
                 method: "POST",
                 cache: "no-cache",
                 credentials: "include",
