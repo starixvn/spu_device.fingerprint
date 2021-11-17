@@ -1,6 +1,7 @@
 import { Encrypting } from "./crypt";
 import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
+import { allowedNodeEnvironmentFlags } from "process";
 
 var _isDebug: boolean = false;
 
@@ -40,17 +41,20 @@ function getFP() {
 
       if (sessionKeyElement) {
         let sessionKeyValue = (sessionKeyElement as HTMLInputElement).value;
-        let encryptedFP = Encrypting(
-          {
-            di: result.Id,
-            fk: sessionKeyValue,
-            attr: result.Properties,
-            subs: appConfig.subscriberId,
-          },
-          appConfig.key
-        );
 
-        postData(encryptedFP);
+        if (sessionKeyValue != null && sessionKeyValue != "") {
+          let encryptedFP = Encrypting(
+            {
+              di: result.Id,
+              fk: sessionKeyValue,
+              attr: result.Properties,
+              subs: appConfig.subscriberId,
+            },
+            appConfig.key
+          );
+
+          postData(encryptedFP);
+        }
       } else {
         let encryptedFP = Encrypting(
           {

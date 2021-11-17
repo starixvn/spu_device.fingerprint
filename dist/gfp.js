@@ -9410,23 +9410,27 @@ var globalFP = (function (exports) {
                 console.log(result.Properties);
             }
             else {
-                let fpsKeyElement = document.getElementById("__fk");
-                if (fpsKeyElement) {
-                    let fpsKeyValue = fpsKeyElement.value;
-                    postData(Encrypting({
-                        di: result.Id,
-                        fk: fpsKeyValue,
-                        attr: result.Properties,
-                        subs: subscriberId,
-                    }, key));
+                let sessionKeyElement = document.getElementById("__fk");
+                if (sessionKeyElement) {
+                    let sessionKeyValue = sessionKeyElement.value;
+                    if (sessionKeyValue != null && sessionKeyValue != "") {
+                        let encryptedFP = Encrypting({
+                            di: result.Id,
+                            fk: sessionKeyValue,
+                            attr: result.Properties,
+                            subs: subscriberId,
+                        }, key);
+                        postData(encryptedFP);
+                    }
                 }
                 else {
-                    postData(Encrypting({
+                    let encryptedFP = Encrypting({
                         di: result.Id,
                         fk: fpsKey,
                         attr: result.Properties,
                         subs: subscriberId,
-                    }, key)).then((res) => {
+                    }, key);
+                    postData(encryptedFP).then((res) => {
                         if (res.ok) {
                             injectSessionKey(fpsKey);
                         }
@@ -9437,7 +9441,6 @@ var globalFP = (function (exports) {
     }
     function postData(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Default options are marked with *
             return fetch(apiUrl, {
                 method: "POST",
                 cache: "no-cache",
@@ -9448,7 +9451,7 @@ var globalFP = (function (exports) {
                 },
                 redirect: "follow",
                 referrerPolicy: "no-referrer",
-                body: JSON.stringify(data), // body data type must match "Content-Type" header
+                body: JSON.stringify(data),
             });
         });
     }
