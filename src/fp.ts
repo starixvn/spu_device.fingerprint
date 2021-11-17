@@ -22,11 +22,11 @@ function getCurrentResolution(): string {
   return screen.width * ratio + "x" + screen.height * ratio;
 }
 
-function getPixelDepth(): string {
-  return screen.pixelDepth.toString();
+function getPixelDepth(): number {
+  return screen.pixelDepth;
 }
 
-function getScreenPrint(): Record<string, string> {
+function getScreenPrint(): {} {
   return {
     currentResolution: getCurrentResolution(),
     pixelDepth: getPixelDepth(),
@@ -70,6 +70,16 @@ async function getFontPreference(): Promise<Record<string, number>> {
   };
 }
 
+function getLanguages(): {} {
+  return {
+    language: window.navigator.language,
+    languages: window.navigator.languages.join(","),
+    userLanguage: window.navigator["userLanguage"],
+    browserLanguage: window.navigator["browserLanguage"],
+    systemLanguage: window.navigator["systemLanguage"],
+  };
+}
+
 export function getDI(): Promise<fpResult> {
   let visitorId: string;
   let properties: {};
@@ -84,6 +94,7 @@ export function getDI(): Promise<fpResult> {
         screenFrame,
         canvas,
         fontPreferences,
+        languages,
         ...components
       } = result.components;
 
@@ -93,6 +104,10 @@ export function getDI(): Promise<fpResult> {
         canvasPrint: { value: getCanvas(), duration: 0 },
         fontPreferencePrint: {
           value: await getFontPreference(),
+          duration: 0,
+        },
+        languagesPrint: {
+          value: getLanguages(),
           duration: 0,
         },
       };

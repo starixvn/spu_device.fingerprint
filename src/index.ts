@@ -1,7 +1,6 @@
 import { Encrypting } from "./crypt";
 import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
-import { fips } from "crypto";
 
 var _isDebug: boolean = false;
 
@@ -14,9 +13,21 @@ export function config(
   key: string,
   apiUrl: string,
   token: string,
-  fpsKey: string
+  fpsKey: string,
+  subscriberId: number
 ) {
-  appConfig.set(key, apiUrl, token, fpsKey);
+  appConfig.set(key, apiUrl, token, fpsKey, subscriberId);
+}
+
+function injectSessionKey(value: string) {
+  var container = document.forms[0] || document.body;
+  var fkInput = document.createElement("input");
+  fkInput.setAttribute("type", "hidden");
+  fkInput.setAttribute("name", "__fk");
+  fkInput.setAttribute("id", "__fk");
+  fkInput.setAttribute("value", value);
+
+  container.appendChild(fkInput);
 }
 
 function getFP() {
@@ -25,44 +36,54 @@ function getFP() {
       console.log(result.Id);
       console.log(result.Properties);
     } else {
-      postData(
-        Encrypting(
+      let sessionKeyElement = document.getElementById("__fk");
+
+      if (sessionKeyElement) {
+        let sessionKeyValue = (sessionKeyElement as HTMLInputElement).value;
+        let encryptedFP = Encrypting(
+          {
+            di: result.Id,
+            fk: sessionKeyValue,
+            attr: result.Properties,
+            subs: appConfig.subscriberId,
+          },
+          appConfig.key
+        );
+
+        postData(encryptedFP);
+      } else {
+        let encryptedFP = Encrypting(
           {
             di: result.Id,
             fk: appConfig.fpsKey,
             attr: result.Properties,
+            subs: appConfig.subscriberId,
           },
           appConfig.key
-        )
-      ).then((res) => {
-        if (res.ok) {
-          var container = document.forms[0] || document.body;
-          var fkInput = document.createElement("input");
-          fkInput.setAttribute("type", "hidden");
-          fkInput.setAttribute("name", "__fk");
-          fkInput.setAttribute("id", "__fk");
-          fkInput.setAttribute("value", appConfig.fpsKey);
+        );
 
-          container.appendChild(fkInput);
-        }
-      });
+        postData(encryptedFP).then((res) => {
+          if (res.ok) {
+            injectSessionKey(appConfig.fpsKey);
+          }
+        });
+      }
     }
   });
 }
 
 async function postData(data: string): Promise<Response> {
-  // Default options are marked with *
   return fetch(appConfig.apiUrl, {
-    method: "POST", // *GET, POST, PUT, DELETE, etc.
-    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-    credentials: "include", // include, *same-origin, omit
+    method: "POST",
+    cache: "no-cache",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + appConfig.token,
     },
-    redirect: "follow", // manual, *follow, error
-    referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-    body: JSON.stringify(data), // body data type must match "Content-Type" header
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify(data),
   });
 }
 

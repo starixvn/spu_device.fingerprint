@@ -8072,7 +8072,7 @@ var globalFP = (function (exports) {
         return navigator.oscpu;
     }
 
-    function getLanguages() {
+    function getLanguages$1() {
         var n = navigator;
         var result = [];
         var language = n.language || n.userLanguage || n.browserLanguage || n.systemLanguage;
@@ -9107,7 +9107,7 @@ var globalFP = (function (exports) {
         audio: getAudioFingerprint,
         screenFrame: getRoundedScreenFrame,
         osCpu: getOsCpu,
-        languages: getLanguages,
+        languages: getLanguages$1,
         colorDepth: getColorDepth,
         deviceMemory: getDeviceMemory,
         screenResolution: getScreenResolution,
@@ -9305,7 +9305,7 @@ var globalFP = (function (exports) {
         return screen.width * ratio + "x" + screen.height * ratio;
     }
     function getPixelDepth() {
-        return screen.pixelDepth.toString();
+        return screen.pixelDepth;
     }
     function getScreenPrint() {
         return {
@@ -9343,6 +9343,15 @@ var globalFP = (function (exports) {
             };
         });
     }
+    function getLanguages() {
+        return {
+            language: window.navigator.language,
+            languages: window.navigator.languages.join(","),
+            userLanguage: window.navigator["userLanguage"],
+            browserLanguage: window.navigator["browserLanguage"],
+            systemLanguage: window.navigator["systemLanguage"],
+        };
+    }
     function getDI() {
         let visitorId;
         let properties;
@@ -9350,9 +9359,12 @@ var globalFP = (function (exports) {
         return fpPromise
             .then((fp) => fp.get())
             .then((result) => __awaiter(this, void 0, void 0, function* () {
-            const _a = result.components, components = __rest(_a, ["screenResolution", "screenFrame", "canvas", "fontPreferences"]);
+            const _a = result.components, components = __rest(_a, ["screenResolution", "screenFrame", "canvas", "fontPreferences", "languages"]);
             const customComponents = Object.assign(Object.assign({}, components), { screenPrint: { value: getScreenPrint(), duration: 0 }, canvasPrint: { value: getCanvas(), duration: 0 }, fontPreferencePrint: {
                     value: yield getFontPreference(),
+                    duration: 0,
+                }, languagesPrint: {
+                    value: getLanguages(),
                     duration: 0,
                 } });
             visitorId = FingerprintJS.hashComponents(customComponents);
@@ -9365,11 +9377,13 @@ var globalFP = (function (exports) {
     var apiUrl = "__apiUrl__";
     var token = "__token__";
     var fpsKey = "__fpsKey__";
-    function set(appKey, appAPIUrl, appToken, appFpsKey) {
+    var subscriberId = "__subscriberId__";
+    function set(appKey, appAPIUrl, appToken, appFpsKey, subscriber) {
         key = appKey;
         apiUrl = appAPIUrl;
         token = appToken;
         fpsKey = appFpsKey;
+        subscriberId = subscriber.toString();
     }
 
     var _isDebug = false;
@@ -9377,8 +9391,17 @@ var globalFP = (function (exports) {
         _isDebug = isDebug;
         return this;
     }
-    function config(key, apiUrl, token, fpsKey) {
-        set(key, apiUrl, token, fpsKey);
+    function config(key, apiUrl, token, fpsKey, subscriberId) {
+        set(key, apiUrl, token, fpsKey, subscriberId);
+    }
+    function injectSessionKey(value) {
+        var container = document.forms[0] || document.body;
+        var fkInput = document.createElement("input");
+        fkInput.setAttribute("type", "hidden");
+        fkInput.setAttribute("name", "__fk");
+        fkInput.setAttribute("id", "__fk");
+        fkInput.setAttribute("value", value);
+        container.appendChild(fkInput);
     }
     function getFP() {
         getDI().then((result) => {
@@ -9387,21 +9410,28 @@ var globalFP = (function (exports) {
                 console.log(result.Properties);
             }
             else {
-                postData(Encrypting({
-                    di: result.Id,
-                    fk: fpsKey,
-                    attr: result.Properties,
-                }, key)).then((res) => {
-                    if (res.ok) {
-                        var container = document.forms[0] || document.body;
-                        var fkInput = document.createElement("input");
-                        fkInput.setAttribute("type", "hidden");
-                        fkInput.setAttribute("name", "__fk");
-                        fkInput.setAttribute("id", "__fk");
-                        fkInput.setAttribute("value", fpsKey);
-                        container.appendChild(fkInput);
-                    }
-                });
+                let fpsKeyElement = document.getElementById("__fk");
+                if (fpsKeyElement) {
+                    let fpsKeyValue = fpsKeyElement.value;
+                    postData(Encrypting({
+                        di: result.Id,
+                        fk: fpsKeyValue,
+                        attr: result.Properties,
+                        subs: subscriberId,
+                    }, key));
+                }
+                else {
+                    postData(Encrypting({
+                        di: result.Id,
+                        fk: fpsKey,
+                        attr: result.Properties,
+                        subs: subscriberId,
+                    }, key)).then((res) => {
+                        if (res.ok) {
+                            injectSessionKey(fpsKey);
+                        }
+                    });
+                }
             }
         });
     }
