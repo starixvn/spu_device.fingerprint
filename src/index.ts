@@ -1,7 +1,6 @@
 import { Encrypting } from "./crypt";
 import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
-import { allowedNodeEnvironmentFlags } from "process";
 
 var _isDebug: boolean = false;
 
@@ -10,14 +9,8 @@ export function isDebug(isDebug: boolean) {
   return this;
 }
 
-export function config(
-  key: string,
-  apiUrl: string,
-  token: string,
-  fpsKey: string,
-  subscriberId: number
-) {
-  appConfig.set(key, apiUrl, token, fpsKey, subscriberId);
+export function config(apiUrl: string, token: string, subscriberId: number) {
+  appConfig.set(apiUrl, token, subscriberId);
 }
 
 function injectSessionKey(value: string) {
@@ -43,32 +36,41 @@ function getFP() {
         let sessionKeyValue = (sessionKeyElement as HTMLInputElement).value;
 
         if (sessionKeyValue != null && sessionKeyValue != "") {
-          let encryptedFP = Encrypting(
-            {
-              di: result.Id,
-              fk: sessionKeyValue,
-              attr: result.Properties,
-              subs: appConfig.subscriberId,
-            },
-            appConfig.key
-          );
+          getConfig().then(async (res) => {
+            if (res.ok) {
+              let response = await res.json();
+              let encryptedFP = Encrypting(
+                {
+                  di: result.Id,
+                  attr: result.Properties,
+                  fk: sessionKeyValue,
+                  subs: appConfig.subscriberId,
+                },
+                response.encryptedKey
+              );
 
-          postData(encryptedFP);
+              postData(encryptedFP, response.token);
+            }
+          });
         }
       } else {
-        let encryptedFP = Encrypting(
-          {
-            di: result.Id,
-            fk: appConfig.fpsKey,
-            attr: result.Properties,
-            subs: appConfig.subscriberId,
-          },
-          appConfig.key
-        );
-
-        postData(encryptedFP).then((res) => {
+        getConfig().then(async (res) => {
           if (res.ok) {
-            injectSessionKey(appConfig.fpsKey);
+            let response = await res.json();
+            let encryptedFP = Encrypting(
+              {
+                di: result.Id,
+                attr: result.Properties,
+                fk: response.sessionKey,
+                subs: appConfig.subscriberId,
+              },
+              response.encryptedKey
+            );
+            postData(encryptedFP, response.token).then((res) => {
+              if (res.ok) {
+                injectSessionKey(response.sessionKey);
+              }
+            });
           }
         });
       }
@@ -76,18 +78,25 @@ function getFP() {
   });
 }
 
-async function postData(data: string): Promise<Response> {
+async function postData(data: string, token: string): Promise<Response> {
   return fetch(appConfig.apiUrl, {
     method: "POST",
     cache: "no-cache",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer " + appConfig.token,
+      Authorization: "Bearer " + token,
     },
     redirect: "follow",
     referrerPolicy: "no-referrer",
     body: JSON.stringify(data),
+  });
+}
+
+function getConfig(): Promise<Response> {
+  return fetch(appConfig.apiUrl + "/conf", {
+    method: "GET",
+    redirect: "follow",
   });
 }
 

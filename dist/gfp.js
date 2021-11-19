@@ -9373,16 +9373,10 @@ var globalFP = (function (exports) {
         }));
     }
 
-    var key = "__key__";
     var apiUrl = "__apiUrl__";
-    var token = "__token__";
-    var fpsKey = "__fpsKey__";
     var subscriberId = "__subscriberId__";
-    function set(appKey, appAPIUrl, appToken, appFpsKey, subscriber) {
-        key = appKey;
+    function set(appAPIUrl, appToken, subscriber) {
         apiUrl = appAPIUrl;
-        token = appToken;
-        fpsKey = appFpsKey;
         subscriberId = subscriber.toString();
     }
 
@@ -9391,8 +9385,8 @@ var globalFP = (function (exports) {
         _isDebug = isDebug;
         return this;
     }
-    function config(key, apiUrl, token, fpsKey, subscriberId) {
-        set(key, apiUrl, token, fpsKey, subscriberId);
+    function config(apiUrl, token, subscriberId) {
+        set(apiUrl, token, subscriberId);
     }
     function injectSessionKey(value) {
         var container = document.forms[0] || document.body;
@@ -9414,32 +9408,42 @@ var globalFP = (function (exports) {
                 if (sessionKeyElement) {
                     let sessionKeyValue = sessionKeyElement.value;
                     if (sessionKeyValue != null && sessionKeyValue != "") {
-                        let encryptedFP = Encrypting({
-                            di: result.Id,
-                            fk: sessionKeyValue,
-                            attr: result.Properties,
-                            subs: subscriberId,
-                        }, key);
-                        postData(encryptedFP);
+                        getConfig().then((res) => __awaiter(this, void 0, void 0, function* () {
+                            if (res.ok) {
+                                let response = yield res.json();
+                                let encryptedFP = Encrypting({
+                                    di: result.Id,
+                                    attr: result.Properties,
+                                    fk: sessionKeyValue,
+                                    subs: subscriberId,
+                                }, response.encryptedKey);
+                                postData(encryptedFP, response.token);
+                            }
+                        }));
                     }
                 }
                 else {
-                    let encryptedFP = Encrypting({
-                        di: result.Id,
-                        fk: fpsKey,
-                        attr: result.Properties,
-                        subs: subscriberId,
-                    }, key);
-                    postData(encryptedFP).then((res) => {
+                    getConfig().then((res) => __awaiter(this, void 0, void 0, function* () {
                         if (res.ok) {
-                            injectSessionKey(fpsKey);
+                            let response = yield res.json();
+                            let encryptedFP = Encrypting({
+                                di: result.Id,
+                                attr: result.Properties,
+                                fk: response.sessionKey,
+                                subs: subscriberId,
+                            }, response.encryptedKey);
+                            postData(encryptedFP, response.token).then((res) => {
+                                if (res.ok) {
+                                    injectSessionKey(response.sessionKey);
+                                }
+                            });
                         }
-                    });
+                    }));
                 }
             }
         });
     }
-    function postData(data) {
+    function postData(data, token) {
         return __awaiter(this, void 0, void 0, function* () {
             return fetch(apiUrl, {
                 method: "POST",
@@ -9453,6 +9457,12 @@ var globalFP = (function (exports) {
                 referrerPolicy: "no-referrer",
                 body: JSON.stringify(data),
             });
+        });
+    }
+    function getConfig() {
+        return fetch(apiUrl + "/conf", {
+            method: "GET",
+            redirect: "follow",
         });
     }
     getFP();
