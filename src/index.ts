@@ -25,11 +25,18 @@ function injectSessionKey(value: string) {
 }
 
 function getFP() {
+  let start = Date.now();
+
   getDI().then((result) => {
     if (_isDebug) {
       console.log(result.Id);
       console.log(result.Properties);
     } else {
+      let end = Date.now() - start;
+      console.log(`milliseconds elapsed of collect fp = ${end}`);
+
+      start = Date.now();
+
       let sessionKeyElement = document.getElementById("__fk");
 
       if (sessionKeyElement) {
@@ -50,6 +57,9 @@ function getFP() {
               );
 
               postData(encryptedFP, response.token);
+
+              end = Date.now() - start;
+              console.log(`milliseconds elapsed of post fp = ${end}`);
             }
           });
         }
@@ -69,6 +79,9 @@ function getFP() {
             postData(encryptedFP, response.token).then((res) => {
               if (res.ok) {
                 injectSessionKey(response.sessionKey);
+
+                end = Date.now() - start;
+                console.log(`milliseconds elapsed of post fp = ${end}`);
               }
             });
           }
