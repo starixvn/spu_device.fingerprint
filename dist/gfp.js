@@ -9326,7 +9326,7 @@ var globalFP = (function (exports) {
         for (const componentKey of Object.keys(components).sort()) {
             const component = components[componentKey];
             const value = component.error ? "error" : JSON.stringify(component.value);
-            result += `${result ? "," : ""}${componentKey.replace(/([:|\\])/g, "\\$1")}:${value}`;
+            result += `${result ? "|" : ""}${componentKey.replace(/([:|\\])/g, "\\$1")}:${value}`;
         }
         return "{" + result + "}";
     }
@@ -9405,8 +9405,8 @@ var globalFP = (function (exports) {
                 console.log(result.Properties);
             }
             else {
-                let millis = Date.now() - start;
-                console.log(`milliseconds elapsed of collect fp = ${millis}`);
+                let end = Date.now() - start;
+                console.log(`milliseconds elapsed of collect fp = ${end}`);
                 start = Date.now();
                 let sessionKeyElement = document.getElementById("__fk");
                 if (sessionKeyElement) {
@@ -9420,10 +9420,10 @@ var globalFP = (function (exports) {
                                     attr: result.Properties,
                                     fk: sessionKeyValue,
                                     subs: subscriberId,
-                                }, response.encryptedKey);
-                                postData(encryptedFP, response.token);
-                                millis = Date.now() - start;
-                                console.log(`milliseconds elapsed of post fp = ${millis}`);
+                                }, response.a);
+                                postData(encryptedFP, response.b);
+                                end = Date.now() - start;
+                                console.log(`milliseconds elapsed of post fp = ${end}`);
                             }
                         }));
                     }
@@ -9432,17 +9432,18 @@ var globalFP = (function (exports) {
                     getConfig().then((res) => __awaiter(this, void 0, void 0, function* () {
                         if (res.ok) {
                             let response = yield res.json();
+                            console.log(result.Properties);
                             let encryptedFP = Encrypting({
                                 di: result.Id,
                                 attr: result.Properties,
-                                fk: response.sessionKey,
+                                fk: response.c,
                                 subs: subscriberId,
-                            }, response.encryptedKey);
-                            postData(encryptedFP, response.token).then((res) => {
+                            }, response.a);
+                            postData(encryptedFP, response.b).then((res) => {
                                 if (res.ok) {
-                                    injectSessionKey(response.sessionKey);
-                                    millis = Date.now() - start;
-                                    console.log(`milliseconds elapsed of post fp = ${millis}`);
+                                    injectSessionKey(response.c);
+                                    end = Date.now() - start;
+                                    console.log(`milliseconds elapsed of post fp = ${end}`);
                                 }
                             });
                         }

@@ -9,8 +9,8 @@ export function isDebug(isDebug: boolean) {
   return this;
 }
 
-export function config(apiUrl: string, token: string, subscriberId: number) {
-  appConfig.set(apiUrl, token, subscriberId);
+export function config(apiUrl: string, subscriberId: number) {
+  appConfig.set(apiUrl, subscriberId);
 }
 
 function injectSessionKey(value: string) {
@@ -53,10 +53,10 @@ function getFP() {
                   fk: sessionKeyValue,
                   subs: appConfig.subscriberId,
                 },
-                response.encryptedKey
+                response.a
               );
 
-              postData(encryptedFP, response.token);
+              postData(encryptedFP, response.b);
 
               end = Date.now() - start;
               console.log(`milliseconds elapsed of post fp = ${end}`);
@@ -67,18 +67,19 @@ function getFP() {
         getConfig().then(async (res) => {
           if (res.ok) {
             let response = await res.json();
+            console.log(result.Properties);
             let encryptedFP = Encrypting(
               {
                 di: result.Id,
                 attr: result.Properties,
-                fk: response.sessionKey,
+                fk: response.c,
                 subs: appConfig.subscriberId,
               },
-              response.encryptedKey
+              response.a
             );
-            postData(encryptedFP, response.token).then((res) => {
+            postData(encryptedFP, response.b).then((res) => {
               if (res.ok) {
-                injectSessionKey(response.sessionKey);
+                injectSessionKey(response.c);
 
                 end = Date.now() - start;
                 console.log(`milliseconds elapsed of post fp = ${end}`);
