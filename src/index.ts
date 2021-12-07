@@ -25,17 +25,17 @@ function injectSessionKey(value: string) {
 }
 
 function getFP() {
-  let start = Date.now();
+  //let start = Date.now();
 
   getDI().then((result) => {
     if (_isDebug) {
       console.log(result.Id);
       console.log(result.Properties);
     } else {
-      let end = Date.now() - start;
-      console.log(`milliseconds elapsed of collect fp = ${end}`);
+      // let end = Date.now() - start;
+      // console.log(`milliseconds elapsed of collect fp = ${end}`);
 
-      start = Date.now();
+      // start = Date.now();
 
       let sessionKeyElement = document.getElementById("__fk");
 
@@ -43,57 +43,60 @@ function getFP() {
         let sessionKeyValue = (sessionKeyElement as HTMLInputElement).value;
 
         if (sessionKeyValue != null && sessionKeyValue != "") {
-          getConfig().then(async (res) => {
-            if (res.ok) {
-              let response = await res.json();
-              let encryptedFP = Encrypting(
-                {
-                  di: result.Id,
-                  attr: result.Properties,
-                  fk: sessionKeyValue,
-                  subs: appConfig.subscriberId,
-                },
-                response.a
-              );
-
-              postData(encryptedFP, response.b);
-
-              end = Date.now() - start;
-              console.log(`milliseconds elapsed of post fp = ${end}`);
-            }
-          });
+          processData(result, false, sessionKeyValue);
         }
       } else {
-        getConfig().then(async (res) => {
-          if (res.ok) {
-            let response = await res.json();
-            console.log(result.Properties);
-            let encryptedFP = Encrypting(
-              {
-                di: result.Id,
-                attr: result.Properties,
-                fk: response.c,
-                subs: appConfig.subscriberId,
-              },
-              response.a
-            );
-            postData(encryptedFP, response.b).then((res) => {
-              if (res.ok) {
-                injectSessionKey(response.c);
-
-                end = Date.now() - start;
-                console.log(`milliseconds elapsed of post fp = ${end}`);
-              }
-            });
-          }
-        });
+        processData(result, true, null);
       }
     }
   });
 }
 
-async function postData(data: string, token: string): Promise<Response> {
-  return fetch(appConfig.apiUrl, {
+function processData(result, isInject: boolean, sessionKey: string) {
+  getDomain()
+    .then((res) => res.text())
+    .then((req) => {
+      var requests = JSON.parse(req).map(function (url) {
+        return fetch(url + "/api/fp/hc", {
+          cache: "no-cache",
+        });
+      });
+      Promise.race(requests).then((res: Response) => {
+        if (res.status == 200) {
+          var str = res.url;
+          var index = str.lastIndexOf("/");
+          var url = str.substring(0, index);
+
+          getConfig(url).then(async (conf) => {
+            if (conf.ok) {
+              let response = await conf.json();
+              let encryptedFP = Encrypting(
+                {
+                  di: result.Id,
+                  attr: result.Properties,
+                  fk: isInject ? response.c : sessionKey,
+                  subs: appConfig.subscriberId,
+                },
+                response.a
+              );
+              postData(url, encryptedFP, response.b).then((data) => {
+                if (data.ok && isInject) {
+                  injectSessionKey(response.c);
+                }
+              });
+            }
+          });
+        }
+      });
+    });
+}
+
+async function postData(
+  url: string,
+  data: string,
+  token: string
+): Promise<Response> {
+  return fetch(url, {
     method: "POST",
     cache: "no-cache",
     credentials: "include",
@@ -107,8 +110,15 @@ async function postData(data: string, token: string): Promise<Response> {
   });
 }
 
-function getConfig(): Promise<Response> {
-  return fetch(appConfig.apiUrl + "/conf", {
+function getConfig(url: string): Promise<Response> {
+  return fetch(url + "/conf", {
+    method: "GET",
+    redirect: "follow",
+  });
+}
+
+function getDomain(): Promise<Response> {
+  return fetch(appConfig.apiUrl + "/subscriber/" + appConfig.subscriberId, {
     method: "GET",
     redirect: "follow",
   });
