@@ -3,6 +3,7 @@ import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
 
 var _isDebug: boolean = false;
+var _hiddenName: string = "__sk";
 
 export function isDebug(isDebug: boolean) {
   _isDebug = isDebug;
@@ -13,31 +14,43 @@ export function config(apiUrl: string, subscriberId: number) {
   appConfig.set(apiUrl, subscriberId);
 }
 
+const promiseAny = async <T>(
+  iterable: Iterable<T | PromiseLike<T>>
+): Promise<T> => {
+  return Promise.all(
+    [...iterable].map((promise) => {
+      return new Promise((resolve, reject) =>
+        Promise.resolve(promise).then(reject, resolve)
+      );
+    })
+  ).then(
+    (errors) => Promise.reject(errors),
+    (value) => Promise.resolve<T>(value)
+  );
+};
+
 function injectSessionKey(value: string) {
   var container = document.forms[0] || document.body;
   var fkInput = document.createElement("input");
   fkInput.setAttribute("type", "hidden");
-  fkInput.setAttribute("name", "__fk");
-  fkInput.setAttribute("id", "__fk");
+  fkInput.setAttribute("name", _hiddenName);
+  fkInput.setAttribute("id", _hiddenName);
   fkInput.setAttribute("value", value);
 
   container.appendChild(fkInput);
 }
 
 function getFP() {
-  //let start = Date.now();
+  let start = Date.now();
 
   getDI().then((result) => {
     if (_isDebug) {
       console.log(result.Id);
       console.log(result.Properties);
     } else {
-      // let end = Date.now() - start;
-      // console.log(`milliseconds elapsed of collect fp = ${end}`);
-
       // start = Date.now();
 
-      let sessionKeyElement = document.getElementById("__fk");
+      let sessionKeyElement = document.getElementById(_hiddenName);
 
       if (sessionKeyElement) {
         let sessionKeyValue = (sessionKeyElement as HTMLInputElement).value;
@@ -50,6 +63,9 @@ function getFP() {
       }
     }
   });
+
+  let end = Date.now() - start;
+  console.log(`milliseconds elapsed of collect fp = ${end}`);
 }
 
 function processData(result, isInject: boolean, sessionKey: string) {
@@ -61,7 +77,8 @@ function processData(result, isInject: boolean, sessionKey: string) {
           cache: "no-cache",
         });
       });
-      Promise.race(requests).then((res: Response) => {
+
+      promiseAny(requests).then((res: Response) => {
         if (res.status == 200) {
           var str = res.url;
           var index = str.lastIndexOf("/");
