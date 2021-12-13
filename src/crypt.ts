@@ -18,3 +18,7 @@ export function Encrypting(data: {}, key: string): string {
 
   return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
 }
+
+export function HashMD5(data: string): string {
+  return CryptoJS.MD5(data).toString();
+}

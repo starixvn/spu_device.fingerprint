@@ -1,6 +1,7 @@
-import { Encrypting } from "./crypt";
+import { Encrypting, HashMD5 } from "./crypt";
 import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
+import { getDeviceInfo } from "./userAgent";
 
 var _isDebug: boolean = false;
 var _hiddenName: string = "__sk";
@@ -48,8 +49,6 @@ function getFP() {
       console.log(result.Id);
       console.log(result.Properties);
     } else {
-      // start = Date.now();
-
       let sessionKeyElement = document.getElementById(_hiddenName);
 
       if (sessionKeyElement) {
@@ -86,13 +85,17 @@ function processData(result, isInject: boolean, sessionKey: string) {
 
           getConfig(url).then(async (conf) => {
             if (conf.ok) {
-              let response = await conf.json();
+              const response = await conf.json();
+              const deviceInfo = getDeviceInfo();
+              const device = JSON.stringify(deviceInfo);
               let encryptedFP = Encrypting(
                 {
                   di: result.Id,
                   attr: result.Properties,
                   fk: isInject ? response.c : sessionKey,
                   subs: appConfig.subscriberId,
+                  dev: device,
+                  devCode: HashMD5(device),
                 },
                 response.a
               );

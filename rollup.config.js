@@ -2,6 +2,8 @@ import typescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from "rollup-plugin-terser";
+import json from "@rollup/plugin-json";
+import {dependencies} from "./package.json";
 
 const commonTerser = terser(require('./terser.config.js'))
 
@@ -10,8 +12,18 @@ const commonOutput = {
     exports: 'named',
   }
 
-export default {
-    input: 'src/index.ts',    
+const commonInput={
+  input: 'src/index.ts', 
+  plugins: [
+    typescript({module: "ESNext"}),
+    nodeResolve({ preferBuiltins: false }), // or `true`
+    commonjs(),
+    json()     
+], 
+}
+
+export default [{
+    ...commonInput, 
     output: [{
     ...commonOutput,
       file: 'dist/gfp.js',
@@ -19,14 +31,26 @@ export default {
     },
     {
       ...commonOutput,
-        file: 'dist/gfp.min.js',
+        file: 'dist/gfp.min.js', 
         format: 'iife',
         plugins: [commonTerser]
-      }],
-    plugins: [
-        typescript({module: "ESNext"}),
-        nodeResolve({ preferBuiltins: false }), // or `true`
-        commonjs()      
-    ],
+      }    
+    ],   
     external: ['moment']
-  };
+  },
+  {
+    ...commonInput, 
+    output: [{
+    ...commonOutput,
+      file: 'dist/gfp.cjs.js',
+      format: 'cjs'
+    },
+    {
+      ...commonOutput,
+        file: 'dist/gfp.es.js',
+        format: 'es'
+      }     
+    ],   
+    external: Object.keys(dependencies)
+  }
+  ];
