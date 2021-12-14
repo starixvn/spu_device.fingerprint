@@ -44,27 +44,29 @@ function injectSessionKey(value: string) {
 function getFP() {
   let start = Date.now();
 
-  getDI().then((result) => {
-    if (_isDebug) {
-      console.log(result.Id);
-      console.log(result.Properties);
-    } else {
-      let sessionKeyElement = document.getElementById(_hiddenName);
-
-      if (sessionKeyElement) {
-        let sessionKeyValue = (sessionKeyElement as HTMLInputElement).value;
-
-        if (sessionKeyValue != null && sessionKeyValue != "") {
-          processData(result, false, sessionKeyValue);
-        }
+  getDI()
+    .then((result) => {
+      if (_isDebug) {
+        console.log(result.Id);
+        console.log(result.Properties);
       } else {
-        processData(result, true, null);
-      }
-    }
-  });
+        let sessionKeyElement = document.getElementById(_hiddenName);
 
-  let end = Date.now() - start;
-  console.log(`milliseconds elapsed of collect fp = ${end}`);
+        if (sessionKeyElement) {
+          let sessionKeyValue = (sessionKeyElement as HTMLInputElement).value;
+
+          if (sessionKeyValue != null && sessionKeyValue != "") {
+            processData(result, false, sessionKeyValue);
+          }
+        } else {
+          processData(result, true, null);
+        }
+      }
+    })
+    .then(() => {
+      let end = Date.now() - start;
+      console.log(`milliseconds elapsed of collect fp = ${end}`);
+    });
 }
 
 function processData(result, isInject: boolean, sessionKey: string) {
