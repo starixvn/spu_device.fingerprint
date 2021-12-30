@@ -8,7 +8,9 @@ module.exports = {
   entry: './index.ts',  
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
-    fallback: {"crypto": false}
+    fallback: {
+      "crypto": false
+    }
   },
   output: {
     filename: 'gfp.js',

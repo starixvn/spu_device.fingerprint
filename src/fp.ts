@@ -3,6 +3,8 @@ import FingerprintJS, {
   UnknownComponents,
 } from "@fingerprintjs/fingerprintjs";
 
+import webglId from "./webgl";
+
 interface fpResult {
   Id: string;
   Properties: {};
@@ -65,7 +67,7 @@ async function getFontPreference(): Promise<Record<string, number>> {
     apple: font["apple"],
     serif: font["serif"],
     sans: font["sans"],
-    min: font["min"],
+    min: font["min"], 
     system: font["system"],
   };
 }
@@ -84,7 +86,9 @@ export function getDI(): Promise<fpResult> {
   let visitorId: string;
   let properties: {};
 
-  const fpPromise = FingerprintJS.load();
+  const fpPromise = FingerprintJS.load({
+    monitoring: false,
+  });
 
   return fpPromise
     .then((fp) => fp.get())

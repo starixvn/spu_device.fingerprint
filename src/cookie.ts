@@ -1,0 +1,147 @@
+import localForage from "localforage";
+import * as appConfig from "./appConfig";
+
+interface cookieResult {
+  id: number;
+  code: string;
+}
+
+function initStorage(): Promise<string[]> {
+  let localForageDrives: Array<string> = [];
+  if (isIndexDB()) {
+    localForageDrives.push(localForage.INDEXEDDB);
+  }
+
+  if (isWebSQL()) {
+    localForageDrives.push(localForage.WEBSQL);
+  }
+
+  if (isLocalStorage()) {
+    localForageDrives.push(localForage.LOCALSTORAGE);
+  }
+
+  return Promise.resolve(localForageDrives);
+}
+
+function isWebSQL(): boolean {
+  const supports_webSQL = "openDatabase" in window;
+
+  return supports_webSQL;
+}
+
+function isIndexDB(): boolean {
+  if (window.indexedDB) return true;
+  return false;
+}
+
+function isLocalStorage(): boolean {
+  if (window.localStorage) return true;
+
+  return false;
+}
+
+function setCookie(name: string, value: string, days: number) {
+  var expires = "";
+  if (days) {
+    var date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    expires = "; expires=" + date.toUTCString();
+  }
+
+  document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}
+
+function getCookie(name: string): string {
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(";");
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == " ") c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+  }
+  return null;
+}
+
+function createStorageInstance(): LocalForage[] {
+  let indexDB: LocalForage, localStorage: LocalForage, webSQL: LocalForage;
+
+  localForage
+    .ready(() => {
+      indexDB = localForage.createInstance({
+        driver: localForage.INDEXEDDB,
+        name: "INDEXEDDB-EC",
+        storeName: "ec",
+      });
+
+      localStorage = localForage.createInstance({
+        driver: localForage.LOCALSTORAGE,
+        name: "LOCALSTORAGE-EC",
+        storeName: "ec",
+      });
+
+      webSQL = localForage.createInstance({
+        driver: localForage.WEBSQL,
+        name: "WEBSQL-EC",
+        storeName: "ec",
+      });
+    })
+    .then(() => {
+      return [indexDB, webSQL, localStorage];
+    });
+
+  return [];
+}
+
+function cookieHandler(cookieValue: string): Promise<cookieResult> {
+  var value = cookieValue != null ? "/" + cookieValue : "";
+  return fetch(appConfig.apiUrl + "/getCookie" + value, {
+    method: "GET",
+    redirect: "follow",
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      return res;
+    });
+}
+
+function setStorage(name: string, value: string) {
+  initStorage().then((drivers) => {
+    drivers.forEach((drive) => {
+      var storageDriver = localForage.createInstance({
+        driver: drive,
+        name: drive + "-EC",
+        storeName: "ec",
+      });
+      storageDriver.setItem(name, value);
+    });
+  });
+}
+
+export function storageHandler(name: string): Promise<number> {
+  return initStorage()
+    .then((driver) => {
+      return driver.map(async (drive) => {
+        var storageDriver = localForage.createInstance({
+          driver: drive,
+          name: drive + "-EC",
+          storeName: "ec",
+        });
+        return await storageDriver.getItem<string>(name);
+      });
+    })
+    .then((res) => {
+      return Promise.all(res).then((cookies) => {
+        var latestCookie: string = null;
+        for (const cookie of cookies) {
+          if (cookie != null) {
+            latestCookie = cookie;
+            break;
+          }
+        }
+        return cookieHandler(latestCookie).then((result: cookieResult) => {
+          setStorage(name, result.code);
+          return result.id;
+        });
+      });
+    });
+}

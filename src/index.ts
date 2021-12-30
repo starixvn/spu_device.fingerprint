@@ -2,9 +2,11 @@ import { Encrypting, HashMD5 } from "./crypt";
 import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
 import { getDeviceInfo } from "./userAgent";
+import { storageHandler } from "./cookie";
 
 var _isDebug: boolean = false;
 var _hiddenName: string = "__sk";
+var _cookieName: string = "__fp";
 
 export function isDebug(isDebug: boolean) {
   _isDebug = isDebug;
@@ -44,32 +46,39 @@ function injectSessionKey(value: string) {
 function getFP() {
   let start = Date.now();
 
-  getDI()
-    .then((result) => {
-      if (_isDebug) {
-        console.log(result.Id);
-        console.log(result.Properties);
-      } else {
-        let sessionKeyElement = document.getElementById(_hiddenName);
-
-        if (sessionKeyElement) {
-          let sessionKeyValue = (sessionKeyElement as HTMLInputElement).value;
-
-          if (sessionKeyValue != null && sessionKeyValue != "") {
-            processData(result, false, sessionKeyValue);
-          }
+  storageHandler(_cookieName).then((cookieId) => {
+    getDI()
+      .then((result) => {
+        if (_isDebug) {
+          console.log(result.Id);
+          console.log(result.Properties);
         } else {
-          processData(result, true, null);
+          let sessionKeyElement = document.getElementById(_hiddenName);
+
+          if (sessionKeyElement) {
+            let sessionKeyValue = (sessionKeyElement as HTMLInputElement).value;
+
+            if (sessionKeyValue != null && sessionKeyValue != "") {
+              processData(result, false, sessionKeyValue, cookieId);
+            }
+          } else {
+            processData(result, true, null, cookieId);
+          }
         }
-      }
-    })
-    .then(() => {
-      let end = Date.now() - start;
-      console.log(`milliseconds elapsed of collect fp = ${end}`);
-    });
+      })
+      .then(() => {
+        let end = Date.now() - start;
+        console.log(`milliseconds elapsed of collect fp = ${end}ms`);
+      });
+  });
 }
 
-function processData(result, isInject: boolean, sessionKey: string) {
+function processData(
+  result,
+  isInject: boolean,
+  sessionKey: string,
+  cookieId: number
+) {
   getDomain()
     .then((res) => res.text())
     .then((req) => {
@@ -98,6 +107,7 @@ function processData(result, isInject: boolean, sessionKey: string) {
                   subs: appConfig.subscriberId,
                   dev: device,
                   devCode: HashMD5(device),
+                  cookieId: cookieId,
                 },
                 response.a
               );
