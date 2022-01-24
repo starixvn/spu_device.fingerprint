@@ -5,7 +5,6 @@ import { getDeviceInfo } from "./userAgent";
 import { storageHandler } from "./cookie";
 
 var _isDebug: boolean = false;
-var _hiddenName: string = "__sk";
 var _cookieName: string = "__fp";
 
 export function isDebug(isDebug: boolean) {
@@ -13,8 +12,12 @@ export function isDebug(isDebug: boolean) {
   return this;
 }
 
-export function config(apiUrl: string, subscriberId: number) {
-  appConfig.set(apiUrl, subscriberId);
+export function config(
+  apiUrl: string,
+  subscriberId: string,
+  sessionKey: string
+) {
+  appConfig.set(apiUrl, subscriberId, sessionKey);
 }
 
 const promiseAny = async <T>(
@@ -32,17 +35,6 @@ const promiseAny = async <T>(
   );
 };
 
-function injectSessionKey(value: string) {
-  var container = document.forms[0] || document.body;
-  var fkInput = document.createElement("input");
-  fkInput.setAttribute("type", "hidden");
-  fkInput.setAttribute("name", _hiddenName);
-  fkInput.setAttribute("id", _hiddenName);
-  fkInput.setAttribute("value", value);
-
-  container.appendChild(fkInput);
-}
-
 function getFP() {
   let start = Date.now();
 
@@ -53,17 +45,7 @@ function getFP() {
           console.log(result.Id);
           console.log(result.Properties);
         } else {
-          let sessionKeyElement = document.getElementById(_hiddenName);
-
-          if (sessionKeyElement) {
-            let sessionKeyValue = (sessionKeyElement as HTMLInputElement).value;
-
-            if (sessionKeyValue != null && sessionKeyValue != "") {
-              processData(result, false, sessionKeyValue, cookieId);
-            }
-          } else {
-            processData(result, true, null, cookieId);
-          }
+          processData(result, appConfig.sessionKey, cookieId);
         }
       })
       .then(() => {
@@ -73,12 +55,7 @@ function getFP() {
   });
 }
 
-function processData(
-  result,
-  isInject: boolean,
-  sessionKey: string,
-  cookieId: number
-) {
+function processData(result, sessionKey: string, cookieId: number) {
   getDomain()
     .then((res) => res.text())
     .then((req) => {
@@ -103,7 +80,7 @@ function processData(
                 {
                   di: result.Id,
                   attr: result.Properties,
-                  fk: isInject ? response.c : sessionKey,
+                  fk: sessionKey,
                   subs: appConfig.subscriberId,
                   dev: device,
                   devCode: HashMD5(device),
@@ -111,11 +88,7 @@ function processData(
                 },
                 response.a
               );
-              postData(url, encryptedFP, response.b).then((data) => {
-                if (data.ok && isInject) {
-                  injectSessionKey(response.c);
-                }
-              });
+              postData(url, encryptedFP, response.b);
             }
           });
         }

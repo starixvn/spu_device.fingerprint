@@ -8,6 +8,7 @@ interface cookieResult {
 
 function initStorage(): Promise<string[]> {
   let localForageDrives: Array<string> = [];
+
   if (isIndexDB()) {
     localForageDrives.push(localForage.INDEXEDDB);
   }
@@ -24,9 +25,9 @@ function initStorage(): Promise<string[]> {
 }
 
 function isWebSQL(): boolean {
-  const supports_webSQL = "openDatabase" in window;
+  if (!window.openDatabase) return false;
 
-  return supports_webSQL;
+  return true;
 }
 
 function isIndexDB(): boolean {
@@ -62,36 +63,6 @@ function getCookie(name: string): string {
   return null;
 }
 
-function createStorageInstance(): LocalForage[] {
-  let indexDB: LocalForage, localStorage: LocalForage, webSQL: LocalForage;
-
-  localForage
-    .ready(() => {
-      indexDB = localForage.createInstance({
-        driver: localForage.INDEXEDDB,
-        name: "INDEXEDDB-EC",
-        storeName: "ec",
-      });
-
-      localStorage = localForage.createInstance({
-        driver: localForage.LOCALSTORAGE,
-        name: "LOCALSTORAGE-EC",
-        storeName: "ec",
-      });
-
-      webSQL = localForage.createInstance({
-        driver: localForage.WEBSQL,
-        name: "WEBSQL-EC",
-        storeName: "ec",
-      });
-    })
-    .then(() => {
-      return [indexDB, webSQL, localStorage];
-    });
-
-  return [];
-}
-
 function cookieHandler(cookieValue: string): Promise<cookieResult> {
   var value = cookieValue != null ? "/" + cookieValue : "";
   return fetch(appConfig.apiUrl + "/getCookie" + value, {
@@ -112,7 +83,15 @@ function setStorage(name: string, value: string) {
         name: drive + "-EC",
         storeName: "ec",
       });
-      storageDriver.setItem(name, value);
+
+      storageDriver
+        .setItem(name, value, () => {})
+        .then(console.log)
+        .catch((e) => {
+          console.log(e.message);
+        });
+
+      setCookie(name, value, 30);
     });
   });
 }
@@ -120,14 +99,18 @@ function setStorage(name: string, value: string) {
 export function storageHandler(name: string): Promise<number> {
   return initStorage()
     .then((driver) => {
-      return driver.map(async (drive) => {
+      var cookies = driver.map(async (drive) => {
         var storageDriver = localForage.createInstance({
           driver: drive,
           name: drive + "-EC",
           storeName: "ec",
         });
-        return await storageDriver.getItem<string>(name);
+        return await storageDriver.getItem<string>(name, () => {});
       });
+
+      cookies.push(Promise.resolve(getCookie(name)));
+
+      return cookies;
     })
     .then((res) => {
       return Promise.all(res).then((cookies) => {
@@ -138,6 +121,7 @@ export function storageHandler(name: string): Promise<number> {
             break;
           }
         }
+
         return cookieHandler(latestCookie).then((result: cookieResult) => {
           setStorage(name, result.code);
           return result.id;

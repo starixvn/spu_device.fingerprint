@@ -9407,9 +9407,11 @@ var globalFP = (function (exports) {
 
     var apiUrl = "__apiUrl__";
     var subscriberId = "__subscriberId__";
-    function set(appAPIUrl, subscriber) {
-        apiUrl = appAPIUrl;
-        subscriberId = subscriber.toString();
+    var sessionKey = "__sessionKey__";
+    function set(appAPIUrl, subscriber, sessionKey) {
+        this.apiUrl = appAPIUrl;
+        this.subscriberId = subscriber;
+        this.sessionKey = sessionKey;
     }
 
     var uaParser = {exports: {}};
@@ -13174,6 +13176,9 @@ var globalFP = (function (exports) {
 
     function initStorage() {
         let localForageDrives = [];
+        // localForageDrives.push(localForage.INDEXEDDB);
+        // localForageDrives.push(localForage.WEBSQL);
+        // localForageDrives.push(localForage.LOCALSTORAGE);
         if (isIndexDB()) {
             localForageDrives.push(localForage.INDEXEDDB);
         }
@@ -13186,8 +13191,9 @@ var globalFP = (function (exports) {
         return Promise.resolve(localForageDrives);
     }
     function isWebSQL() {
-        const supports_webSQL = "openDatabase" in window;
-        return supports_webSQL;
+        if (!window.openDatabase)
+            return false;
+        return true;
     }
     function isIndexDB() {
         if (window.indexedDB)
@@ -13198,6 +13204,27 @@ var globalFP = (function (exports) {
         if (window.localStorage)
             return true;
         return false;
+    }
+    function setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(";");
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == " ")
+                c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0)
+                return c.substring(nameEQ.length, c.length);
+        }
+        return null;
     }
     function cookieHandler(cookieValue) {
         var value = cookieValue != null ? "/" + cookieValue : "";
@@ -13218,21 +13245,29 @@ var globalFP = (function (exports) {
                     name: drive + "-EC",
                     storeName: "ec",
                 });
-                storageDriver.setItem(name, value);
+                storageDriver
+                    .setItem(name, value, () => { })
+                    .then(console.log)
+                    .catch((e) => {
+                    console.log(e.message);
+                });
+                setCookie(name, value, 30);
             });
         });
     }
     function storageHandler(name) {
         return initStorage()
             .then((driver) => {
-            return driver.map((drive) => __awaiter(this, void 0, void 0, function* () {
+            var cookies = driver.map((drive) => __awaiter(this, void 0, void 0, function* () {
                 var storageDriver = localForage.createInstance({
                     driver: drive,
                     name: drive + "-EC",
                     storeName: "ec",
                 });
-                return yield storageDriver.getItem(name);
+                return yield storageDriver.getItem(name, () => { });
             }));
+            cookies.push(Promise.resolve(getCookie(name)));
+            return cookies;
         })
             .then((res) => {
             return Promise.all(res).then((cookies) => {
@@ -13252,29 +13287,28 @@ var globalFP = (function (exports) {
     }
 
     var _isDebug = false;
-    var _hiddenName = "__sk";
     var _cookieName = "__fp";
     function isDebug(isDebug) {
         _isDebug = isDebug;
         return this;
     }
-    function config(apiUrl, subscriberId) {
-        set(apiUrl, subscriberId);
+    function config(apiUrl, subscriberId, sessionKey) {
+        set(apiUrl, subscriberId, sessionKey);
     }
     const promiseAny = (iterable) => __awaiter(void 0, void 0, void 0, function* () {
         return Promise.all([...iterable].map((promise) => {
             return new Promise((resolve, reject) => Promise.resolve(promise).then(reject, resolve));
         })).then((errors) => Promise.reject(errors), (value) => Promise.resolve(value));
     });
-    function injectSessionKey(value) {
-        var container = document.forms[0] || document.body;
-        var fkInput = document.createElement("input");
-        fkInput.setAttribute("type", "hidden");
-        fkInput.setAttribute("name", _hiddenName);
-        fkInput.setAttribute("id", _hiddenName);
-        fkInput.setAttribute("value", value);
-        container.appendChild(fkInput);
-    }
+    // function injectSessionKey(value: string) {
+    //   var container = document.forms[0] || document.body;
+    //   var fkInput = document.createElement("input");
+    //   fkInput.setAttribute("type", "hidden");
+    //   fkInput.setAttribute("name", _hiddenName);
+    //   fkInput.setAttribute("id", _hiddenName);
+    //   fkInput.setAttribute("value", value);
+    //   container.appendChild(fkInput);
+    // }
     function getFP() {
         let start = Date.now();
         storageHandler(_cookieName).then((cookieId) => {
@@ -13285,16 +13319,7 @@ var globalFP = (function (exports) {
                     console.log(result.Properties);
                 }
                 else {
-                    let sessionKeyElement = document.getElementById(_hiddenName);
-                    if (sessionKeyElement) {
-                        let sessionKeyValue = sessionKeyElement.value;
-                        if (sessionKeyValue != null && sessionKeyValue != "") {
-                            processData(result, false, sessionKeyValue, cookieId);
-                        }
-                    }
-                    else {
-                        processData(result, true, null, cookieId);
-                    }
+                    processData(result, sessionKey, cookieId);
                 }
             })
                 .then(() => {
@@ -13303,7 +13328,7 @@ var globalFP = (function (exports) {
             });
         });
     }
-    function processData(result, isInject, sessionKey, cookieId) {
+    function processData(result, sessionKey, cookieId) {
         getDomain()
             .then((res) => res.text())
             .then((req) => {
@@ -13325,17 +13350,13 @@ var globalFP = (function (exports) {
                             let encryptedFP = Encrypting({
                                 di: result.Id,
                                 attr: result.Properties,
-                                fk: isInject ? response.c : sessionKey,
+                                fk: sessionKey,
                                 subs: subscriberId,
                                 dev: device,
                                 devCode: HashMD5(device),
                                 cookieId: cookieId,
                             }, response.a);
-                            postData(url, encryptedFP, response.b).then((data) => {
-                                if (data.ok && isInject) {
-                                    injectSessionKey(response.c);
-                                }
-                            });
+                            postData(url, encryptedFP, response.b);
                         }
                     }));
                 }
