@@ -1,93 +1,86 @@
-import { IOS, IResult, UAParser } from "ua-parser-js";
-
-interface UAResult extends IResult {
+interface UAResult {
+  ua: string;
   isDesktop: boolean;
   isMobile: boolean;
 }
 
 export function getDeviceInfo(): UAResult {
-  const parser = new UAParser();
-  const result = parser.getResult();
+  const userAgent = navigator.userAgent;
 
   const isMobile =
-    isMobileAndroid(result.ua) ||
-    isMobileBlackBerry(result.ua) ||
-    isMobileIOS(result.ua) ||
-    isMobileOpera(result.ua) ||
-    isMobileWindows(result.ua);
+    isMobileAndroid(userAgent) ||
+    isMobileBlackBerry(userAgent) ||
+    isMobileIOS(userAgent) ||
+    isMobileOpera(userAgent) ||
+    isMobileWindows(userAgent);
 
   const isDesktop =
-    isWindows(result.os) ||
-    isMac(result.os) ||
-    isLinux(result.os) ||
-    isSolaris(result.os) ||
-    isUbuntu(result.os);
+    isWindows(userAgent) ||
+    isMac(userAgent) ||
+    isLinux(userAgent) ||
+    isSolaris(userAgent) ||
+    isUbuntu(userAgent);
 
   return {
-    ua: result.ua,
-    device: result.device,
-    browser: result.browser,
-    engine: result.engine,
-    os: result.os,
-    cpu: result.cpu,
+    ua: userAgent,
     isMobile: isMobile,
     isDesktop: isDesktop,
   };
 }
 
-function isWindows(os: IOS): boolean {
-  return /Windows/i.test(os.name);
+function isWindows(userAgent: string): boolean {
+  return /Windows/i.test(userAgent);
 }
 
-function isMac(os: IOS): boolean {
-  return /Mac/i.test(os.name);
+function isMac(userAgent: string): boolean {
+  return /Mac/i.test(userAgent);
 }
 
-function isLinux(os: IOS): boolean {
-  return /Linux/i.test(os.name);
+function isLinux(userAgent: string): boolean {
+  return /Linux/i.test(userAgent);
 }
 
-function isSolaris(os: IOS): boolean {
-  return /Solaris/i.test(os.name);
+function isSolaris(userAgent: string): boolean {
+  return /Solaris/i.test(userAgent);
 }
 
-function isUbuntu(os: IOS): boolean {
-  return /Ubuntu/i.test(os.name);
+function isUbuntu(userAgent: string): boolean {
+  return /Ubuntu/i.test(userAgent);
 }
 
-function isMobileAndroid(ua: string): boolean {
-  if (ua.match(/Android/i)) {
+function isMobileAndroid(userAgent: string): boolean {
+  if (userAgent.match(/Android/i)) {
     return true;
   }
   return false;
 }
 
-function isMobileOpera(ua: string): boolean {
-  if (ua.match(/Opera Mini/i)) {
+function isMobileOpera(userAgent: string): boolean {
+  if (userAgent.match(/Opera Mini/i)) {
     return true;
   }
   return false;
 }
 
 // Is Mobile Windows.  Check if the browser is on a windows mobile device.
-function isMobileWindows(ua: string): boolean {
-  if (ua.match(/IEMobile/i)) {
+function isMobileWindows(userAgent: string): boolean {
+  if (userAgent.match(/IEMobile/i)) {
     return true;
   }
   return false;
 }
 
 // Is Mobile BlackBerry.  Check if the browser is on a blackberry mobile device.
-function isMobileBlackBerry(ua: string): boolean {
-  if (ua.match(/BlackBerry/i)) {
+function isMobileBlackBerry(userAgent: string): boolean {
+  if (userAgent.match(/BlackBerry/i)) {
     return true;
   }
   return false;
 }
 
 // Is Mobile iOS.  Check if the browser is on an Apple iOS device.
-function isMobileIOS(ua: string): boolean {
-  if (ua.match(/iPhone|iPad|iPod/i)) {
+function isMobileIOS(userAgent: string): boolean {
+  if (userAgent.match(/iPhone|iPad|iPod/i)) {
     return true;
   }
   return false;
