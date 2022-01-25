@@ -2,6 +2,7 @@ interface UAResult {
   ua: string;
   isDesktop: boolean;
   isMobile: boolean;
+  isOther: boolean;
 }
 
 export function getDeviceInfo(): UAResult {
@@ -24,7 +25,8 @@ export function getDeviceInfo(): UAResult {
   return {
     ua: userAgent,
     isMobile: isMobile,
-    isDesktop: isDesktop,
+    isDesktop: isMobile ? false : isDesktop,
+    isOther: isMobile || isDesktop ? false : true,
   };
 }
 
