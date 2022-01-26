@@ -12,23 +12,19 @@
   "license": "ISC",
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^3.3.1",
-    "@types/ua-parser-js": "^0.7.36",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
-    "crypto-js": "^4.1.1",
     "device-detector-js": "^3.0.0",
     "localforage": "^1.10.0",
     "localforage-driver-memory": "^1.0.5",
     "ts-loader": "^9.2.6",
-    "typescript": "^4.4.4",
-    "ua-parser-js": "^1.0.2"
+    "typescript": "^4.4.4"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.0.6",
     "@rollup/plugin-typescript": "^8.3.0",
-    "@types/crypto-js": "^4.0.2",
     "@types/node": "^16.11.1",
     "clean-webpack-plugin": "^4.0.0",
     "html-webpack-plugin": "^5.5.0",

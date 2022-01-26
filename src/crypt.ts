@@ -1,4 +1,4 @@
-import CryptoJS from "crypto-js";
+import CryptoJS from "../override/crypto-js";
 
 export function Encrypting(data: {}, key: string): string {
   var iv = CryptoJS.enc.Hex.parse("c3eef06037e837f4ee390bda69c05023");
