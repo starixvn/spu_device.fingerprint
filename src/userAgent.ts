@@ -5,6 +5,21 @@ interface UAResult {
   isOther: boolean;
 }
 
+const flaggedEnum = {
+  HUMAN: 0,
+  BOT_HEADLESS_CHROME: 1
+};
+
+export function checkHeadless() {
+  const userAgent = navigator.userAgent;
+  let isBot = isHeadlessChrome(userAgent);
+  return isBot ? flaggedEnum.BOT_HEADLESS_CHROME : flaggedEnum.HUMAN;
+}
+
+function isHeadlessChrome(userAgent: string): boolean {
+  return /HeadlessChrome/i.test(userAgent);
+}
+
 export function getDeviceInfo(): UAResult {
   const userAgent = navigator.userAgent;
 

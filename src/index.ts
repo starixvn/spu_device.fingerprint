@@ -1,7 +1,7 @@
 import { Encrypting, HashMD5 } from "./crypt";
 import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
-import { getDeviceInfo } from "./userAgent";
+import { getDeviceInfo, checkHeadless } from "./userAgent";
 import { storageHandler } from "./cookie";
 
 var _isDebug: boolean = false;
@@ -75,6 +75,7 @@ function processData(result, sessionKey: string, cookieId: number) {
             if (conf.ok) {
               const response = await conf.json();
               const deviceInfo = getDeviceInfo();
+              const flagged = checkHeadless();
               const device = JSON.stringify(deviceInfo);
               let encryptedFP = Encrypting(
                 {
@@ -85,6 +86,7 @@ function processData(result, sessionKey: string, cookieId: number) {
                   dev: device,
                   devCode: HashMD5(device),
                   cookieId: cookieId,
+                  flagged: flagged
                 },
                 response.a
               );
