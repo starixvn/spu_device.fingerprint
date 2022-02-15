@@ -25,18 +25,31 @@ function initStorage(): Promise<string[]> {
 }
 
 function isWebSQL(): boolean {
-  if (!window.openDatabase) return false;
+  try {
+    if (!window.openDatabase) return false;
+  } catch {
+    return false;
+  }
 
   return true;
 }
 
 function isIndexDB(): boolean {
-  if (window.indexedDB) return true;
+  try {
+    if (window.indexedDB) return true;
+  } catch {
+    return false;
+  }
+
   return false;
 }
 
 function isLocalStorage(): boolean {
-  if (window.localStorage) return true;
+  try {
+    if (window.localStorage) return true;
+  } catch {
+    return false;
+  }
 
   return false;
 }
@@ -100,12 +113,18 @@ export function storageHandler(name: string): Promise<number> {
   return initStorage()
     .then((driver) => {
       var cookies = driver.map(async (drive) => {
-        var storageDriver = localForage.createInstance({
-          driver: drive,
-          name: drive + "-EC",
-          storeName: "ec",
-        });
-        return await storageDriver.getItem<string>(name, () => {});
+        if (drive != null) {
+          try {
+            var storageDriver = localForage.createInstance({
+              driver: drive,
+              name: drive + "-EC",
+              storeName: "ec",
+            });
+            return await storageDriver.getItem<string>(name, () => {});
+          } catch {
+            return Promise.resolve(null);
+          }
+        }
       });
 
       cookies.push(Promise.resolve(getCookie(name)));
@@ -116,6 +135,7 @@ export function storageHandler(name: string): Promise<number> {
       return Promise.all(res).then((cookies) => {
         var latestCookie: string = null;
         for (const cookie of cookies) {
+          console.log(cookie);
           if (cookie != null) {
             latestCookie = cookie;
             break;
