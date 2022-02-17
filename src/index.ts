@@ -72,6 +72,7 @@ function processData(result, sessionKey: string, cookieId: number) {
           devCode: HashMD5(device),
           cookieId: cookieId,
           flagged: flagged,
+          url: window.location && window.location.origin ? `${window.location.origin}/` : ''
         },
         response.a
       );
