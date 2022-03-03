@@ -1,11 +1,6 @@
 import localForage from "localforage";
 import * as appConfig from "./appConfig";
 
-interface cookieResult {
-  id: number;
-  code: string;
-}
-
 function initStorage(): Promise<string[]> {
   let localForageDrives: Array<string> = [];
 
@@ -76,46 +71,26 @@ function getCookie(name: string): string {
   return null;
 }
 
-function cookieHandler(cookieValue: string): Promise<cookieResult> {
-  let CookieResult: cookieResult | PromiseLike<cookieResult>;
-  if(isGuid(cookieValue)){
-    CookieResult = {
-      id: null,
-      code: cookieValue
-    } as cookieResult;
-  }
-  else {
-    const uuid = generateUUID();
-    CookieResult = {
-      id: null,
-      code: uuid
-    } as cookieResult;
-  }
-
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(CookieResult);
-    }, 300);
+function cookieHandler(cookieCode: string): Promise<string> {
+  return new Promise((resolve) => {
+    resolve(isGuid(cookieCode) ? cookieCode : generateUUID());
   });
 }
 
-function isGuid(cookieValue: string) {
-  if (cookieValue === "{") {
-    cookieValue = cookieValue.substring(1, cookieValue.length - 1);
-  }
+function isGuid(cookieCode: string) {
   var regexGuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return regexGuid.test(cookieValue);
+  return regexGuid.test(cookieCode);
 }
 
-function generateUUID() { // Public Domain/MIT
-  var d = new Date().getTime();//Timestamp
-  var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+function generateUUID() {   // Public Domain/MIT
+  var d = new Date().getTime();   //Timestamp
+  var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;    //Time in microseconds since page-load or 0 if unsupported
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16;//random number between 0 and 16
-      if(d > 0){//Use timestamp until depleted
+      var r = Math.random() * 16;   //random number between 0 and 16
+      if(d > 0){  //Use timestamp until depleted
           r = (d + r)%16 | 0;
           d = Math.floor(d/16);
-      } else {//Use microseconds since page-load if supported
+      } else {  //Use microseconds since page-load if supported
           r = (d2 + r)%16 | 0;
           d2 = Math.floor(d2/16);
       }
@@ -124,7 +99,6 @@ function generateUUID() { // Public Domain/MIT
 }
 
 function setStorage(name: string, value: string) {
-  console.log('setStorage', value);
   initStorage().then((drivers) => {
     drivers.forEach((drive) => {
       var storageDriver = localForage.createInstance({
@@ -145,7 +119,7 @@ function setStorage(name: string, value: string) {
   });
 }
 
-export function storageHandler(name: string): Promise<number> {
+export function storageHandler(name: string): Promise<string> {
   return initStorage()
     .then((driver) => {
       var cookies = driver.map(async (drive) => {
@@ -176,9 +150,9 @@ export function storageHandler(name: string): Promise<number> {
           }
         }
 
-        return cookieHandler(latestCookie).then((result: cookieResult) => {
-          setStorage(name, result.code);
-          return result.id;
+        return cookieHandler(latestCookie).then((cookieValue: string) => {
+          setStorage(name, cookieValue);
+          return cookieValue;
         });
       });
     });

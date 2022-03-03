@@ -38,14 +38,14 @@ const promiseAny = async <T>(
 function getFP() {
   let start = Date.now();
 
-  storageHandler(_cookieName).then((cookieId) => {
+  storageHandler(_cookieName).then((cookieCode) => {
     getDI()
       .then((result) => {
         if (_isDebug) {
           console.log(result.Id);
           console.log(result.Properties);
         } else {
-          processData(result, appConfig.sessionKey, cookieId);
+          processData(result, appConfig.sessionKey, cookieCode);
         }
       })
       .then(() => {
@@ -55,7 +55,7 @@ function getFP() {
   });
 }
 
-function processData(result, sessionKey: string, cookieId: number) {
+function processData(result, sessionKey: string, cookieCode: string) {
   getConfig(appConfig.apiUrl).then(async (conf) => {
     if (conf.ok) {
       const response = await conf.json();
@@ -70,7 +70,7 @@ function processData(result, sessionKey: string, cookieId: number) {
           subs: appConfig.subscriberId,
           dev: device,
           devCode: HashMD5(device),
-          cookieId: cookieId,
+          cookieCode: cookieCode,
           flagged: flagged,
           url: window.location && window.location.origin ? `${window.location.origin}/` : ''
         },

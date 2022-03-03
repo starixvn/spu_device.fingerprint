@@ -3194,33 +3194,14 @@ function getCookie(name) {
     }
     return null;
 }
-function cookieHandler(cookieValue) {
-    let CookieResult;
-    if (isGuid(cookieValue)) {
-        CookieResult = {
-            id: null,
-            code: cookieValue
-        };
-    }
-    else {
-        const uuid = generateUUID();
-        CookieResult = {
-            id: null,
-            code: uuid
-        };
-    }
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve(CookieResult);
-        }, 300);
+function cookieHandler(cookieCode) {
+    return new Promise((resolve) => {
+        resolve(isGuid(cookieCode) ? cookieCode : generateUUID());
     });
 }
-function isGuid(cookieValue) {
-    if (cookieValue === "{") {
-        cookieValue = cookieValue.substring(1, cookieValue.length - 1);
-    }
+function isGuid(cookieCode) {
     var regexGuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    return regexGuid.test(cookieValue);
+    return regexGuid.test(cookieCode);
 }
 function generateUUID() {
     var d = new Date().getTime(); //Timestamp
@@ -3239,7 +3220,6 @@ function generateUUID() {
     });
 }
 function setStorage(name, value) {
-    console.log('setStorage', value);
     initStorage().then((drivers) => {
         drivers.forEach((drive) => {
             var storageDriver = localForage__default["default"].createInstance({
@@ -3287,9 +3267,9 @@ function storageHandler(name) {
                     break;
                 }
             }
-            return cookieHandler(latestCookie).then((result) => {
-                setStorage(name, result.code);
-                return result.id;
+            return cookieHandler(latestCookie).then((cookieValue) => {
+                setStorage(name, cookieValue);
+                return cookieValue;
             });
         });
     });
@@ -3306,7 +3286,7 @@ function config(apiUrl, subscriberId, sessionKey) {
 }
 function getFP() {
     let start = Date.now();
-    storageHandler(_cookieName).then((cookieId) => {
+    storageHandler(_cookieName).then((cookieCode) => {
         getDI()
             .then((result) => {
             if (_isDebug) {
@@ -3314,7 +3294,7 @@ function getFP() {
                 console.log(result.Properties);
             }
             else {
-                processData(result, sessionKey, cookieId);
+                processData(result, sessionKey, cookieCode);
             }
         })
             .then(() => {
@@ -3323,7 +3303,7 @@ function getFP() {
         });
     });
 }
-function processData(result, sessionKey, cookieId) {
+function processData(result, sessionKey, cookieCode) {
     getConfig(apiUrl).then((conf) => __awaiter(this, void 0, void 0, function* () {
         if (conf.ok) {
             const response = yield conf.json();
@@ -3337,7 +3317,7 @@ function processData(result, sessionKey, cookieId) {
                 subs: subscriberId,
                 dev: device,
                 devCode: HashMD5(device),
-                cookieId: cookieId,
+                cookieCode: cookieCode,
                 flagged: flagged,
                 url: window.location && window.location.origin ? `${window.location.origin}/` : ''
             }, response.a);
