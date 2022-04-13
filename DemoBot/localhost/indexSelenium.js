@@ -3,8 +3,20 @@ const firefox = require('selenium-webdriver/firefox');
 
 (async function example() {
   const options = new firefox.Options();
-  options.headless();
-  //options.addArguments('--user-agent="Mozilla/4.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.11 Safari/537.36"');
+  options.addArguments(
+    "--verbose",
+    "--disable-web-security",
+    "--ignore-certificate-errors",
+    "--allow-running-insecure-content",
+    "--allow-insecure-localhost",
+    "--no-sandbox",
+    "--disable-gpu"
+   );
+   // options.headless();
+   // options.addArguments("headless");
+  // options.addArguments("no-sandbox");
+  // options.addArguments("window-size=1200x600");
+  // options.addArguments("user-agent=ABC");
   let driver = await new Builder().forBrowser('firefox')
               .setFirefoxOptions(options)
               .build();
