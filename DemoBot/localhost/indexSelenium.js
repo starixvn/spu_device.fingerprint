@@ -1,7 +1,13 @@
-const {Builder, By, Key, until} = require('selenium-webdriver');
+const {Builder, By, promise, Capabilities} = require('selenium-webdriver');
+const firefox = require('selenium-webdriver/firefox');
 
 (async function example() {
-  let driver = await new Builder().forBrowser('firefox').build();
+  const options = new firefox.Options();
+  options.headless();
+  //options.addArguments('--user-agent="Mozilla/4.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.11 Safari/537.36"');
+  let driver = await new Builder().forBrowser('firefox')
+              .setFirefoxOptions(options)
+              .build();
   try {
     await driver.get('http://localhost:44392/Login');
 
@@ -9,24 +15,8 @@ const {Builder, By, Key, until} = require('selenium-webdriver');
     driver.findElement(By.name("Password")).sendKeys("1234aa");
 
     driver.findElement(By.className("btn btn-default")).click();
-
-    // const expected_title = "Home Page - My ASP.NET Application";
-    // const actual_title = driver.getTitle();
-
-    // // Check successfully
-    // if (expected_title == actual_title) {
-    //   console.log("Login Successfull!");
-    // }
-    // else{
-    //   console.log('actual_title', actual_title);
-    //   console.log("Login Failed!");
-    // }
-
-    // await driver.manage().setTimeouts( { implicit: 5000 } );
-    //driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-
   } finally {
-    // driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-    // await driver.quit();
+    await promise.delayed(3000);
+    await driver.quit();
   }
 })();
