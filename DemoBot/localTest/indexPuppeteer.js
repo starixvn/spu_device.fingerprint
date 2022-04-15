@@ -1,6 +1,9 @@
 const puppeteer = require('puppeteer');
+const {arrayUA} = require('../Constant/ListUserAgent');
+const {arrayUrlLocalTest} = require('../Constant/ListUrl');
 
 async function getBunnies() {
+
     const browser = await puppeteer.launch({
         headless: false,
         defaultViewport: null
@@ -8,8 +11,7 @@ async function getBunnies() {
         // executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
         // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
     });
-    const url = "http://ha.nexdev.net:7402/Local07/";
-    const urlAgentList = "http://ha.nexdev.net:7409/ex-main/_Transfer/Master/AgentList.aspx";
+    const url = "https://alpha.nexdev.net/Local07/";
     
     const page = await browser.newPage();
     await page.goto(url);
@@ -19,15 +21,22 @@ async function getBunnies() {
 
     await page.waitForSelector("#txtPassWord");
     await page.type("#txtPassWord", "1234aaAA", {});  
-    
-    await page.setUserAgent("Mozilla/5.1 Puppeteer (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.7113.93 Safari/537.36");
 
+    var ua = arrayUA[Math.floor(Math.random()*arrayUA.length)];    
+    await page.setUserAgent(ua);
+      
     await page.click('.btnLogin');
     await page.waitForNavigation('networkidle2');
 
     const title = await page.title();
+    
     if(title == "Home"){
-        await page.goto(urlAgentList);
+
+        var redirectUrl = arrayUrlLocalTest[Math.floor(Math.random()*arrayUrlLocalTest.length)];
+        await page.goto(redirectUrl);
+
+        await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', {get: () => false}))
+
     }
 
     // setTimeout(() => { browser.close(); }, 3000);

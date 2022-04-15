@@ -3,35 +3,37 @@ const {
     firefox,
     chromium
   } = require('playwright');
+
+const {arrayUA} = require('../Constant/ListUserAgent');
+const {arrayUrlLocalhost} = require('../Constant/ListUrl');
   
-  
-// let page, browser, context;
 const url = 'http://localhost:44392/Login';
-// beforeEach(async () => {
-//     browser = await engine.launch({ headless: false });
-//     context = await browser.newContext();
-//     page = await context.newPage(url);
-// })
 
-  const simulate = async (engine) => {
-  
-    const browser = await engine.launch({ headless: false });
-    const context = await browser.newContext({
-        userAgent: 'my-user-agent'
-      });
-    const page = await context.newPage();
-  
-    await page.goto(url);
-    await page.fill('input[name="Username"]', "test");
-    await page.fill('input[name="Password"]', "1234aa");
-    await page.locator('button').click();
+const simulate = async (engine) => {
 
-    console.log(await page.evaluate(() => navigator.userAgent));
-    await page.waitForTimeout(5000);
+  const browser = await engine.launch({ headless: false, viewport: null });
+  const ua = arrayUA[Math.floor(Math.random()*arrayUA.length)];   
+
+  const context = await browser.newContext({
+      userAgent: ua
+    });
+  const page = await context.newPage();
+
+  await page.goto(url);
+  await page.fill('input[name="Username"]', "test");
+  await page.fill('input[name="Password"]', "1234aa");
+  await page.locator('button').click();
   
-    await browser.close();
-  };
+  var redirectUrl = arrayUrlLocalhost[Math.floor(Math.random()*arrayUrlLocalhost.length)];
+  await page.goto(redirectUrl);
   
-  simulate(firefox)
-//   simulate(webkit)
-//   simulate(chromium)
+  await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', {get: () => false}));
+
+  // await page.waitForTimeout(5000);
+
+  // await browser.close();
+};
+  
+  simulate(firefox);
+  simulate(webkit)
+  simulate(chromium)
