@@ -4,6 +4,9 @@ async function execute(browser) {
     const {arrayUrlLocalhost} = require('../Constant/ListUrl');
     const driver = await new Builder().forBrowser(browser).build();
 
+    var js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})";
+    driver.executeScript(js);
+
     await driver.get('http://localhost:44392/Login');
 
     driver.findElement(By.name("Username")).sendKeys("test");

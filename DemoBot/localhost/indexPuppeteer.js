@@ -21,6 +21,8 @@ async function getBunnies() {
 
     await page.waitForSelector("#Password");
     await page.type("#Password", "1234aa", {});  
+        
+    await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', {get: () => false}))
 
     var ua = arrayUA[Math.floor(Math.random()*arrayUA.length)];    
     await page.setUserAgent(ua);
