@@ -1,35 +1,38 @@
-const {Builder, By, promise, Capabilities, until} = require('selenium-webdriver');
-const firefox = require('selenium-webdriver/firefox');
-const {arrayUrlLocalTest} = require('../Constant/ListUrl');
+const { Builder, By, until } = require('selenium-webdriver');
 
-(async function example() {
-  const options = new firefox.Options();
-  //options.headless();
-  let driver = await new Builder().forBrowser('firefox')
-              .setFirefoxOptions(options)
-              .build();
+// WEB DRIVER
+// Opera
+// https://github.com/operasoftware/operachromiumdriver/releases
+// Firefox
+// https://github.com/mozilla/geckodriver/releases
+// Chrome
+// http://chromedriver.chromium.org/downloads
+// Internet Explorer
+// https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver
+// Microsoft Edge
+// https://blogs.windows.com/msedgedev/2015/07/23/bringing-automated-testing-to-microsoft-edge-through-webdriver/
 
-  const url = "https://alpha.nexdev.net/Local07/";
+async function execute(browser) {
+    const {arrayUrlLocalTest} = require('../Constant/ListUrl');
+    const driver = await new Builder().forBrowser(browser).build();
 
-  try {
-    
-    await driver.get(url);
+    await driver.get('https://alpha.nexdev.net/Local07/');
 
     driver.findElement(By.name("txtUserName")).sendKeys("sutest01");
     driver.findElement(By.name("txtPassWord")).sendKeys("1234aaAA");
 
     driver.findElement(By.className("btnLogin")).click();
 
-    await driver.wait(until.titleIs('Home'), 100);
+    await driver.wait(until.titleIs('Home'), 1000);
 
     var redirectUrl = arrayUrlLocalTest[Math.floor(Math.random()*arrayUrlLocalTest.length)];
     await driver.get(redirectUrl);
 
     var js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})";
     driver.executeScript(js);
+};
 
-  } finally {
-    // await promise.delayed(3000);
-    // await driver.quit();
-  }
-})();
+// execute('firefox');
+// execute('MicrosoftEdge');
+// execute('chrome');
+execute('opera');

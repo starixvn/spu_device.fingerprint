@@ -25,8 +25,10 @@ async function getBunnies() {
     var ua = arrayUA[Math.floor(Math.random()*arrayUA.length)];    
     await page.setUserAgent(ua);
       
-    await page.click('.btnLogin');
-    await page.waitForNavigation('networkidle2');
+    await Promise.all([
+        page.waitForNavigation(),
+        page.click('.btn.btn-default')
+    ]);
 
     const title = await page.title();
     

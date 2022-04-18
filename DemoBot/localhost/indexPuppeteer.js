@@ -5,14 +5,15 @@ const {arrayUrlLocalhost} = require('../Constant/ListUrl');
 async function getBunnies() {
     const browser = await puppeteer.launch({
         headless: false,
-        defaultViewport: null
-        // product: 'firefox'
+        defaultViewport: null,
+        product: 'chrome' // chrome, firefox
         // executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
         // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
     });
     const url = "http://localhost:44392/Login";
 
-    const page = await browser.newPage();
+    const context = await browser.createIncognitoBrowserContext();
+    const page = await context.newPage();
     await page.goto(url);
 
     await page.waitForSelector("#Username");
@@ -24,8 +25,10 @@ async function getBunnies() {
     var ua = arrayUA[Math.floor(Math.random()*arrayUA.length)];    
     await page.setUserAgent(ua);
 
-    await page.click('.btn.btn-default'); 
-    await page.waitForNavigation('networkidle2');
+    await Promise.all([
+        page.waitForNavigation(),
+        page.click('.btn.btn-default')
+    ]);
 
     const title = await page.title();
     if(title == "Home Page - My ASP.NET Application"){
