@@ -5,17 +5,17 @@ const {arrayUrlLocalTest} = require('../Constant/ListUrl');
 async function getBunnies() {
 
     const browser = await puppeteer.launch({
-        headless: false,
-        defaultViewport: null
+        headless: true,
+        defaultViewport: null,
         // product: 'firefox'
         // executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
-        // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+        // executablePath: "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
     });
-    const url = "https://alpha.nexdev.net/Local07/";
+    const url = "http://localhost:44392/Login";
     
     const page = await browser.newPage();
     await page.goto(url);
-
+    
     await page.waitForSelector("#txtUserName");
     await page.type("#txtUserName", "sutest01", {});
 
@@ -40,7 +40,7 @@ async function getBunnies() {
         await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', {get: () => false}))
 
     }
-
+  
     // setTimeout(() => { browser.close(); }, 3000);
 }
 getBunnies();
