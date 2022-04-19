@@ -1,29 +1,42 @@
 const {
-    webkit,
-    firefox,
-    chromium
-  } = require('playwright');
-  
-const url = 'https://alpha.nexdev.net/Local07/';
-const {arrayUrlLocalTest} = require('../Constant/ListUrl');
+  webkit,
+  firefox,
+  chromium
+} = require('playwright');
 
-  const simulate = async (engine) => {
-  
-    const browser = await engine.launch({ headless: false });
-    const context = await browser.newContext({
-        userAgent: 'Mozilla/5.2 Playwright (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.7113.93 Safari/537.36'
+const {arrayUA} = require('./Constant/ListUserAgent');
+const {arrayUrl} = require('./Constant/ListUrl');
+const {config, loginInfo} = require('./Constant/Config');
+
+const execute = async (engine) => {
+
+  const browser = await engine.launch({ headless: config.headless, viewport: null });
+
+  let context = await browser.newContext({});
+
+  if(config.changeUA){
+    const ua = arrayUA[Math.floor(Math.random()*arrayUA.length)];
+    context = await browser.newContext({
+        userAgent: ua
       });
-    const page = await context.newPage();
+  }
   
-    await page.goto(url);
-    await page.fill('input[name="txtUserName"]', "sutest01");
-    await page.fill('input[name="txtPassWord"]', "1234aaAA");
-    await page.locator('.btnLogin').click();
-  
-    var redirectUrl = arrayUrlLocalTest[Math.floor(Math.random()*arrayUrlLocalTest.length)];
-    await page.goto(redirectUrl);
+  const page = await context.newPage();
 
-    await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', {get: () => false}));
-  };
+  await page.goto(loginInfo.url);
+  await page.fill('input[name="txtUserName"]', loginInfo.username);
+  await page.fill('input[name="txtPassWord"]', loginInfo.password);
+  await page.locator('.btnLogin').click();
+
   
-  simulate(firefox);
+  if(config.redirect){
+    var redirectUrl = arrayUrl[Math.floor(Math.random()*arrayUrl.length)];
+    await page.goto(redirectUrl);
+  }
+  
+  if(config.turnOffWebdriver){
+    await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', {get: () => false}));
+  }
+};
+
+execute(firefox);

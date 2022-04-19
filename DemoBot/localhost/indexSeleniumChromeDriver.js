@@ -1,6 +1,18 @@
 const { Builder, By, until } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 
+// WEB DRIVER
+// Opera
+// https://github.com/operasoftware/operachromiumdriver/releases
+// Firefox
+// https://github.com/mozilla/geckodriver/releases
+// Chrome
+// http://chromedriver.chromium.org/downloads
+// Internet Explorer
+// https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver
+// Microsoft Edge
+// https://blogs.windows.com/msedgedev/2015/07/23/bringing-automated-testing-to-microsoft-edge-through-webdriver/
+
 async function execute(browser) {
     const {arrayUrl} = require('./Constant/ListUrl');
     const {config, loginInfo} = require('./Constant/Config');
