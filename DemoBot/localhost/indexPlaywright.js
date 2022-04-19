@@ -28,6 +28,7 @@ const execute = async (engine) => {
   await page.fill('input[name="Password"]', loginInfo.password);
   await page.locator('button').click();
   
+  await page.waitForTimeout(3000);
   if(config.redirect){
     var redirectUrl = arrayUrl[Math.floor(Math.random()*arrayUrl.length)];
     await page.goto(redirectUrl);
@@ -42,6 +43,6 @@ const execute = async (engine) => {
   // await browser.close();
 };
   
-execute(firefox);
+// execute(firefox);
 // execute(webkit)
-// execute(chromium)
+execute(chromium)

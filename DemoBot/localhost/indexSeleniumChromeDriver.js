@@ -13,7 +13,7 @@ const chrome = require('selenium-webdriver/chrome');
 // Microsoft Edge
 // https://blogs.windows.com/msedgedev/2015/07/23/bringing-automated-testing-to-microsoft-edge-through-webdriver/
 
-async function execute(browser) {
+async function execute() {
     const {arrayUrl} = require('./Constant/ListUrl');
     const {config, loginInfo} = require('./Constant/Config');
 
@@ -21,7 +21,7 @@ async function execute(browser) {
     if(config.headless)
         options.headless();
 
-    const driver = await new Builder().forBrowser(browser)
+    const driver = await new Builder().forBrowser('chrome')
                     .setChromeOptions(options)
                     .build();
     
@@ -50,4 +50,4 @@ async function execute(browser) {
     }
 };
 
-execute('chrome');
+execute();

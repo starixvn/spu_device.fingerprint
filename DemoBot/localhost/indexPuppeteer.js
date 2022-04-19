@@ -8,8 +8,8 @@ async function execute() {
         headless: config.headless,
         defaultViewport: null,
         // product: 'firefox' // chrome, firefox
-        // executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
         // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+        // executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
     });
 
     // const context = await browser.createIncognitoBrowserContext();
