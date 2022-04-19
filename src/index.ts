@@ -1,8 +1,8 @@
-import { Encrypting, HashMD5 } from "./crypt";
+import { Encrypting } from "./crypt";
 import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
-import { getDeviceInfo, checkHeadless } from "./userAgent";
 import { storageHandler } from "./cookie";
+import { testBrowser } from "./robot";
 
 var _isDebug: boolean = false;
 var _cookieName: string = "__fp";
@@ -19,21 +19,6 @@ export function config(
 ) {
   appConfig.set(apiUrl, subscriberId, sessionKey);
 }
-
-const promiseAny = async <T>(
-  iterable: Iterable<T | PromiseLike<T>>
-): Promise<T> => {
-  return Promise.all(
-    [...iterable].map((promise) => {
-      return new Promise((resolve, reject) =>
-        Promise.resolve(promise).then(reject, resolve)
-      );
-    })
-  ).then(
-    (errors) => Promise.reject(errors),
-    (value) => Promise.resolve<T>(value)
-  );
-};
 
 function getFP() {
   let start = Date.now();
@@ -59,20 +44,17 @@ function processData(result, sessionKey: string, cookieCode: string) {
   getConfig(appConfig.apiUrl).then(async (conf) => {
     if (conf.ok) {
       const response = await conf.json();
-      const deviceInfo = getDeviceInfo();
-      const flagged = checkHeadless();
-      const device = JSON.stringify(deviceInfo);
+      const flagged = testBrowser();
       let encryptedFP = Encrypting(
         {
           di: result.Id,
           attr: result.Properties,
           fk: sessionKey,
           subs: appConfig.subscriberId,
-          ua: device,
-          uaCode: HashMD5(device),
           cookieCode: cookieCode,
           flagged: flagged,
-          url: window.location && window.location.href ? window.location.href : ''
+          url:
+            window.location && window.location.href ? window.location.href : "",
         },
         response.a
       );
@@ -102,13 +84,6 @@ async function postData(
 
 function getConfig(url: string): Promise<Response> {
   return fetch(url + "/conf", {
-    method: "GET",
-    redirect: "follow",
-  });
-}
-
-function getDomain(): Promise<Response> {
-  return fetch(appConfig.apiUrl + "/subscriber/" + appConfig.subscriberId, {
     method: "GET",
     redirect: "follow",
   });
