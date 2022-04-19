@@ -4,36 +4,44 @@ const {
     chromium
   } = require('playwright');
 
-const {arrayUA} = require('../Constant/ListUserAgent');
-const {arrayUrlLocalhost} = require('../Constant/ListUrl');
+const {arrayUA} = require('./Constant/ListUserAgent');
+const {arrayUrl} = require('./Constant/ListUrl');
+const {config, loginInfo} = require('./Constant/Config');
+
+const execute = async (engine) => {
+
+  const browser = await engine.launch({ headless: config.headless, viewport: null });
   
-const url = 'http://localhost:44392/Login';
+  let context = await browser.newContext({});
 
-const simulate = async (engine) => {
+  if(config.changeUA){
+    const ua = arrayUA[Math.floor(Math.random()*arrayUA.length)];
+    context = await browser.newContext({
+        userAgent: ua
+      });
+  }   
 
-  const browser = await engine.launch({ headless: false, viewport: null });
-  const ua = arrayUA[Math.floor(Math.random()*arrayUA.length)];   
-
-  const context = await browser.newContext({
-      userAgent: ua
-    });
   const page = await context.newPage();
 
-  await page.goto(url);
-  await page.fill('input[name="Username"]', "test");
-  await page.fill('input[name="Password"]', "1234aa");
+  await page.goto(loginInfo.url);
+  await page.fill('input[name="Username"]', loginInfo.username);
+  await page.fill('input[name="Password"]', loginInfo.password);
   await page.locator('button').click();
   
-  var redirectUrl = arrayUrlLocalhost[Math.floor(Math.random()*arrayUrlLocalhost.length)];
-  await page.goto(redirectUrl);
+  if(config.redirect){
+    var redirectUrl = arrayUrl[Math.floor(Math.random()*arrayUrl.length)];
+    await page.goto(redirectUrl);
+  }
   
-  await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', {get: () => false}));
+  if(config.turnOffWebdriver){
+    await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', {get: () => false}));
+  }
 
   // await page.waitForTimeout(5000);
 
   // await browser.close();
 };
   
-  simulate(firefox);
-  simulate(webkit)
-  simulate(chromium)
+execute(firefox);
+// execute(webkit)
+// execute(chromium)

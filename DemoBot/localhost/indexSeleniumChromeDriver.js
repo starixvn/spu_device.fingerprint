@@ -1,35 +1,41 @@
-var webdriver = require('selenium-webdriver');
-var chrome = require('selenium-webdriver/chrome');
-var path = require('chromedriver').path;
+const { Builder, By, until } = require('selenium-webdriver');
+const chrome = require('selenium-webdriver/chrome');
 
-async function example() {
-    const {arrayUrlLocalhost} = require('../Constant/ListUrl');
-    console.log('path', path);
+async function execute(browser) {
+    const {arrayUrl} = require('./Constant/ListUrl');
+    const {config, loginInfo} = require('./Constant/Config');
 
-    var service = new chrome.ServiceBuilder(path).build();
-    chrome.setDefaultService(service);
+    const options = new chrome.Options();
+    if(config.headless)
+        options.headless();
 
-    var driver = new webdriver.Builder()
-    .withCapabilities(webdriver.Capabilities.chrome())
-    .build();
+    const driver = await new Builder().forBrowser(browser)
+                    .setChromeOptions(options)
+                    .build();
+    
+    if(config.turnOffWebdriver){
+        var js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})";
+        driver.executeScript(js);
+    }
 
-    // Navigate to google.com, enter a search.
-    await driver.get('http://localhost:44392/Login');
+    await driver.get(loginInfo.url);
 
-    driver.findElement(webdriver.By.name("Username")).sendKeys("test");
-    driver.findElement(webdriver.By.name("Password")).sendKeys("1234aa");
+    driver.findElement(By.name("Username")).sendKeys(loginInfo.username);
+    driver.findElement(By.name("Password")).sendKeys(loginInfo.password);
 
-    driver.findElement(webdriver.By.className("btn btn-default")).click();
+    driver.findElement(By.className("btn btn-default")).click();
 
-    await driver.wait(webdriver.until.titleIs('Home Page - My ASP.NET Application'), 1000);
+    await driver.wait(until.titleIs('Home Page - My ASP.NET Application'), 1000);
 
-    var redirectUrl = arrayUrlLocalhost[Math.floor(Math.random()*arrayUrlLocalhost.length)];
-    await driver.get(redirectUrl);
-
-    var js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})";
-    driver.executeScript(js);
-
-    // driver.quit();
+    if(config.redirect){
+        var redirectUrl = arrayUrl[Math.floor(Math.random()*arrayUrl.length)];
+        await driver.get(redirectUrl);
+    }
+    
+    if(config.turnOffWebdriver){
+        var js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})";
+        driver.executeScript(js);
+    }
 };
 
-example();
+execute('chrome');

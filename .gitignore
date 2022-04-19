@@ -1,3 +1,7 @@
 /node_modules/
 src/userAgentTest.ts
 node_modules_custom/*
+DemoBot/localhost/Constant/__pycache__/*
+DemoBot/localTest/Constant/__pycache__/*
+DemoBot/Python/Constant/__pycache__/*
+DemoBot/Python/localhost/geckodriver.log
