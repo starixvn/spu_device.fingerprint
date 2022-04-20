@@ -28,6 +28,7 @@
     "@types/node": "^16.11.1",
     "clean-webpack-plugin": "^4.0.0",
     "html-webpack-plugin": "^5.5.0",
+    "minimist": "^1.2.6",
     "network-information-types": "^0.1.1",
     "phantom": "^6.3.0",
     "playwright": "^1.21.0",

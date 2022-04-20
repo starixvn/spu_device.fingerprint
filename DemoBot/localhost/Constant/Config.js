@@ -2,7 +2,8 @@ const config = {
     headless: true,
     turnOffWebdriver: false,
     redirect: false,
-    changeUA: false
+    changeUA: false,
+    closeBrowser: true
 };
   
 const loginInfo = {

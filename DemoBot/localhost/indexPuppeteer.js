@@ -4,13 +4,9 @@ const {arrayUrl} = require('./Constant/ListUrl');
 const {config, loginInfo} = require('./Constant/Config');
 
 async function execute() {
-    const browser = await puppeteer.launch({
-        headless: config.headless,
-        defaultViewport: null,
-        // product: 'firefox' // chrome, firefox
-        // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-        // executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
-    });
+    
+    var argv = require('minimist')(process.argv.slice(2));
+    const browser = await getBrowser(argv.browser);
 
     // const context = await browser.createIncognitoBrowserContext();
     const page = await browser.newPage();
@@ -49,6 +45,41 @@ async function execute() {
         }
         
     }
-    // setTimeout(() => { browser.close(); }, 3000);
+    setTimeout(() => { browser.close(); }, 3000);
 }
+
+async function getBrowser(browser) {
+    console.log('browser', browser);
+    if(browser == "default"){
+        return await puppeteer.launch({
+            headless: config.headless,
+            defaultViewport: null
+        });
+    }
+    if(browser == "firefox"){
+        return await puppeteer.launch({
+            headless: config.headless,
+            defaultViewport: null,
+            product: 'firefox'
+            // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+            // executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
+        });
+    }
+    if(browser == "chrome"){
+        return await puppeteer.launch({
+            headless: config.headless,
+            defaultViewport: null,
+            executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+            // executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
+        });
+    }
+    if(browser == "edge"){
+        return await puppeteer.launch({
+            headless: config.headless,
+            defaultViewport: null,
+            executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
+        });
+    }
+}
+
 execute();
