@@ -47,6 +47,11 @@ async function execute() {
         var js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})";
         driver.executeScript(js);
     }
+
+    if(config.closeBrowser){
+        await driver.sleep(config.waitingTime);
+        driver.quit();
+    }
 };
 
 execute();

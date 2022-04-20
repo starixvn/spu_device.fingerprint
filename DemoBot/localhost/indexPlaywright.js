@@ -8,8 +8,9 @@ const {arrayUA} = require('./Constant/ListUserAgent');
 const {arrayUrl} = require('./Constant/ListUrl');
 const {config, loginInfo} = require('./Constant/Config');
 
-const execute = async (engine) => {
+async function execute(){
 
+  const engine = getEngine();
   const browser = await engine.launch({ headless: config.headless, viewport: null });
   
   let context = await browser.newContext({});
@@ -38,11 +39,26 @@ const execute = async (engine) => {
     await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', {get: () => false}));
   }
 
-  // await page.waitForTimeout(5000);
-
-  // await browser.close();
+  if(config.closeBrowser && config.waitingTime > 0){
+    await page.waitForTimeout(config.waitingTime);
+    await browser.close();
+  }
 };
   
-// execute(firefox);
-// execute(webkit)
-execute(chromium)
+function getEngine() {
+  const argv = require('minimist')(process.argv.slice(2));
+
+  if(argv.browser == "chromium"){
+    console.log(argv.browser);
+    return chromium;
+  }
+  if(argv.browser == "firefox"){
+    return firefox;
+  }
+  if(argv.browser == "webkit"){
+    return webkit;
+  }
+  return chromium;
+}
+
+execute()

@@ -45,17 +45,13 @@ async function execute() {
         }
         
     }
-    setTimeout(() => { browser.close(); }, 3000);
+
+    if(config.closeBrowser && config.waitingTime > 0){
+        setTimeout(() => { browser.close(); }, config.waitingTime);
+    }
 }
 
 async function getBrowser(browser) {
-    console.log('browser', browser);
-    if(browser == "default"){
-        return await puppeteer.launch({
-            headless: config.headless,
-            defaultViewport: null
-        });
-    }
     if(browser == "firefox"){
         return await puppeteer.launch({
             headless: config.headless,
@@ -80,6 +76,11 @@ async function getBrowser(browser) {
             executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
         });
     }
+    // default
+    return await puppeteer.launch({
+        headless: config.headless,
+        defaultViewport: null
+    });
 }
 
 execute();

@@ -3,7 +3,8 @@ const config = {
     turnOffWebdriver: false,
     redirect: false,
     changeUA: false,
-    closeBrowser: true
+    closeBrowser: true,
+    waitingTime: 2000
 };
   
 const loginInfo = {

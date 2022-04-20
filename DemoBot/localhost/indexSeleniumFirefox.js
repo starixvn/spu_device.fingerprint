@@ -50,8 +50,10 @@ async function execute() {
         driver.executeScript(js);
     }
 
-    driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
-    driver.close();
+    if(config.closeBrowser){
+        await driver.sleep(config.waitingTime);
+        driver.quit();
+    }
 };
 
 execute();

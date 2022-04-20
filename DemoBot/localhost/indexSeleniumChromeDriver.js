@@ -50,7 +50,7 @@ async function execute() {
     }
 
     if(config.closeBrowser){
-        driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+        await driver.sleep(config.waitingTime);
         driver.quit();
     }
 };
