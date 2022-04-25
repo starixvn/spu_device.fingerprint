@@ -1,8 +1,10 @@
 const config = {
-    headless: false,
+    headless: true,
     turnOffWebdriver: false,
     redirect: false,
-    changeUA: false
+    changeUA: false,
+    closeBrowser: true,
+    waitingTime: 2000
 };
   
 const loginInfo = {

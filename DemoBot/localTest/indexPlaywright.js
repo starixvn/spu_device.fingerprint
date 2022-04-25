@@ -8,8 +8,9 @@ const {arrayUA} = require('./Constant/ListUserAgent');
 const {arrayUrl} = require('./Constant/ListUrl');
 const {config, loginInfo} = require('./Constant/Config');
 
-const execute = async (engine) => {
+async function execute(){
 
+  const engine = getEngine();
   const browser = await engine.launch({ headless: config.headless, viewport: null });
 
   let context = await browser.newContext({});
@@ -27,7 +28,6 @@ const execute = async (engine) => {
   await page.fill('input[name="txtUserName"]', loginInfo.username);
   await page.fill('input[name="txtPassWord"]', loginInfo.password);
   await page.locator('.btnLogin').click();
-
   
   if(config.redirect){
     var redirectUrl = arrayUrl[Math.floor(Math.random()*arrayUrl.length)];
@@ -37,6 +37,26 @@ const execute = async (engine) => {
   if(config.turnOffWebdriver){
     await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', {get: () => false}));
   }
-};
 
-execute(firefox);
+  if(config.closeBrowser){
+    await page.waitForTimeout(config.waitingTime);
+    await browser.close();
+  }
+};
+  
+function getEngine() {
+  const argv = require('minimist')(process.argv.slice(2));
+
+  if(argv.browser == "chromium"){
+    return chromium;
+  }
+  if(argv.browser == "firefox"){
+    return firefox;
+  }
+  if(argv.browser == "webkit"){
+    return webkit;
+  }
+  return chromium;
+}
+
+execute()

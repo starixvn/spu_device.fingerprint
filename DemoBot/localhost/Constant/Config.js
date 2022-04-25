@@ -1,8 +1,8 @@
 const config = {
     headless: true,
-    turnOffWebdriver: false,
+    turnOffWebdriver: true,
     redirect: false,
-    changeUA: false,
+    changeUA: true,
     closeBrowser: true,
     waitingTime: 2000
 };

@@ -3,7 +3,7 @@ const chrome = require('selenium-webdriver/chrome');
 
 // Chrome
 // http://chromedriver.chromium.org/downloads
-async function execute(browser) {
+async function execute() {
     const {arrayUrl} = require('./Constant/ListUrl');
     const {config, loginInfo} = require('./Constant/Config');
 
@@ -11,7 +11,7 @@ async function execute(browser) {
     if(config.headless)
         options.headless();
 
-    const driver = await new Builder().forBrowser(browser)
+    const driver = await new Builder().forBrowser('chrome')
                     .setChromeOptions(options)
                     .build();
     
@@ -38,6 +38,11 @@ async function execute(browser) {
         var js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})";
         driver.executeScript(js);
     }
+
+    if(config.closeBrowser){
+        await driver.sleep(config.waitingTime);
+        driver.quit();
+    }
 };
 
-execute('chrome');
+execute();

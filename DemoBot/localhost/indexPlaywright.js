@@ -29,7 +29,6 @@ async function execute(){
   await page.fill('input[name="Password"]', loginInfo.password);
   await page.locator('button').click();
   
-  await page.waitForTimeout(3000);
   if(config.redirect){
     var redirectUrl = arrayUrl[Math.floor(Math.random()*arrayUrl.length)];
     await page.goto(redirectUrl);
@@ -39,7 +38,7 @@ async function execute(){
     await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', {get: () => false}));
   }
 
-  if(config.closeBrowser && config.waitingTime > 0){
+  if(config.closeBrowser){
     await page.waitForTimeout(config.waitingTime);
     await browser.close();
   }
@@ -49,7 +48,6 @@ function getEngine() {
   const argv = require('minimist')(process.argv.slice(2));
 
   if(argv.browser == "chromium"){
-    console.log(argv.browser);
     return chromium;
   }
   if(argv.browser == "firefox"){

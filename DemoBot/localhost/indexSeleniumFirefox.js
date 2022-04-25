@@ -38,6 +38,27 @@ async function execute() {
 
     driver.findElement(By.className("btn btn-default")).click();
 
+    const data1 = await driver.executeScript(() => {
+        return navigator.permissions.query({ name: "notifications" }).then(function (permissionStatus) {
+            return [Notification.permission, permissionStatus.state];
+        });     
+       });
+ 
+       console.log(data1);
+
+    const data = await driver.executeScript(() => {
+        return navigator.permissions.query({ name: "notifications" }).then(function (permissionStatus) {
+       if (Notification.permission === "denied" && permissionStatus.state === "prompt") {
+         // Headless
+         return 1;
+       } else {
+         // Not Headless
+         return 0;
+       }});        
+       });
+ 
+       console.log(data);
+
     await driver.wait(until.titleIs('Home Page - My ASP.NET Application'), 1000);
 
     if(config.redirect){

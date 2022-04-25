@@ -41,12 +41,27 @@ async function execute() {
         }
         
         if(config.turnOffWebdriver){
-            await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', {get: () => false}))
+            // await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', {get: () => false}))
+            await page.evaluate(() => {
+                Object.defineProperty(navigator, 'webdriver', {get: () => false});
+                Object.defineProperty(window, 'chrome', {get: () => true});
+                Object.defineProperty(Notification, 'permission', {get: () => true});
+                Object.defineProperty(navigator, 'plugins', {get: () => true});
+                
+                var i = navigator.connection
+                Object.defineProperty(i, 'rtt', { value: 2 });
+                Object.defineProperty(navigator, 'connection', {
+                    get() {
+                        return i;
+                    }
+                });
+            })
+            
         }
         
     }
 
-    if(config.closeBrowser && config.waitingTime > 0){
+    if(config.closeBrowser){
         setTimeout(() => { browser.close(); }, config.waitingTime);
     }
 }
@@ -65,7 +80,8 @@ async function getBrowser(browser) {
         return await puppeteer.launch({
             headless: config.headless,
             defaultViewport: null,
-            executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+            executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+            // args: ['--user-data-dir=C:/Users/jonathan.doan/AppData/Local/Google/Chrome/User Data/']
             // executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
         });
     }
