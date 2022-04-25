@@ -41,8 +41,8 @@ function testChromeWindow() {
 }
 
 // Notification Permissions
-function testNotificationPermissions(callback) {
-  navigator.permissions
+function testNotificationPermissions() {
+  const res = navigator.permissions
     .query({ name: "notifications" })
     .then(function (permissionStatus) {
       if (
@@ -50,12 +50,14 @@ function testNotificationPermissions(callback) {
         permissionStatus.state === "prompt"
       ) {
         // Headless
-        callback(1);
+        return 1;
       } else {
         // Not Headless
-        callback(0);
+        return 0;
       }
     });
+
+  return res;
 }
 
 // No Plugins
@@ -86,19 +88,14 @@ function testConnectionRtt() {
 
 //* Main Functions *//
 
-export function getHeadlessScore() {
+export async function getHeadlessScore() {
   let score = 0;
-  let testsRun = 1;
+  let testsRun = 0;
   let testFunction = "";
 
-  // Notification Permissions test has to be done using Callbacks
-  // That's why it's done separately from all the other tests.
-  testNotificationPermissions(function (v) {
-    score += v;
-    testsRun++;
-  });
-
-  testFunction = "NotificationPermissions = " + (score > 0 ? 1 : 0) + ", ";
+  score += await testNotificationPermissions();
+  testFunction = "NotificationPermissions = " + score + ", ";
+  testsRun++;
 
   allTestFunctions.forEach((test) => {
     let result = test.testFunction();
