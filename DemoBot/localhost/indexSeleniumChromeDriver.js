@@ -18,6 +18,7 @@ async function execute() {
     const {config, loginInfo} = require('./Constant/Config');
 
     const options = new chrome.Options();
+    
     if(config.headless)
         options.headless();
 
@@ -37,22 +38,22 @@ async function execute() {
 
     driver.findElement(By.className("btn btn-default")).click();
 
-    await driver.wait(until.titleIs('Home Page - My ASP.NET Application'), 1000);
+    // await driver.wait(until.titleIs('Home Page - My ASP.NET Application'), 1000);
 
-    if(config.redirect){
-        var redirectUrl = arrayUrl[Math.floor(Math.random()*arrayUrl.length)];
-        await driver.get(redirectUrl);
-    }
+    // if(config.redirect){
+    //     var redirectUrl = arrayUrl[Math.floor(Math.random()*arrayUrl.length)];
+    //     await driver.get(redirectUrl);
+    // }
     
-    if(config.turnOffWebdriver){
-        var js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})";
-        driver.executeScript(js);
-    }
+    // if(config.turnOffWebdriver){
+    //     var js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})";
+    //     driver.executeScript(js);
+    // }
 
-    if(config.closeBrowser){
-        await driver.sleep(config.waitingTime);
-        driver.quit();
-    }
+    // if(config.closeBrowser){
+    //     await driver.sleep(config.waitingTime);
+    //     driver.quit();
+    // }
 };
 
 execute();

@@ -1,14 +1,16 @@
 config = {
     "headless": 0,
+    "incognito": 0,
+    "isMobile": 1,
     "turnOffWebdriver": 0,
     "redirect": 0,
-    "changeUA": 1,
+    "changeUA": 0,
     "closeBrowser": 1,
-    "waitingTime": 5
+    "waitingTime": 3
 }
   
 loginInfo = {
-    "url": "https://fps-demo.nexdev.net/Login",
+    "url": "http://localhost:44392/",
     "username": "test",
     "password": "1234aa"
 }

@@ -1,14 +1,15 @@
 const config = {
-    headless: true,
-    turnOffWebdriver: true,
+    headless: false,
+    incognito: true,
+    turnOffWebdriver: false,
     redirect: false,
-    changeUA: true,
-    closeBrowser: true,
+    changeUA: false,
+    closeBrowser: false,
     waitingTime: 2000
 };
   
 const loginInfo = {
-    url: "https://fps-demo.nexdev.net/Login",
+    url: "http://localhost:44392/Login/Index",
     username: "test",
     password: "1234aa"
 };

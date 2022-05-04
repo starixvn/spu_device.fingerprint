@@ -65,12 +65,19 @@ def getDriver():
         op = webdriver.EdgeOptions()
     else:
         op = webdriver.ChromeOptions()
+
+    if config["isMobile"] == 1:
+        mobile_emulation = { "deviceName": "iphone X" }
+        op.add_experimental_option("mobileEmulation", mobile_emulation)
         
     if config["closeBrowser"] == 0 and args.browser != "firefox":
         op.add_experimental_option("detach", True)
 
     if config["headless"] == 1:
         op.add_argument("--headless")
+       
+    if config["incognito"] == 1: 
+        op.add_argument("--incognito")
 
     if config["changeUA"] == 1:
         userAgent = arrayUA[random.randint(0, len(arrayUA)-1)]

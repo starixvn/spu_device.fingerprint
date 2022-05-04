@@ -33,48 +33,56 @@ async function execute() {
 
     await driver.get(loginInfo.url);
 
-    driver.findElement(By.name("Username")).sendKeys(loginInfo.username);
-    driver.findElement(By.name("Password")).sendKeys(loginInfo.password);
+    // driver.findElement(By.name("Username")).sendKeys(loginInfo.username);
+    // driver.findElement(By.name("Password")).sendKeys(loginInfo.password);
 
-    driver.findElement(By.className("btn btn-default")).click();
-
+    // driver.findElement(By.className("btn btn-default")).click();
+    
     const data1 = await driver.executeScript(() => {
-        return navigator.permissions.query({ name: "notifications" }).then(function (permissionStatus) {
-            return [Notification.permission, permissionStatus.state];
-        });     
+        const canvas = document.getElementById('canvas'); 
+        const gl = canvas.getContext('webgl'); 
+        return gl.VERSION;
        });
  
        console.log(data1);
 
-    const data = await driver.executeScript(() => {
-        return navigator.permissions.query({ name: "notifications" }).then(function (permissionStatus) {
-       if (Notification.permission === "denied" && permissionStatus.state === "prompt") {
-         // Headless
-         return 1;
-       } else {
-         // Not Headless
-         return 0;
-       }});        
-       });
+    // const data1 = await driver.executeScript(() => {
+    //     return navigator.permissions.query({ name: "notifications" }).then(function (permissionStatus) {
+    //         return [Notification.permission, permissionStatus.state];
+    //     });     
+    //    });
  
-       console.log(data);
+    //    console.log(data1);
 
-    await driver.wait(until.titleIs('Home Page - My ASP.NET Application'), 1000);
+    // const data = await driver.executeScript(() => {
+    //     return navigator.permissions.query({ name: "notifications" }).then(function (permissionStatus) {
+    //    if (Notification.permission === "denied" && permissionStatus.state === "prompt") {
+    //      // Headless
+    //      return 1;
+    //    } else {
+    //      // Not Headless
+    //      return 0;
+    //    }});        
+    //    });
+ 
+    //    console.log(data);
 
-    if(config.redirect){
-        var redirectUrl = arrayUrl[Math.floor(Math.random()*arrayUrl.length)];
-        await driver.get(redirectUrl);
-    }
+    // await driver.wait(until.titleIs('Home Page - My ASP.NET Application'), 1000);
+
+    // if(config.redirect){
+    //     var redirectUrl = arrayUrl[Math.floor(Math.random()*arrayUrl.length)];
+    //     await driver.get(redirectUrl);
+    // }
     
-    if(config.turnOffWebdriver){
-        var js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})";
-        driver.executeScript(js);
-    }
+    // if(config.turnOffWebdriver){
+    //     var js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})";
+    //     driver.executeScript(js);
+    // }
 
-    if(config.closeBrowser){
-        await driver.sleep(config.waitingTime);
-        driver.quit();
-    }
+    // if(config.closeBrowser){
+    //     await driver.sleep(config.waitingTime);
+    //     driver.quit();
+    // }
 };
 
 execute();
