@@ -44,7 +44,7 @@ function processData(result, sessionKey: string, cookieCode: string) {
   getConfig(appConfig.apiUrl).then(async (conf) => {
     if (conf.ok) {
       const response = await conf.json();
-      const flagged = await getHeadlessScore();
+      const flagged = JSON.stringify(await getHeadlessScore());
       let encryptedFP = Encrypting(
         {
           di: result.Id,

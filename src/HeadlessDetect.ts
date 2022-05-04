@@ -1,13 +1,15 @@
 let allTestFunctions = [
   {
-    name: "UserAgent",
-    testFunction: testUserAgent,
+    name: "NotificationPermissions",
+    testFunction: testNotificationPermissions,
+    active: 1,
   },
-  { name: "ChromeWindow", testFunction: testChromeWindow },
-  { name: "Plugins", testFunction: testPlugins },
-  { name: "AppVersion", testFunction: testAppVersion },
-  { name: "ConnectionRtt", testFunction: testConnectionRtt },
-  { name: "Webdriver", testFunction: testWebdriver },
+  { name: "UserAgent", testFunction: testUserAgent, active: 1 },
+  { name: "ChromeWindow", testFunction: testChromeWindow, active: 1 },
+  { name: "Plugins", testFunction: testPlugins, active: 0 },
+  { name: "AppVersion", testFunction: testAppVersion, active: 1 },
+  { name: "ConnectionRtt", testFunction: testConnectionRtt, active: 1 },
+  { name: "Webdriver", testFunction: testWebdriver, active: 1 },
 ];
 
 //* All Tests *//
@@ -19,7 +21,6 @@ function testWebdriver() {
 
 // User Agent
 function testUserAgent() {
-  console.log(window.navigator.userAgent);
   if (/Headless/.test(window.navigator.userAgent)) {
     // Headless
     return 1;
@@ -90,21 +91,21 @@ function testConnectionRtt() {
 
 export async function getHeadlessScore() {
   let score = 0;
-  let testsRun = 0;
-  let testFunction = "";
+  let testsRun = 1;
 
-  score += await testNotificationPermissions();
-  testFunction = "NotificationPermissions = " + score + ", ";
-  testsRun++;
+  let resultTest = allTestFunctions.map(async (test) => {
+    if (test.active == 1) {
+      let result = await test.testFunction();
 
-  allTestFunctions.forEach((test) => {
-    let result = test.testFunction();
-    score += result;
-    testsRun++;
-    testFunction += test.name + " = " + result + ", ";
+      score += result;
+      testsRun++;
+
+      return test.name + " : " + result;
+    }
   });
-
-  testFunction = testFunction.substring(0, testFunction.length - 2);
-
-  return `${score}` + " / " + `${testsRun}` + " - (" + testFunction + ")";
+  return {
+    score: await score,
+    testsRun: await testsRun,
+    testsDetail: (await Promise.all(resultTest)).join(", "),
+  };
 }
