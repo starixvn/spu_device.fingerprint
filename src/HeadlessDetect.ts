@@ -1,9 +1,4 @@
 let allTestFunctions = [
-  {
-    name: "NotificationPermissions",
-    testFunction: testNotificationPermissions,
-    active: 1,
-  },
   { name: "UserAgent", testFunction: testUserAgent, active: 1 },
   { name: "ChromeWindow", testFunction: testChromeWindow, active: 1 },
   { name: "Plugins", testFunction: testPlugins, active: 0 },
@@ -42,8 +37,8 @@ function testChromeWindow() {
 }
 
 // Notification Permissions
-function testNotificationPermissions() {
-  const res = navigator.permissions
+async function testNotificationPermissions() {
+  return await navigator.permissions
     .query({ name: "notifications" })
     .then(function (permissionStatus) {
       if (
@@ -57,8 +52,6 @@ function testNotificationPermissions() {
         return 0;
       }
     });
-
-  return res;
 }
 
 // No Plugins
@@ -91,21 +84,31 @@ function testConnectionRtt() {
 
 export async function getHeadlessScore() {
   let score = 0;
-  let testsRun = 1;
+  let testsRun = 0;
+  let testRunDetail = "";
 
-  let resultTest = allTestFunctions.map(async (test) => {
-    if (test.active == 1) {
-      let result = await test.testFunction();
-
-      score += result;
+  return await testNotificationPermissions()
+    .then((x) => {
+      score = x;
       testsRun++;
+      testRunDetail = "testNotificationPermissions : " + x + ", ";
+    })
+    .then(() => {
+      allTestFunctions.forEach((test) => {
+        if (test.active == 1) {
+          let result = test.testFunction();
 
-      return test.name + " : " + result;
-    }
-  });
-  return {
-    score: await score,
-    testsRun: await testsRun,
-    testsDetail: (await Promise.all(resultTest)).join(", "),
-  };
+          score += result;
+          testsRun++;
+
+          testRunDetail += test.name + " : " + result + ", ";
+        }
+      });
+
+      return {
+        score: score,
+        testsRun: testsRun,
+        testsDetail: testRunDetail.substring(0, testRunDetail.length - 2),
+      };
+    });
 }
