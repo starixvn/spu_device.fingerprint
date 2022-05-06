@@ -91,7 +91,7 @@ export async function getHeadlessScore() {
     .then((x) => {
       score = x;
       testsRun++;
-      testRunDetail = "testNotificationPermissions : " + x + ", ";
+      testRunDetail = "NotificationPermissions : " + x + ", ";
     })
     .then(() => {
       allTestFunctions.forEach((test) => {
