@@ -6,7 +6,9 @@ def execute(script):
     
 def process():
     print('start')
-
+    # check_output('py ./testpy.py --browser chrome')
+    # check_output('py ./testpy.py --browser firefox')
+    # check_output('py ./testpy.py --browser edge')
     # creating threads
     t11 = threading.Thread(target=execute, args=('py ./testpy.py --browser chrome',))
     t12 = threading.Thread(target=execute, args=('py ./testpy.py --browser firefox',))

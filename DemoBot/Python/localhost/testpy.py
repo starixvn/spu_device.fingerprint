@@ -16,36 +16,40 @@ def async_execute():
     driver.maximize_window()
 
     driver.get(loginInfo["url"])
+    
+    if config["inputDelay"] > 0:
+        time.sleep(config["inputDelay"])
     driver.find_element(by=By.NAME, value="Username").send_keys(loginInfo["username"])
+
+    if config["inputDelay"] > 0:
+        time.sleep(config["inputDelay"])
     driver.find_element(by=By.NAME, value="Password").send_keys(loginInfo["password"])
     
+    if config["inputDelay"] > 0:
+        time.sleep(config["inputDelay"])
     driver.find_element(by=By.CLASS_NAME, value="btn-default").click()
 
     WebDriverWait(driver, 10).until(
                 EC.title_is('Home Page - My ASP.NET Application')
             )
 
-    js = "Object.defineProperty(window, 'chrome', {get: () => true})"
-    driver.execute_script(js)
-    js = "Object.defineProperty(Notification, 'permission', {get: () => true})"
-    driver.execute_script(js)
-    js = "Object.defineProperty(navigator, 'plugins', {get: () => true})"
-    driver.execute_script(js)
-    js = "Object.defineProperty(navigator, 'connection.rtt', {get: () => 111})"
-    driver.execute_script(js)
+    if config["turnOffWebdriver"] == 1:
+        js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})"
+        driver.execute_script(js)
 
-    # ua = driver.execute_script("return navigator.userAgent")
-    # ua = ua.replace("Headless", "")
-    # js = "Object.defineProperty(navigator, 'userAgent', {get: () => "+ua+"})"
-    # driver.execute_script(js)
+    if config["undetectBots"] == 1:
+        driver = undetectBots(driver)
 
     if config["redirect"] == 1:
         redirectUrl = arrayUrl[random.randint(0, len(arrayUrl)-1)]
         driver.get(redirectUrl)
 
-    if config["turnOffWebdriver"] == 1:
-        js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})"
-        driver.execute_script(js)
+        if config["turnOffWebdriver"] == 1:
+            js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})"
+            driver.execute_script(js)
+
+        if config["undetectBots"] == 1:
+            driver = undetectBots(driver)
 
     
     if config["waitingTime"] > 0:
@@ -91,6 +95,27 @@ def getDriver():
         return webdriver.Edge(options=op)
     else:
         return webdriver.Chrome(options=op)
+
+def undetectBots(driver):
+    if config["turnOffWebdriver"] == 0:
+        js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})"
+        driver.execute_script(js)
+        
+    js = "Object.defineProperty(Notification, 'permission', {get: () => true})"
+    driver.execute_script(js)
+    js = "Object.defineProperty(navigator, 'plugins', {get: () => true})"
+    driver.execute_script(js)
+    js = "Object.defineProperty(window, 'chrome', {get: () => true})"
+    driver.execute_script(js)
+    js = "var i = navigator.connection; Object.defineProperty(i, 'rtt', { value: 2 }); Object.defineProperty(navigator, 'connection', {get() {return i;}});"
+    driver.execute_script(js)
+
+    # ua = driver.execute_script("return navigator.userAgent")
+    # ua = ua.replace("Headless", "")
+    # js = "Object.defineProperty(navigator, 'userAgent', {get: () => "+ua+"})"
+    # driver.execute_script(js)
+    
+    return driver
 
 if __name__ == '__main__':
     async_execute()

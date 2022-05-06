@@ -1,6 +1,6 @@
 const config = {
     headless: false,
-    incognito: true,
+    incognito: false,
     turnOffWebdriver: false,
     redirect: false,
     changeUA: false,

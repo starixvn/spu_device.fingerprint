@@ -1,7 +1,7 @@
 arrayUrl = [
-    "http://localhost:44392/ViewPage/ViewPage1",
-    "http://localhost:44392/ViewPage/ViewPage2",
-    "http://localhost:44392/ViewPage/ViewPage3",
-    "http://localhost:44392/ViewPage/ViewPage4",
-    "http://localhost:44392/ViewPage/ViewPage5"
+    "https://fps-demo.nexdev.net/ViewPage/ViewPage1",
+    "https://fps-demo.nexdev.net/ViewPage/ViewPage2",
+    "https://fps-demo.nexdev.net/ViewPage/ViewPage3",
+    "https://fps-demo.nexdev.net/ViewPage/ViewPage4",
+    "https://fps-demo.nexdev.net/ViewPage/ViewPage5"
 ]
