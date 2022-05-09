@@ -1,14 +1,13 @@
 config = {
-    "changeUA": 0,
+    "changeUA": 1,
     "closeBrowser": 0,
-    "headless": 0,
+    "headless": 1,
     "incognito": 0,
-    "isMobile": 0,
     "inputDelay": 0.5,
     "redirect": 0,
-    "turnOffWebdriver": 0,
+    "turnOffWebdriver": 1,
     "waitingTime": 3,
-    "undetectBots": 0
+    "undetectBots": 1
 }
   
 loginInfo = {

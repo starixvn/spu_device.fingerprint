@@ -1,14 +1,13 @@
 config = {
-    "changeUA": 1,
-    "closeBrowser": 1,
-    "headless": 1,
-    "incognito": 1,
-    "isMobile": 0,
+    "changeUA": 0,
+    "closeBrowser": 0,
+    "headless": 0,
+    "incognito": 0,
     "inputDelay": 0.5,
     "redirect": 0,
     "turnOffWebdriver": 0,
     "waitingTime": 3,
-    "undetectBots": 1
+    "undetectBots": 0
 }
   
 loginInfo = {
@@ -17,8 +16,8 @@ loginInfo = {
     "password": "1234aa"
 }
 
-webDriverPath = {
-    "chrome": "C:\\SeleniumWebDriver\\chromedriver.exe",
-    "firefox": "",
-    "edge": "",
-}
+# webDriverPath = {
+#     "chrome": "C:\\SeleniumWebDriver\\chromedriver.exe",
+#     "firefox": "",
+#     "edge": "",
+# }
