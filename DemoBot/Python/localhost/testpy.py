@@ -11,11 +11,20 @@ from Constant.Config import config, loginInfo
 from Constant.ListUrl import arrayUrl
 from Constant.ListUserAgent import arrayUA
 
+colorRed = "\033[91m {}\033[00m"
+colorGreen = "\033[92m {}\033[00m"
+
 def async_execute():
+    print(colorGreen.format('Start!'))
+    
     driver = getDriver()
     driver.maximize_window()
 
+    print(colorRed.format('View LoginPage: ') + colorGreen.format(loginInfo["url"]))
     driver.get(loginInfo["url"])
+    print(colorRed.format('Fill in the input: '))
+    print(colorGreen.format('\tUsername: ' + loginInfo["username"]))
+    print(colorGreen.format('\tPassword: ' + loginInfo["password"]))
     
     if config["inputDelay"] > 0:
         time.sleep(config["inputDelay"])
@@ -27,36 +36,45 @@ def async_execute():
     
     if config["inputDelay"] > 0:
         time.sleep(config["inputDelay"])
+    print(colorRed.format('Click on button login!'))
     driver.find_element(by=By.CLASS_NAME, value="btn-default").click()
 
+    print(colorRed.format('Waiting Home Page...'))
+    print(colorRed.format('View Home Page!'))
     WebDriverWait(driver, 10).until(
                 EC.title_is('Home Page - My ASP.NET Application')
             )
 
+
     if config["turnOffWebdriver"] == 1:
+        print(colorRed.format('Change Webdriver'))
         js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})"
         driver.execute_script(js)
 
     if config["undetectBots"] == 1:
+        print(colorRed.format('Execute ') + colorGreen.format('[UndetectBots]'))
         driver = undetectBots(driver)
+    
+    if config["waitingTime"] > 0:
+        print(colorRed.format('Waiting before close browser...'))
+        time.sleep(config["waitingTime"])
 
     if config["redirect"] == 1:
+        print(colorRed.format('Navigate to another url'))
         redirectUrl = arrayUrl[random.randint(0, len(arrayUrl)-1)]
         driver.get(redirectUrl)
 
         if config["turnOffWebdriver"] == 1:
+            print(colorRed.format('Re-change Webdriver'))
             js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})"
             driver.execute_script(js)
 
         if config["undetectBots"] == 1:
+            print(colorRed.format('Re-execute ') + colorGreen.format('[UndetectBots]'))
             driver = undetectBots(driver)
 
-    
-    if config["waitingTime"] > 0:
-        time.sleep(config["waitingTime"])
-
-
 def getDriver():
+    print(colorRed.format('Get browser-driver'))
     parser = argparse.ArgumentParser()
     parser.add_argument('--browser', dest='browser', type=str, help='Add browser')
     args = parser.parse_args()
@@ -69,31 +87,29 @@ def getDriver():
         op = webdriver.EdgeOptions()
     else:
         op = webdriver.ChromeOptions()
-
-    if config["isMobile"] == 1:
-        mobile_emulation = { "deviceName": "iphone X" }
-        op.add_experimental_option("mobileEmulation", mobile_emulation)
         
     if config["closeBrowser"] == 0 and args.browser != "firefox":
         op.add_experimental_option("detach", True)
 
     if config["headless"] == 1:
         op.add_argument("--headless")
-       
-    if config["incognito"] == 1: 
-        op.add_argument("--incognito")
 
     if config["changeUA"] == 1:
+        print(colorRed.format('Change User-agent'))
         userAgent = arrayUA[random.randint(0, len(arrayUA)-1)]
         op.add_argument("user-agent="+userAgent)
 
     if args and args.browser == "chrome":
+        print(colorRed.format('Return chromedriver'))
         return webdriver.Chrome(options=op)
     elif args and args.browser == "firefox":
+        print(colorRed.format('Return geckodriver'))
         return webdriver.Firefox(options=op)
     elif args and args.browser == "edge":
+        print(colorRed.format('Return msedgedriver'))
         return webdriver.Edge(options=op)
     else:
+        print(colorRed.format('Return chromedriver'))
         return webdriver.Chrome(options=op)
 
 def undetectBots(driver):
@@ -110,6 +126,8 @@ def undetectBots(driver):
     js = "var i = navigator.connection; Object.defineProperty(i, 'rtt', { value: 2 }); Object.defineProperty(navigator, 'connection', {get() {return i;}});"
     driver.execute_script(js)
 
+    print(colorRed.format('Done ') + colorGreen.format('[UndetectBots]'))
+
     # ua = driver.execute_script("return navigator.userAgent")
     # ua = ua.replace("Headless", "")
     # js = "Object.defineProperty(navigator, 'userAgent', {get: () => "+ua+"})"
@@ -119,4 +137,4 @@ def undetectBots(driver):
 
 if __name__ == '__main__':
     async_execute()
-# asyncio.run(async_execute())
+

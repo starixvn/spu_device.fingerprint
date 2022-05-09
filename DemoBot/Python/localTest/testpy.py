@@ -11,15 +11,19 @@ from Constant.Config import config, loginInfo
 from Constant.ListUrl import arrayUrl
 from Constant.ListUserAgent import arrayUA
 
-def async_execute():
-    print('Start!')
+colorRed = "\033[91m {}\033[00m"
+colorGreen = "\033[92m {}\033[00m"
 
-    driver = getDriver()
-    driver.maximize_window()
+def async_execute():
+    print(colorGreen.format('Start!'))
     
+    driver = getDriver()
+
+    print(colorRed.format('View LoginPage: ') + colorGreen.format(loginInfo["url"]))
     driver.get(loginInfo["url"])
-    print('View LoginPage')
-    print('Fill in the input')
+    print(colorRed.format('Fill in the input: '))
+    print(colorGreen.format('\tUsername: ' + loginInfo["username"]))
+    print(colorGreen.format('\tPassword: ' + loginInfo["password"]))
 
     if config["inputDelay"] > 0:
         time.sleep(config["inputDelay"])
@@ -31,42 +35,42 @@ def async_execute():
 
     if config["inputDelay"] > 0:
         time.sleep(config["inputDelay"])
-    print('Click button login')
+    print(colorRed.format('Click on button login!'))
     driver.find_element(by=By.CLASS_NAME, value="btnLogin").click()
 
-
-    print('Waiting Home Page')
+    print(colorRed.format('Waiting Home Page...'))
+    print(colorRed.format('View Home Page!'))
     WebDriverWait(driver, 100).until(EC.title_is('Home'))
 
     if config["turnOffWebdriver"] == 1:
-        print('Change Webdriver')
+        print(colorRed.format('Change Webdriver'))
         js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})"
         driver.execute_script(js)
 
     if config["undetectBots"] == 1:
-        print('Execcute UndetectBots')
+        print(colorRed.format('Execute ') + colorGreen.format('[UndetectBots]'))
         driver = undetectBots(driver)
     
     if config["waitingTime"] > 0:
-        print('Waiting before close browser...')
+        print(colorRed.format('Waiting before close browser...'))
         time.sleep(config["waitingTime"])
 
     if config["redirect"] == 1:
-        print('Navigate to another url')
+        print(colorRed.format('Navigate to another url'))
         redirectUrl = arrayUrl[random.randint(0, len(arrayUrl)-1)]
         driver.get(redirectUrl)
 
         if config["turnOffWebdriver"] == 1:
-            print('Re-change Webdriver')
+            print(colorRed.format('Re-change Webdriver'))
             js = "Object.defineProperty(navigator, 'webdriver', {get: () => false})"
             driver.execute_script(js)
 
         if config["undetectBots"] == 1:
-            print('Re-execute UndetectBots')
+            print(colorRed.format('Re-execute ') + colorGreen.format('[UndetectBots]'))
             driver = undetectBots(driver)
 
 def getDriver():
-    print('Get browser-driver')
+    print(colorRed.format('Get browser-driver'))
     parser = argparse.ArgumentParser()
     parser.add_argument('--browser', dest='browser', type=str, help='Add browser')
     args = parser.parse_args()
@@ -87,20 +91,21 @@ def getDriver():
         op.add_argument("--headless")
 
     if config["changeUA"] == 1:
+        print(colorRed.format('Change User-agent'))
         userAgent = arrayUA[random.randint(0, len(arrayUA)-1)]
         op.add_argument("user-agent="+userAgent)
 
     if args and args.browser == "chrome":
-        print('Return chromedriver')
+        print(colorRed.format('Return chromedriver'))
         return webdriver.Chrome(options=op)
     elif args and args.browser == "firefox":
-        print('Return geckodriver')
+        print(colorRed.format('Return geckodriver'))
         return webdriver.Firefox(options=op)
     elif args and args.browser == "edge":
-        print('Return msedgedriver')
+        print(colorRed.format('Return msedgedriver'))
         return webdriver.Edge(options=op)
     else:
-        print('Return chromedriver')
+        print(colorRed.format('Return chromedriver'))
         return webdriver.Chrome(options=op)
 
 def undetectBots(driver):
@@ -112,12 +117,12 @@ def undetectBots(driver):
     driver.execute_script(js)
     js = "Object.defineProperty(navigator, 'plugins', {get: () => true})"
     driver.execute_script(js)
-    js = "Object.defineProperty(window, 'chrome', {get: () => true})"
-    driver.execute_script(js)
     js = "var i = navigator.connection; Object.defineProperty(i, 'rtt', { value: 2 }); Object.defineProperty(navigator, 'connection', {get() {return i;}});"
     driver.execute_script(js)
+    # js = "Object.defineProperty(window, 'chrome', {get: () => true})"
+    # driver.execute_script(js)
 
-    print('Done UndetectBots')
+    print(colorRed.format('Done ') + colorGreen.format('[UndetectBots]'))
 
     # ua = driver.execute_script("return navigator.userAgent")
     # ua = ua.replace("Headless", "")

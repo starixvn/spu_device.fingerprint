@@ -4,9 +4,9 @@ config = {
     "headless": 1,
     "incognito": 0,
     "inputDelay": 0.5,
-    "redirect": 0,
-    "turnOffWebdriver": 1,
-    "waitingTime": 3,
+    "redirect": 1,
+    "turnOffWebdriver": 0,
+    "waitingTime": 2,
     "undetectBots": 1
 }
   
