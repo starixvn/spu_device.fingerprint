@@ -14,25 +14,54 @@ from Constant.ListUserAgent import arrayUA
 colorRed = "\033[91m {}\033[00m"
 colorGreen = "\033[92m {}\033[00m"
 
+def getUserInfo(args):
+    if args.username == None and args.password == None:
+        return loginInfo["username"], loginInfo["password"]
+    else:
+        return args.username, args.password
+
 def async_execute():
     print(colorGreen.format('Start!'))
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--browser', dest='browser', type=str, help='Add browser')
+    parser.add_argument('--username', dest='username', type=str, help='Add username')
+    parser.add_argument('--password', dest='password', type=str, help='Add password')
+    args = parser.parse_args()
+
+    userInfo = getUserInfo(args)
+    username = userInfo[0]
+    password = userInfo[1]
     
-    driver = getDriver()
+    driver = getDriver(args)
     driver.maximize_window()
 
+    for i in range(config["loop"]):
+        print(colorGreen.format('Loop: ' + str(i+1)))
+        Process(driver, username, password)
+        if config["logout"] == 1:
+            Logout(driver)
+    
+def Logout(driver):
+    if config["inputDelay"] > 0:
+        time.sleep(config["inputDelay"])
+    print(colorGreen.format('Log out'))
+    driver.get('http://localhost:44392/Login/Logout')
+
+def Process(driver, username, password):
     print(colorRed.format('View LoginPage: ') + colorGreen.format(loginInfo["url"]))
     driver.get(loginInfo["url"])
     print(colorRed.format('Fill in the input: '))
-    print(colorGreen.format('\tUsername: ' + loginInfo["username"]))
-    print(colorGreen.format('\tPassword: ' + loginInfo["password"]))
+    print(colorGreen.format('\tUsername: ' + username))
+    print(colorGreen.format('\tPassword: ' + password))
     
     if config["inputDelay"] > 0:
         time.sleep(config["inputDelay"])
-    driver.find_element(by=By.NAME, value="Username").send_keys(loginInfo["username"])
+    driver.find_element(by=By.NAME, value="Username").send_keys(username)
 
     if config["inputDelay"] > 0:
         time.sleep(config["inputDelay"])
-    driver.find_element(by=By.NAME, value="Password").send_keys(loginInfo["password"])
+    driver.find_element(by=By.NAME, value="Password").send_keys(password)
     
     if config["inputDelay"] > 0:
         time.sleep(config["inputDelay"])
@@ -73,11 +102,8 @@ def async_execute():
             print(colorRed.format('Re-execute ') + colorGreen.format('[UndetectBots]'))
             driver = undetectBots(driver)
 
-def getDriver():
+def getDriver(args):
     print(colorRed.format('Get browser-driver'))
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--browser', dest='browser', type=str, help='Add browser')
-    args = parser.parse_args()
 
     if args and args.browser == "chrome":
         op = webdriver.ChromeOptions()

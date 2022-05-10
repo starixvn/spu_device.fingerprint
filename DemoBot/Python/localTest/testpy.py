@@ -52,7 +52,7 @@ def async_execute():
         driver = undetectBots(driver)
     
     if config["waitingTime"] > 0:
-        print(colorRed.format('Waiting before close browser...'))
+        print(colorRed.format('Waiting process...'))
         time.sleep(config["waitingTime"])
 
     if config["redirect"] == 1:

@@ -9,7 +9,7 @@ def process():
 
     # creating threads
     t11 = threading.Thread(target=execute, args=('py ./testpy.py --browser chrome',))
-    t12 = threading.Thread(target=execute, args=('py ./testpy.py --browser firefox',))
+    t12 = threading.Thread(target=execute, args=('py ./testpy.py --browser chrome',))
     t13 = threading.Thread(target=execute, args=('py ./testpy.py --browser edge',))
 
     # starting threads
@@ -18,9 +18,9 @@ def process():
     t13.start()
 
     # wait until all threads finish
-    t11.join()
-    t12.join()
-    t13.join()
+    # t11.join()
+    # t12.join()
+    # t13.join()
 
     print('stop')
 
