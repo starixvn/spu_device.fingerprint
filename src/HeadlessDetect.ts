@@ -46,7 +46,7 @@ async function testNotificationPermissions() {
         permissionStatus.state === "prompt"
       ) {
         // Headless
-        return 1;
+        return 0.5;
       } else {
         // Not Headless
         return 0;
@@ -76,7 +76,7 @@ function testConnectionRtt() {
   if (connectionRtt === undefined) {
     return 0; // Flag doesn't even exists so just return NOT HEADLESS
   } else {
-    return connectionRtt === 0 ? 1 : 0;
+    return connectionRtt === 0 ? 0.5 : 0;
   }
 }
 

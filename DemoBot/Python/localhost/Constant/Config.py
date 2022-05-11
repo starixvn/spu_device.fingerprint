@@ -1,11 +1,11 @@
 config = {
     "changeUA": 0,
     "closeBrowser": 0,
-    "headless": 0,
+    "headless": 1,
     "incognito": 0,
     "inputDelay": 0.2,
     "logout": 1,
-    "loop": 10,
+    "loop": 1,
     "redirect": 0,
     "turnOffWebdriver": 0,
     "waitingTime": 1,

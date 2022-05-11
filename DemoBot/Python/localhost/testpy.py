@@ -15,10 +15,14 @@ colorRed = "\033[91m {}\033[00m"
 colorGreen = "\033[92m {}\033[00m"
 
 def getUserInfo(args):
-    if args.username == None and args.password == None:
-        return loginInfo["username"], loginInfo["password"]
-    else:
-        return args.username, args.password
+    username = loginInfo["username"]
+    password = loginInfo["password"]
+
+    if args.username == None:
+        username = loginInfo["username"]
+    if args.password == None:
+        password = loginInfo["password"]
+    return username, password
 
 def async_execute():
     print(colorGreen.format('Start!'))
