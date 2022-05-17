@@ -10,19 +10,19 @@ def process():
     # check_output('py ./testpy.py --browser firefox')
     # check_output('py ./testpy.py --browser edge')
     # creating threads
-    t11 = threading.Thread(target=execute, args=('py ./testpy.py --browser chrome',))
-    t12 = threading.Thread(target=execute, args=('py ./testpy.py --browser firefox',))
-    t13 = threading.Thread(target=execute, args=('py ./testpy.py --browser edge',))
+    t11 = threading.Thread(target=execute, args=('py ./loadTest.py --browser chrome',))
+    t12 = threading.Thread(target=execute, args=('py ./loadTest.py --browser firefox',))
+    t13 = threading.Thread(target=execute, args=('py ./loadTest.py --browser edge',))
 
     # starting threads
     t11.start()
-    t12.start()
-    t13.start()
+    # t12.start()
+    # t13.start()
 
     # wait until all threads finish
     t11.join()
-    t12.join()
-    t13.join()
+    # t12.join()
+    # t13.join()
 
     print('stop')
 
