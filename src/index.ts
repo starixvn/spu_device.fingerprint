@@ -1,9 +1,9 @@
-import { Encrypting, EncryptingAsync } from "./crypt";
+import { Encrypting } from "./crypt";
 import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
 import { storageHandler } from "./cookie";
 import { getHeadlessScore } from "./headlessdetection";
-import * as core from "./core";
+import { getBrowserInfo } from "./BrowserInfo";
 
 var _isDebug: boolean = false;
 var _cookieName: string = "__fp";
@@ -23,7 +23,6 @@ export function config(
 
 function getFP() {
   let start = Date.now();
-
   storageHandler(_cookieName).then((cookieCode) => {
     getDI()
       .then((result) => {
@@ -42,37 +41,48 @@ function getFP() {
 }
 
 function processData(result, sessionKey: string, cookieCode: string) {
+  let start = Date.now();
   getConfig(appConfig.apiUrl).then(async (conf) => {
     if (conf.ok) {
       const response = await conf.json();
-
-      const fingerPrintAttribute = EncryptingAsync(
+      const flagged = JSON.stringify(await getHeadlessScore());
+      let encryptedFP = Encrypting(
         {
           di: result.Id,
           attr: result.Properties,
-        },
-        response.a
-      ).then((res) => {
-        return core.postData(appConfig.apiUrl + "/fpa", res);
-      });
-
-      const transaction = EncryptingAsync(
-        {
-          di: result.Id,
           fk: sessionKey,
           subs: appConfig.subscriberId,
           cookieCode: cookieCode,
-          flagged: JSON.stringify(await getHeadlessScore()),
+          flagged: flagged,
+          binfo: JSON.stringify(getBrowserInfo()),
           url:
             window.location && window.location.href ? window.location.href : "",
         },
         response.a
-      ).then((res) => {
-        return core.postDataFp(appConfig.apiUrl, res, response.b);
-      });
-
-      Promise.all([fingerPrintAttribute, transaction]);
+      );
+      let end = Date.now() - start;
+      console.log(`milliseconds elapsed of processData = ${end}ms`);
+      postData(appConfig.apiUrl, encryptedFP, response.b);
     }
+  });
+}
+
+async function postData(
+  url: string,
+  data: string,
+  token: string
+): Promise<Response> {
+  return fetch(url + "/fp", {
+    method: "POST",
+    cache: "no-cache",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify(data),
   });
 }
 

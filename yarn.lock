@@ -66,6 +66,13 @@
   "resolved" "https://registry.npmjs.org/@leichtgewicht/ip-codec/-/ip-codec-2.0.3.tgz"
   "version" "2.0.3"
 
+"@lzwme/get-physical-address@^1.0.1":
+  "integrity" "sha512-lvli7bhIuPClg6ae+Hx5/DGTIEnNNsyHXyVfHm8Qv/uIivvJ7DrJD6T5D1PTWtiSupv2qgxb4suZ472YEM5FvQ=="
+  "resolved" "https://registry.npmjs.org/@lzwme/get-physical-address/-/get-physical-address-1.0.1.tgz"
+  "version" "1.0.1"
+  optionalDependencies:
+    "iconv-lite" "*"
+
 "@rollup/plugin-commonjs@^21.0.1":
   "integrity" "sha512-EA+g22lbNJ8p5kuZJUYyhhDK7WgJckW5g4pNN7n4mAFUM96VuwUnNT3xr2Db2iCZPI1pJPbGyfT5mS9T1dHfMg=="
   "resolved" "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-21.0.1.tgz"
@@ -1940,7 +1947,7 @@
   "resolved" "https://registry.npmjs.org/human-signals/-/human-signals-2.1.0.tgz"
   "version" "2.1.0"
 
-"iconv-lite@0.4.24":
+"iconv-lite@*", "iconv-lite@0.4.24":
   "integrity" "sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA=="
   "resolved" "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.24.tgz"
   "version" "0.4.24"
