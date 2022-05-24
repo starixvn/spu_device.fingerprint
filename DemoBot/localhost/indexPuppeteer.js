@@ -67,6 +67,7 @@ async function execute() {
 }
 
 async function getBrowser(browser) {
+    console.log(browser)
     if(browser == "firefox"){
         return await puppeteer.launch({
             headless: config.headless,

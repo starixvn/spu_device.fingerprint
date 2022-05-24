@@ -2998,12 +2998,6 @@ var globalFP = (function (exports) {
         var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key128Bits1000Iterations, cfg);
         return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
     }
-    function EncryptingAsync(data, key) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let result = Encrypting(data, key);
-            return Promise.resolve(result);
-        });
-    }
 
     /**
      * FingerprintJS v3.3.3 - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprintjs.com)
@@ -8717,32 +8711,60 @@ var globalFP = (function (exports) {
         });
     }
 
-    function postData(url, data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
-        });
+    function detectBrowserName() {
+        // OPERA 8.0+
+        var isOpera = (!!window.opr && !!window.opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+        if (isOpera)
+            return 'Opera';
+        // FIREFOX 1.0+
+        var isFirefox = typeof InstallTrigger !== 'undefined';
+        if (isFirefox)
+            return 'Firefox';
+        // SAFARI 3.0+
+        var isSafari = /constructor/i.test(window['HTMLElement']) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+        if (isSafari)
+            return 'Safari';
+        // INTERNET EXPLORER 6-11
+        var isIE = /*@cc_on!@*/ !!document['documentMode'];
+        if (isIE)
+            return 'IE';
+        // EDGE 20+
+        var isEdge = !isIE && !!window['StyleMedia'];
+        if (isEdge)
+            return 'Edge';
+        // CHROME 1+
+        var isChrome = !!window.chrome;
+        if (isChrome)
+            return 'Chrome';
+        // // BLINK ENGINE DETECTION
+        // var isBlink = (isChrome || isOpera) && !!window.CSS;
+        // if(isBlink) return 'Blink';
+        return 'Other';
     }
-    function postDataFp(url, data, token) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return fetch(url + "/fp", {
-                method: "POST",
-                cache: "no-cache",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: "Bearer " + token,
-                },
-                redirect: "follow",
-                referrerPolicy: "no-referrer",
-                body: JSON.stringify(data),
-            });
-        });
+    function getOS() {
+        var userAgent = window.navigator.userAgent, platform = window.navigator.platform, macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'], windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'], iosPlatforms = ['iPhone', 'iPad', 'iPod'], os = null;
+        if (macosPlatforms.indexOf(platform) !== -1) {
+            os = 'Mac OS';
+        }
+        else if (iosPlatforms.indexOf(platform) !== -1) {
+            os = 'iOS';
+        }
+        else if (windowsPlatforms.indexOf(platform) !== -1) {
+            os = 'Windows';
+        }
+        else if (/Android/.test(userAgent)) {
+            os = 'Android';
+        }
+        else if (!os && /Linux/.test(platform)) {
+            os = 'Linux';
+        }
+        return os;
+    }
+    function getBrowserInfo() {
+        return {
+            OSName: getOS(),
+            BrowserName: detectBrowserName()
+        };
     }
 
     var _isDebug = false;
@@ -8774,28 +8796,42 @@ var globalFP = (function (exports) {
         });
     }
     function processData(result, sessionKey, cookieCode) {
+        let start = Date.now();
         getConfig(apiUrl).then((conf) => __awaiter(this, void 0, void 0, function* () {
             if (conf.ok) {
                 const response = yield conf.json();
-                const fingerPrintAttribute = EncryptingAsync({
+                const flagged = JSON.stringify(yield getHeadlessScore());
+                let encryptedFP = Encrypting({
                     di: result.Id,
                     attr: result.Properties,
-                }, response.a).then((res) => {
-                    return postData(apiUrl + "/fpa", res);
-                });
-                const transaction = EncryptingAsync({
-                    di: result.Id,
                     fk: sessionKey,
                     subs: subscriberId,
                     cookieCode: cookieCode,
-                    flagged: JSON.stringify(yield getHeadlessScore()),
+                    flagged: flagged,
+                    binfo: JSON.stringify(getBrowserInfo()),
                     url: window.location && window.location.href ? window.location.href : "",
-                }, response.a).then((res) => {
-                    return postDataFp(apiUrl, res, response.b);
-                });
-                Promise.all([fingerPrintAttribute, transaction]);
+                }, response.a);
+                let end = Date.now() - start;
+                console.log(`milliseconds elapsed of processData = ${end}ms`);
+                postData(apiUrl, encryptedFP, response.b);
             }
         }));
+    }
+    function postData(url, data, token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return fetch(url + "/fp", {
+                method: "POST",
+                cache: "no-cache",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token,
+                },
+                redirect: "follow",
+                referrerPolicy: "no-referrer",
+                body: JSON.stringify(data),
+            });
+        });
     }
     function getConfig(url) {
         return fetch(url + "/conf", {

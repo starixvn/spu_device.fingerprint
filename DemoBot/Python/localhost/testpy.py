@@ -53,6 +53,8 @@ def Logout(driver):
     driver.get('http://localhost:44392/Login/Logout')
 
 def Process(driver, username, password):
+    chrome = driver.execute_script("return window.chrome")
+    print(colorRed.format('chrome: ') + colorGreen.format(chrome))
     print(colorRed.format('View LoginPage: ') + colorGreen.format(loginInfo["url"]))
     driver.get(loginInfo["url"])
     print(colorRed.format('Fill in the input: '))
@@ -117,17 +119,24 @@ def getDriver(args):
         op = webdriver.EdgeOptions()
     else:
         op = webdriver.ChromeOptions()
-        
-    if config["closeBrowser"] == 0 and args.browser != "firefox":
-        op.add_experimental_option("detach", True)
+    
+    if args.browser == "firefox":
+        if config["changeUA"] == 1:
+            print(colorRed.format('Change User-agent'))
+            userAgent = arrayUA[random.randint(0, len(arrayUA)-1)]
+            op.set_preference("general.useragent.override", userAgent)
+    else:
+        if config["closeBrowser"] == 0:
+            op.add_experimental_option("detach", True)
+
+        if config["changeUA"] == 1:
+            print(colorRed.format('Change User-agent'))
+            userAgent = arrayUA[random.randint(0, len(arrayUA)-1)]
+            op.add_argument("user-agent="+userAgent)
+
 
     if config["headless"] == 1:
         op.add_argument("--headless")
-
-    if config["changeUA"] == 1:
-        print(colorRed.format('Change User-agent'))
-        userAgent = arrayUA[random.randint(0, len(arrayUA)-1)]
-        op.add_argument("user-agent="+userAgent)
 
     if args and args.browser == "chrome":
         print(colorRed.format('Return chromedriver'))
@@ -162,6 +171,8 @@ def undetectBots(driver):
     # ua = ua.replace("Headless", "")
     # js = "Object.defineProperty(navigator, 'userAgent', {get: () => "+ua+"})"
     # driver.execute_script(js)
+
+    
     
     return driver
 

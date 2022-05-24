@@ -1,15 +1,6 @@
 declare const InstallTrigger: any;
 declare const safari: any;
 
-import { getNetworkIFaceOne } from '@lzwme/get-physical-address';
-
-
-function getAdr() {
-  // getMac().then(mac => console.log(`the MAC address is ${mac}`));
-  // getMac('en0').then(mac => console.log(`the MAC address for en0 is ${mac}`));
-  // getNetworkIFaceOne().then(item => console.log(`the MAC address is ${item.mac}, the IP address is ${item.address}`));
-}
-
 function getEngineBrowser() {
   var prefix = (Array.prototype.slice
     .call(window.getComputedStyle(document.documentElement, ""))
@@ -42,10 +33,10 @@ function detectBrowserName() {
   // CHROME 1+
   var isChrome = !!window.chrome;
   if(isChrome) return 'Chrome';
-
   // // BLINK ENGINE DETECTION
   // var isBlink = (isChrome || isOpera) && !!window.CSS;
   // if(isBlink) return 'Blink';
+  return 'Other';
 }
 
 function getOS() {
@@ -71,9 +62,12 @@ function getOS() {
 }
 
 export function getBrowserInfo() {
-  getAdr();
   return {
     OSName: getOS(),
     BrowserName: detectBrowserName()
   };
+}
+
+export function getBrowserName() {
+  return detectBrowserName();
 }
