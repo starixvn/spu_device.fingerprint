@@ -3382,24 +3382,29 @@ function processData(result, sessionKey, cookieCode) {
     getConfig(apiUrl).then((conf) => __awaiter(this, void 0, void 0, function* () {
         if (conf.ok) {
             const response = yield conf.json();
-            const flagged = JSON.stringify(yield getHeadlessScore());
-            let encryptedFP = Encrypting({
+            const encryptedBrowserInfo = Encrypting({
+                fk: sessionKey,
+                ua: navigator.userAgent,
+                hscore: JSON.stringify(yield getHeadlessScore()),
+                binfo: JSON.stringify(getBrowserInfo())
+            }, response.a);
+            console.log('encryptedBrowserInfo', encryptedBrowserInfo);
+            postDataBrowser(apiUrl, encryptedBrowserInfo);
+            const encryptedFP = Encrypting({
                 di: result.Id,
                 attr: result.Properties,
                 fk: sessionKey,
                 subs: subscriberId,
                 cookieCode: cookieCode,
-                flagged: flagged,
-                binfo: JSON.stringify(getBrowserInfo()),
                 url: window.location && window.location.href ? window.location.href : "",
             }, response.a);
-            let end = Date.now() - start;
+            const end = Date.now() - start;
             console.log(`milliseconds elapsed of processData = ${end}ms`);
-            postData(apiUrl, encryptedFP, response.b);
+            postDataFp(apiUrl, encryptedFP, response.b);
         }
     }));
 }
-function postData(url, data, token) {
+function postDataFp(url, data, token) {
     return __awaiter(this, void 0, void 0, function* () {
         return fetch(url + "/fp", {
             method: "POST",
@@ -3415,10 +3420,23 @@ function postData(url, data, token) {
         });
     });
 }
+function postDataBrowser(url, data) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return fetch(url + "/browserinfo", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data),
+        });
+    });
+}
 function getConfig(url) {
-    return fetch(url + "/conf", {
-        method: "GET",
-        redirect: "follow",
+    return __awaiter(this, void 0, void 0, function* () {
+        return fetch(url + "/conf", {
+            method: "GET",
+            redirect: "follow",
+        });
     });
 }
 getFP();

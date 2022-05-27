@@ -23,6 +23,7 @@ export function config(
 
 function getFP() {
   let start = Date.now();
+
   storageHandler(_cookieName).then((cookieCode) => {
     getDI()
       .then((result) => {
@@ -42,32 +43,42 @@ function getFP() {
 
 function processData(result, sessionKey: string, cookieCode: string) {
   let start = Date.now();
+  
   getConfig(appConfig.apiUrl).then(async (conf) => {
     if (conf.ok) {
       const response = await conf.json();
-      const flagged = JSON.stringify(await getHeadlessScore());
-      let encryptedFP = Encrypting(
+      
+      const encryptedBrowserInfo = Encrypting(
+        {
+          fk: sessionKey,
+          ua: navigator.userAgent,
+          hscore: JSON.stringify(await getHeadlessScore()),
+          binfo: JSON.stringify(getBrowserInfo())
+        },
+        response.a
+      );
+      postDataBrowser(appConfig.apiUrl, encryptedBrowserInfo);
+
+      const encryptedFP = Encrypting(
         {
           di: result.Id,
           attr: result.Properties,
           fk: sessionKey,
           subs: appConfig.subscriberId,
           cookieCode: cookieCode,
-          flagged: flagged,
-          binfo: JSON.stringify(getBrowserInfo()),
           url:
             window.location && window.location.href ? window.location.href : "",
         },
         response.a
       );
-      let end = Date.now() - start;
+      const end = Date.now() - start;
       console.log(`milliseconds elapsed of processData = ${end}ms`);
-      postData(appConfig.apiUrl, encryptedFP, response.b);
+      postDataFp(appConfig.apiUrl, encryptedFP, response.b);
     }
   });
 }
 
-async function postData(
+async function postDataFp(
   url: string,
   data: string,
   token: string
@@ -86,7 +97,20 @@ async function postData(
   });
 }
 
-function getConfig(url: string): Promise<Response> {
+async function postDataBrowser(
+  url: string,
+  data: string
+): Promise<Response> {
+  return fetch(url + "/browserinfo", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+async function getConfig(url: string): Promise<Response> {
   return fetch(url + "/conf", {
     method: "GET",
     redirect: "follow",
