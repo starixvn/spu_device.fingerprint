@@ -51,7 +51,7 @@ function componentsToCanonicalString(components: UnknownComponents): {} {
     const component = components[componentKey];
     const value = component.error ? "error" : JSON.stringify(component.value);
 
-    result += `${result ? "|" : ""}${componentKey.replace(
+    result += `${result ? "," : ""}${componentKey.replace(
       /([:|\\])/g,
       "\\$1"
     )}:${value}`;
@@ -67,7 +67,7 @@ async function getFontPreference(): Promise<Record<string, number>> {
     apple: font["apple"],
     serif: font["serif"],
     sans: font["sans"],
-    min: font["min"], 
+    min: font["min"],
     system: font["system"],
   };
 }
