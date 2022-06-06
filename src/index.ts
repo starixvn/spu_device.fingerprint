@@ -3,7 +3,7 @@ import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
 import { storageHandler } from "./cookie";
 import { getHeadlessScore } from "./headlessdetection";
-import { getBrowserInfo } from "./BrowserInfo";
+import { getBrowserInfo } from "./browserDetect";
 
 var _isDebug: boolean = false;
 var _cookieName: string = "__fp";
@@ -43,17 +43,17 @@ function getFP() {
 
 function processData(result, sessionKey: string, cookieCode: string) {
   let start = Date.now();
-  
+
   getConfig(appConfig.apiUrl).then(async (conf) => {
     if (conf.ok) {
       const response = await conf.json();
-      
+
       const encryptedBrowserInfo = Encrypting(
         {
           fk: sessionKey,
           ua: navigator.userAgent,
           hscore: JSON.stringify(await getHeadlessScore()),
-          binfo: JSON.stringify(getBrowserInfo())
+          binfo: JSON.stringify(getBrowserInfo()),
         },
         response.a
       );
@@ -97,14 +97,11 @@ async function postDataFp(
   });
 }
 
-async function postDataBrowser(
-  url: string,
-  data: string
-): Promise<Response> {
+async function postDataBrowser(url: string, data: string): Promise<Response> {
   return fetch(url + "/browserinfo", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
   });

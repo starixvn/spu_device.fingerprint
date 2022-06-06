@@ -22,6 +22,21 @@ const commonInput={
 ], 
 }
 
+const robotOutput={
+  name: 'robotFP',
+  exports: 'named'
+}
+
+const robotInput={
+  input: 'src/robotDetection/index.ts',
+  plugins: [
+    typescript({module: "ESNext"}),
+    nodeResolve({ preferBuiltins: false }), // or `true`
+    commonjs(),
+    json()     
+  ]
+}
+
 export default [{
     ...commonInput, 
     output: [{
@@ -52,5 +67,22 @@ export default [{
       }     
     ],   
     external: Object.keys(dependencies)
+  },
+  {
+    ...robotInput,
+    output: [
+      {
+        ...robotOutput,
+        file: 'dist/fprobot.js',
+        format: 'iife'
+      },
+      {
+        ...robotOutput,
+        file: 'dist/fprobot.min.js',
+        format: 'iife',
+        plugins: [commonTerser]
+      }
+    ],   
+    external: ['moment']
   }
   ];

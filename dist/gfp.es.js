@@ -3293,59 +3293,65 @@ function getHeadlessScore() {
     });
 }
 
-function detectBrowserName() {
+function getBrowserName() {
     // OPERA 8.0+
-    var isOpera = (!!window.opr && !!window.opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+    var isOpera = (!!window.opr && !!window.opr.addons) ||
+        !!window.opera ||
+        navigator.userAgent.indexOf(" OPR/") >= 0;
     if (isOpera)
-        return 'Opera';
+        return "Opera";
     // FIREFOX 1.0+
-    var isFirefox = typeof InstallTrigger !== 'undefined';
+    var isFirefox = typeof InstallTrigger !== "undefined";
     if (isFirefox)
-        return 'Firefox';
+        return "Firefox";
     // SAFARI 3.0+
-    var isSafari = /constructor/i.test(window['HTMLElement']) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+    var isSafari = /constructor/i.test(window["HTMLElement"]) ||
+        (function (p) {
+            return p.toString() === "[object SafariRemoteNotification]";
+        })(!window["safari"] ||
+            (typeof safari !== "undefined" && safari.pushNotification));
     if (isSafari)
-        return 'Safari';
+        return "Safari";
     // INTERNET EXPLORER 6-11
-    var isIE = /*@cc_on!@*/ !!document['documentMode'];
+    var isIE = /*@cc_on!@*/ !!document["documentMode"];
     if (isIE)
-        return 'IE';
+        return "IE";
     // EDGE 20+
-    var isEdge = !isIE && !!window['StyleMedia'];
+    var isEdge = !isIE && !!window["StyleMedia"];
     if (isEdge)
-        return 'Edge';
+        return "Edge";
     // CHROME 1+
     var isChrome = !!window.chrome;
     if (isChrome)
-        return 'Chrome';
+        return "Chrome";
     // // BLINK ENGINE DETECTION
     // var isBlink = (isChrome || isOpera) && !!window.CSS;
     // if(isBlink) return 'Blink';
-    return 'Other';
+    return "Other";
 }
 function getOS() {
-    var userAgent = window.navigator.userAgent, platform = window.navigator.platform, macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'], windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'], iosPlatforms = ['iPhone', 'iPad', 'iPod'], os = null;
+    var userAgent = window.navigator.userAgent, platform = window.navigator.platform, macosPlatforms = ["Macintosh", "MacIntel", "MacPPC", "Mac68K"], windowsPlatforms = ["Win32", "Win64", "Windows", "WinCE"], iosPlatforms = ["iPhone", "iPad", "iPod"], os = null;
     if (macosPlatforms.indexOf(platform) !== -1) {
-        os = 'Mac OS';
+        os = "Mac OS";
     }
     else if (iosPlatforms.indexOf(platform) !== -1) {
-        os = 'iOS';
+        os = "iOS";
     }
     else if (windowsPlatforms.indexOf(platform) !== -1) {
-        os = 'Windows';
+        os = "Windows";
     }
     else if (/Android/.test(userAgent)) {
-        os = 'Android';
+        os = "Android";
     }
     else if (!os && /Linux/.test(platform)) {
-        os = 'Linux';
+        os = "Linux";
     }
     return os;
 }
 function getBrowserInfo() {
     return {
         OSName: getOS(),
-        BrowserName: detectBrowserName()
+        BrowserName: getBrowserName(),
     };
 }
 
@@ -3386,9 +3392,8 @@ function processData(result, sessionKey, cookieCode) {
                 fk: sessionKey,
                 ua: navigator.userAgent,
                 hscore: JSON.stringify(yield getHeadlessScore()),
-                binfo: JSON.stringify(getBrowserInfo())
+                binfo: JSON.stringify(getBrowserInfo()),
             }, response.a);
-            console.log('encryptedBrowserInfo', encryptedBrowserInfo);
             postDataBrowser(apiUrl, encryptedBrowserInfo);
             const encryptedFP = Encrypting({
                 di: result.Id,
@@ -3425,7 +3430,7 @@ function postDataBrowser(url, data) {
         return fetch(url + "/browserinfo", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(data),
         });
