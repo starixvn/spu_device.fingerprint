@@ -9,7 +9,7 @@ def process():
 
     # creating threads
     t11 = threading.Thread(target=execute, args=('py ./testpy.py --browser chrome',))
-    t12 = threading.Thread(target=execute, args=('py ./testpy.py --browser chrome',))
+    t12 = threading.Thread(target=execute, args=('py ./testpy.py --browser firefox',))
     t13 = threading.Thread(target=execute, args=('py ./testpy.py --browser edge',))
 
     # starting threads

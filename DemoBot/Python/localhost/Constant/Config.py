@@ -1,9 +1,9 @@
 config = {
-    "changeUA": 1,
+    "changeUA": 0,
     "closeBrowser": 0,
-    "headless": 0,
+    "headless": 1,
     "incognito": 0,
-    "inputDelay": 0.2,
+    "inputDelay": 0.5,
     "logout": 0,
     "loop": 1,
     "redirect": 0,
