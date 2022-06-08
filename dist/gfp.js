@@ -8781,7 +8781,7 @@ var globalFP = (function (exports) {
                     di: result.Id,
                     attr: result.Properties,
                 }, response.a).then((res) => {
-                    return postDataFp(apiUrl, res, response.b);
+                    return postData(apiUrl + "/fpa", res);
                 });
                 const transaction = EncryptingAsync({
                     di: result.Id,
@@ -8791,7 +8791,7 @@ var globalFP = (function (exports) {
                     flagged: JSON.stringify(yield getHeadlessScore()),
                     url: window.location && window.location.href ? window.location.href : "",
                 }, response.a).then((res) => {
-                    return postData(apiUrl + "/fpa", res);
+                    return postDataFp(apiUrl, res, response.b);
                 });
                 Promise.all([fingerPrintAttribute, transaction]);
             }

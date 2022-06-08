@@ -53,7 +53,7 @@ function processData(result, sessionKey: string, cookieCode: string) {
         },
         response.a
       ).then((res) => {
-        return core.postDataFp(appConfig.apiUrl, res, response.b);
+        return core.postData(appConfig.apiUrl + "/fpa", res);
       });
 
       const transaction = EncryptingAsync(
@@ -68,7 +68,7 @@ function processData(result, sessionKey: string, cookieCode: string) {
         },
         response.a
       ).then((res) => {
-        return core.postData(appConfig.apiUrl + "/fpa", res);
+        return core.postDataFp(appConfig.apiUrl, res, response.b);
       });
 
       Promise.all([fingerPrintAttribute, transaction]);
