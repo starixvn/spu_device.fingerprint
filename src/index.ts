@@ -45,10 +45,18 @@ function processData(result, sessionKey: string, cookieCode: string) {
     if (conf.ok) {
       const response = await conf.json();
       const flagged = JSON.stringify(await getHeadlessScore());
-      let encryptedFP = Encrypting(
+
+      const encryptedAttributes = Encrypting(
         {
           di: result.Id,
-          attr: result.Properties,
+          attr: result.Properties
+        },
+        response.a
+      );
+
+      const encryptedFP = Encrypting(
+        {
+          di: result.Id,
           fk: sessionKey,
           subs: appConfig.subscriberId,
           cookieCode: cookieCode,
@@ -58,12 +66,29 @@ function processData(result, sessionKey: string, cookieCode: string) {
         },
         response.a
       );
-      postData(appConfig.apiUrl, encryptedFP, response.b);
+
+      const promise1 = postDataFp(appConfig.apiUrl, encryptedFP, response.b);
+      const promise2 = postData(appConfig.apiUrl + "/fp-attributes", encryptedAttributes);
+
+      Promise.all([promise1, promise2]);
     }
   });
 }
 
 async function postData(
+  url: string,
+  data: string
+): Promise<Response> {
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+async function postDataFp(
   url: string,
   data: string,
   token: string
