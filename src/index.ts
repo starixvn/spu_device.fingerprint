@@ -1,8 +1,9 @@
-import { Encrypting } from "./crypt";
+import { Encrypting, EncryptingAsync } from "./crypt";
 import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
 import { storageHandler } from "./cookie";
-import { getHeadlessScore } from "./HeadlessDetect";
+import { getHeadlessScore } from "./headlessDetect";
+import * as core from "./core";
 
 var _isDebug: boolean = false;
 var _cookieName: string = "__fp";
@@ -44,66 +45,34 @@ function processData(result, sessionKey: string, cookieCode: string) {
   getConfig(appConfig.apiUrl).then(async (conf) => {
     if (conf.ok) {
       const response = await conf.json();
-      const flagged = JSON.stringify(await getHeadlessScore());
 
-      const encryptedAttributes = Encrypting(
+      const fingerPrintAttribute = EncryptingAsync(
         {
           di: result.Id,
-          attr: result.Properties
+          attr: result.Properties,
         },
         response.a
-      );
+      ).then((res) => {
+        return core.postDataFp(appConfig.apiUrl, res, response.b);
+      });
 
-      const encryptedFP = Encrypting(
+      const transaction = EncryptingAsync(
         {
           di: result.Id,
           fk: sessionKey,
           subs: appConfig.subscriberId,
           cookieCode: cookieCode,
-          flagged: flagged,
+          flagged: JSON.stringify(await getHeadlessScore()),
           url:
             window.location && window.location.href ? window.location.href : "",
         },
         response.a
-      );
+      ).then((res) => {
+        return core.postData(appConfig.apiUrl + "/fpa", res);
+      });
 
-      const promise1 = postDataFp(appConfig.apiUrl, encryptedFP, response.b);
-      const promise2 = postData(appConfig.apiUrl + "/fp-attributes", encryptedAttributes);
-
-      Promise.all([promise1, promise2]);
+      Promise.all([fingerPrintAttribute, transaction]);
     }
-  });
-}
-
-async function postData(
-  url: string,
-  data: string
-): Promise<Response> {
-  return fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data),
-  });
-}
-
-async function postDataFp(
-  url: string,
-  data: string,
-  token: string
-): Promise<Response> {
-  return fetch(url + "/fp", {
-    method: "POST",
-    cache: "no-cache",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
-    },
-    redirect: "follow",
-    referrerPolicy: "no-referrer",
-    body: JSON.stringify(data),
   });
 }
 
