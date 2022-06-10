@@ -38,6 +38,10 @@ function testChromeWindow() {
 
 // Notification Permissions
 async function testNotificationPermissions() {
+  if (!navigator.permissions) {
+    return 0;
+  }
+  
   return await navigator.permissions
     .query({ name: "notifications" })
     .then(function (permissionStatus) {

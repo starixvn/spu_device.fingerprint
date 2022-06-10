@@ -1,8 +1,9 @@
-import { Encrypting } from "./crypt";
+import { Encrypting, EncryptingAsync } from "./crypt";
 import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
 import { storageHandler } from "./cookie";
-import { getHeadlessScore } from "./HeadlessDetect";
+import { getHeadlessScore } from "./headlessDetect";
+import * as core from "./core";
 
 var _isDebug: boolean = false;
 var _cookieName: string = "__fp";
@@ -44,41 +45,34 @@ function processData(result, sessionKey: string, cookieCode: string) {
   getConfig(appConfig.apiUrl).then(async (conf) => {
     if (conf.ok) {
       const response = await conf.json();
-      const flagged = JSON.stringify(await getHeadlessScore());
-      let encryptedFP = Encrypting(
+
+      const fingerPrintAttribute = EncryptingAsync(
         {
           di: result.Id,
           attr: result.Properties,
+        },
+        response.a
+      ).then((res) => {
+        return core.postData(appConfig.apiUrl + "/fpa", res);
+      });
+
+      const transaction = EncryptingAsync(
+        {
+          di: result.Id,
           fk: sessionKey,
           subs: appConfig.subscriberId,
           cookieCode: cookieCode,
-          flagged: flagged,
+          flagged: JSON.stringify(await getHeadlessScore()),
           url:
             window.location && window.location.href ? window.location.href : "",
         },
         response.a
-      );
-      postData(appConfig.apiUrl, encryptedFP, response.b);
-    }
-  });
-}
+      ).then((res) => {
+        return core.postDataFp(appConfig.apiUrl, res, response.b);
+      });
 
-async function postData(
-  url: string,
-  data: string,
-  token: string
-): Promise<Response> {
-  return fetch(url + "/fp", {
-    method: "POST",
-    cache: "no-cache",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
-    },
-    redirect: "follow",
-    referrerPolicy: "no-referrer",
-    body: JSON.stringify(data),
+      Promise.all([fingerPrintAttribute, transaction]);
+    }
   });
 }
 

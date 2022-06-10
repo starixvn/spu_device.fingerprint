@@ -19,6 +19,12 @@ export function Encrypting(data: {}, key: string): string {
   return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
 }
 
+export async function EncryptingAsync(data: {}, key: string): Promise<string> {
+  let result = Encrypting(data, key);
+
+  return Promise.resolve(result);
+}
+
 export function HashMD5(data: string): string {
   return CryptoJS.MD5(data).toString();
 }
