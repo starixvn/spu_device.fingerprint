@@ -4,6 +4,7 @@ import FingerprintJS, {
 } from "@fingerprintjs/fingerprintjs";
 
 import webglId from "./webgl";
+import _ from 'lodash';
 
 interface fpResult {
   Id: string;
@@ -91,8 +92,8 @@ export function getDI(): Promise<fpResult> {
   });
 
   return fpPromise
-    .then((fp) => fp.get())
-    .then(async (result) => {
+    .then(function(fp) {fp.get()})
+    .then(async function(result){
       const {
         screenResolution,
         screenFrame,
@@ -100,7 +101,7 @@ export function getDI(): Promise<fpResult> {
         fontPreferences,
         languages,
         ...components
-      } = result.components;
+      } = _.get(result, 'components');
 
       const customComponents = {
         ...components,

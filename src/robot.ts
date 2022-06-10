@@ -92,7 +92,7 @@ export function testBrowser() {
     { name: "OuterDimensions", testFunction: testOuter },
   ];
 
-  tests.forEach((test) => {
+  tests.forEach(function(test){
     let tested = test.testFunction();
 
     results += JSON.stringify(test.name) + ":" + tested + ", ";

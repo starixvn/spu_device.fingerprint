@@ -19,8 +19,8 @@ export function Encrypting(data: {}, key: string): string {
   return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
 }
 
-export async function EncryptingAsync(data: {}, key: string): Promise<string> {
-  let result = Encrypting(data, key);
+export function EncryptingAsync(data: {}, key: string): Promise<string> {
+  var result = Encrypting(data, key);
 
   return Promise.resolve(result);
 }

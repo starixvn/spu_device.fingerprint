@@ -71,7 +71,7 @@ function getCookie(name: string): string {
 }
 
 function cookieHandler(cookieCode: string): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise(function(resolve){
     resolve(isGuid(cookieCode) ? cookieCode : generateUUID());
   });
 }
@@ -106,8 +106,8 @@ function generateUUID() {
 }
 
 function setStorage(name: string, value: string) {
-  initStorage().then((drivers) => {
-    drivers.forEach((drive) => {
+  initStorage().then(function(drivers){
+    drivers.forEach(function(drive){
       var storageDriver = localForage.createInstance({
         driver: drive,
         name: drive + "-EC",
@@ -115,9 +115,9 @@ function setStorage(name: string, value: string) {
       });
 
       storageDriver
-        .setItem(name, value, () => {})
+        .setItem(name, value, function(){})
         .then(console.log)
-        .catch((e) => {
+        .catch(function(e){
           console.log(e.message);
         });
 
@@ -128,8 +128,8 @@ function setStorage(name: string, value: string) {
 
 export function storageHandler(name: string): Promise<string> {
   return initStorage()
-    .then((driver) => {
-      var cookies = driver.map(async (drive) => {
+    .then(function(driver){
+      var cookies = driver.map(async function(drive){
         if (drive != null) {
           try {
             var storageDriver = localForage.createInstance({
@@ -137,7 +137,7 @@ export function storageHandler(name: string): Promise<string> {
               name: drive + "-EC",
               storeName: "ec",
             });
-            return await storageDriver.getItem<string>(name, () => {});
+            return await storageDriver.getItem<string>(name, function(){});
           } catch {
             return Promise.resolve(null);
           }
@@ -147,8 +147,8 @@ export function storageHandler(name: string): Promise<string> {
 
       return cookies;
     })
-    .then((res) => {
-      return Promise.all(res).then((cookies) => {
+    .then(function(res){
+      return Promise.all(res).then(function(cookies){
         var latestCookie: string = null;
         for (const cookie of cookies) {
           if (cookie != null) {
@@ -157,7 +157,7 @@ export function storageHandler(name: string): Promise<string> {
           }
         }
 
-        return cookieHandler(latestCookie).then((cookieValue: string) => {
+        return cookieHandler(latestCookie).then(function(cookieValue: string){
           setStorage(name, cookieValue);
           return cookieValue;
         });

@@ -92,13 +92,13 @@ export async function getHeadlessScore() {
   let testRunDetail = "";
 
   return await testNotificationPermissions()
-    .then((x) => {
+    .then(function(x){
       score = x;
       testsRun++;
       testRunDetail = "NotificationPermissions : " + x + ", ";
     })
-    .then(() => {
-      allTestFunctions.forEach((test) => {
+    .then(function(){
+      allTestFunctions.forEach(function(test){
         if (test.active == 1) {
           let result = test.testFunction();
 

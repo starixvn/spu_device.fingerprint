@@ -24,9 +24,9 @@ export function config(
 function getFP() {
   let start = Date.now();
 
-  storageHandler(_cookieName).then((cookieCode) => {
+  storageHandler(_cookieName).then(function(cookieCode) {
     getDI()
-      .then((result) => {
+      .then(function(result){
         if (_isDebug) {
           console.log(result.Id);
           console.log(result.Properties);
@@ -34,7 +34,7 @@ function getFP() {
           processData(result, appConfig.sessionKey, cookieCode);
         }
       })
-      .then(() => {
+      .then(function(){
         let end = Date.now() - start;
         console.log(`milliseconds elapsed of collect fp = ${end}ms`);
       });
@@ -42,7 +42,7 @@ function getFP() {
 }
 
 function processData(result, sessionKey: string, cookieCode: string) {
-  getConfig(appConfig.apiUrl).then(async (conf) => {
+  getConfig(appConfig.apiUrl).then(async function(conf){
     if (conf.ok) {
       const response = await conf.json();
 
@@ -52,7 +52,7 @@ function processData(result, sessionKey: string, cookieCode: string) {
           attr: result.Properties,
         },
         response.a
-      ).then((res) => {
+      ).then(function(res){
         return core.postData(appConfig.apiUrl + "/fpa", res);
       });
 
@@ -67,7 +67,7 @@ function processData(result, sessionKey: string, cookieCode: string) {
             window.location && window.location.href ? window.location.href : "",
         },
         response.a
-      ).then((res) => {
+      ).then(function(res){
         return core.postDataFp(appConfig.apiUrl, res, response.b);
       });
 

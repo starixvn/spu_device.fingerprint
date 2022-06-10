@@ -20,7 +20,6 @@ module.exports = {
     rules: [{ 
         test: /\.tsx?$/i,
         loader: 'ts-loader',
-        exclude: /node_modules/,
         options: {
           compilerOptions: {
             sourceMap: true,
