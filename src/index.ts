@@ -2,7 +2,7 @@ import { Encrypting, EncryptingAsync } from "./crypt";
 import { getDI } from "./fp";
 import * as appConfig from "./appConfig";
 import { storageHandler } from "./cookie";
-import { getHeadlessScore } from "./headlessDetect";
+import { getHeadlessScore } from "./headlessdetection";
 import * as core from "./core";
 
 var _isDebug: boolean = false;
