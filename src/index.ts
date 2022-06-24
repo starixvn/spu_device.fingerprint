@@ -75,12 +75,13 @@ function processData(result, sessionKey: string, cookieCode: string) {
         {
           fk: sessionKey,
           ua: navigator.userAgent,
+          uad: JSON.stringify(navigator.userAgentData),
           hscore: JSON.stringify(await getHeadlessScore()),
           binfo: JSON.stringify(getBrowserInfo()),
         },
         response.a
       ).then((res) => {						
-        return core.postData(appConfig.apiUrl + "/browserinfo", res);
+        return core.postData(appConfig.apiUrl + "/bi", res);
       });
       
       Promise.all([fingerPrintAttribute, transaction, browserInfo]);
