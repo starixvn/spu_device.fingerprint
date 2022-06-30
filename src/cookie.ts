@@ -116,7 +116,7 @@ function setStorage(name: string, value: string) {
 
       storageDriver
         .setItem(name, value, () => {})
-        .then(console.log)
+        //.then(console.log)
         .catch((e) => {
           console.log(e.message);
         });
