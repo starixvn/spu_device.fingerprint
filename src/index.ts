@@ -1,8 +1,8 @@
-import { EncryptingAsync } from "./crypt";
+import { encryptingAsync } from "./crypt";
 import { getFP } from "./fp";
 import * as appConfig from "./appConfig";
 import { storageHandler } from "./cookie";
-import { getHeadlessScore } from "./headlessdetection";
+import { getHeadlessScore } from "./headlessDetection";
 import * as core from "./core";
 
 var _isDebug: boolean = false;
@@ -29,21 +29,23 @@ export function index() {
   Promise.all([configs, cookies, fps, headless]).then(
     ([config, cookie, fp, hl]) => {
       if (config != null && config != "") {
-        EncryptingAsync(
+        const cryptConfig = {
+          iv: config.iv,
+          pass: config.ek,
+          salt: config.sa,
+        };
+
+        encryptingAsync(
           {
             di: fp.Id,
             attr: fp.Properties,
           },
-          {
-            iv: config.iv,
-            pass: config.ek,
-            salt: config.sa,
-          }
+          cryptConfig
         ).then((res) => {
           return core.postData(appConfig.apiUrl + "/fpa", res);
         });
 
-        EncryptingAsync(
+        encryptingAsync(
           {
             di: fp.Id,
             fk: appConfig.sessionKey,
@@ -55,11 +57,7 @@ export function index() {
                 ? window.location.href
                 : "",
           },
-          {
-            iv: config.iv,
-            pass: config.ek,
-            salt: config.sa,
-          }
+          cryptConfig
         ).then((res) => {
           return core.postDataFp(appConfig.apiUrl, res, config.tk);
         });

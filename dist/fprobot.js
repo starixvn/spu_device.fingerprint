@@ -64,6 +64,9 @@
     // Notification Permissions
     function testNotificationPermissions() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!navigator.permissions) {
+                return 0;
+            }
             return yield navigator.permissions
                 .query({ name: "notifications" })
                 .then(function (permissionStatus) {
