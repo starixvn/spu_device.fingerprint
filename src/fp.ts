@@ -82,7 +82,7 @@ function getLanguages(): {} {
   };
 }
 
-export function getDI(): Promise<fpResult> {
+export function getFP(): Promise<fpResult> {
   let visitorId: string;
   let properties: {};
 

@@ -1,18 +1,12 @@
-import { Encrypting, EncryptingAsync } from "./crypt";
-import { getDI } from "./fp";
+import { EncryptingAsync } from "./crypt";
+import { getFP } from "./fp";
 import * as appConfig from "./appConfig";
 import { storageHandler } from "./cookie";
 import { getHeadlessScore } from "./headlessdetection";
 import * as core from "./core";
-import { getBrowserInfo } from "./browserDetect";
 
 var _isDebug: boolean = false;
 var _cookieName: string = "__fp";
-
-export function isDebug(isDebug: boolean) {
-  _isDebug = isDebug;
-  return this;
-}
 
 export function config(
   apiUrl: string,
@@ -22,78 +16,67 @@ export function config(
   appConfig.set(apiUrl, subscriberId, sessionKey);
 }
 
-function getFP() {
-  let start = Date.now();
-
-  storageHandler(_cookieName).then((cookieCode) => {
-    getDI()
-      .then((result) => {
-        if (_isDebug) {
-          console.log(result.Id);
-          console.log(result.Properties);
-        } else {
-          processData(result, appConfig.sessionKey, cookieCode);
-        }
-      })
-      .then(() => {
-        let end = Date.now() - start;
-        console.log(`milliseconds elapsed of collect fp = ${end}ms`);
-      });
-  });
-}
-
-function processData(result, sessionKey: string, cookieCode: string) {
-  getConfig(appConfig.apiUrl).then(async (conf) => {
-    if (conf.ok) {
-      const response = await conf.json();
-
-      const fingerPrintAttribute = EncryptingAsync(
-        {
-          di: result.Id,
-          attr: result.Properties,		  
-        },
-        response.a
-      ).then((res) => {
-        return core.postData(appConfig.apiUrl + "/fpa", res);
-      });
-
-      const transaction = EncryptingAsync(
-        {
-          di: result.Id,
-          fk: sessionKey,
-          subs: appConfig.subscriberId,
-          cookieCode: cookieCode,
-          url:
-            window.location && window.location.href ? window.location.href : "",
-        },
-        response.a
-      ).then((res) => {						
-        return core.postDataFp(appConfig.apiUrl, res, response.b);
-      });
-
-      const browserInfo = EncryptingAsync(
-        {
-          fk: sessionKey,
-          ua: navigator.userAgent,
-          uad: JSON.stringify(navigator.userAgentData),
-          hscore: JSON.stringify(await getHeadlessScore()),
-          binfo: JSON.stringify(getBrowserInfo()),
-        },
-        response.a
-      ).then((res) => {						
-        return core.postData(appConfig.apiUrl + "/bi", res);
-      });
-      
-      Promise.all([fingerPrintAttribute, transaction, browserInfo]);
+export function index() {
+  const configs = getConfig(appConfig.apiUrl, appConfig.sessionKey).then(
+    (conf) => {
+      return conf.json();
     }
-  });
+  );
+  const cookies = getCookie();
+  const fps = getFP();
+  const headless = getHeadlessScore();
+
+  Promise.all([configs, cookies, fps, headless]).then(
+    ([config, cookie, fp, hl]) => {
+      if (config != null && config != "") {
+        EncryptingAsync(
+          {
+            di: fp.Id,
+            attr: fp.Properties,
+          },
+          {
+            iv: config.iv,
+            pass: config.ek,
+            salt: config.sa,
+          }
+        ).then((res) => {
+          return core.postData(appConfig.apiUrl + "/fpa", res);
+        });
+
+        EncryptingAsync(
+          {
+            di: fp.Id,
+            fk: appConfig.sessionKey,
+            subs: appConfig.subscriberId,
+            cookieCode: cookie,
+            flagged: JSON.stringify(hl),
+            url:
+              window.location && window.location.href
+                ? window.location.href
+                : "",
+          },
+          {
+            iv: config.iv,
+            pass: config.ek,
+            salt: config.sa,
+          }
+        ).then((res) => {
+          return core.postDataFp(appConfig.apiUrl, res, config.tk);
+        });
+      }
+    }
+  );
 }
 
-async function getConfig(url: string): Promise<Response> {
-  return fetch(url + "/conf", {
+function getCookie() {
+  return storageHandler(_cookieName);
+}
+
+function getConfig(url: string, sessionKey: string): Promise<Response> {
+  return fetch(url + "/conf/" + sessionKey, {
     method: "GET",
     redirect: "follow",
   });
 }
 
-getFP();
+index();
