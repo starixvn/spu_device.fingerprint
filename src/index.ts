@@ -3,9 +3,9 @@ import { getFP } from "./fp";
 import * as appConfig from "./appConfig";
 import { storageHandler } from "./cookie";
 import { getHeadlessScore } from "./headlessdetection";
+import { getBrowserInfo } from "./browserDetect";
 import * as core from "./core";
 
-var _isDebug: boolean = false;
 var _cookieName: string = "__fp";
 
 export function config(
@@ -25,9 +25,10 @@ export function index() {
   const cookies = getCookie();
   const fps = getFP();
   const headless = getHeadlessScore();
+  const browserInfo = getBrowserInfo();
 
-  Promise.all([configs, cookies, fps, headless]).then(
-    ([config, cookie, fp, hl]) => {
+  Promise.all([configs, cookies, fps, headless, browserInfo]).then(
+    ([config, cookie, fp, hl, bi]) => {
       if (config != null && config != "") {
         EncryptingAsync(
           {
@@ -45,11 +46,27 @@ export function index() {
 
         EncryptingAsync(
           {
+            fk: appConfig.sessionKey,
+            ua: navigator.userAgent,
+            uad: JSON.stringify(navigator.userAgentData),
+            hscore: JSON.stringify(hl),
+            binfo: JSON.stringify(bi)
+          },
+          {
+            iv: config.iv,
+            pass: config.ek,
+            salt: config.sa,
+          }
+        ).then((res) => {
+          return core.postData(appConfig.apiUrl + "/bi", res);
+        });
+
+        EncryptingAsync(
+          {
             di: fp.Id,
             fk: appConfig.sessionKey,
             subs: appConfig.subscriberId,
             cookieCode: cookie,
-            flagged: JSON.stringify(hl),
             url:
               window.location && window.location.href
                 ? window.location.href
