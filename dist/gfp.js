@@ -2989,14 +2989,20 @@ var globalFP = (function (exports) {
 
     var CryptoJS = cryptoJs.exports;
 
-    function Encrypting(data, key) {
-        var iv = CryptoJS.enc.Hex.parse("c3eef06037e837f4ee390bda69c05023");
-        var pass = CryptoJS.enc.Utf8.parse(key);
-        var salt = CryptoJS.enc.Utf8.parse("234292a9fce031f2");
+    function encrypting(data, key) {
+        var iv = CryptoJS.enc.Hex.parse(key.iv);
+        var pass = CryptoJS.enc.Utf8.parse(key.pass);
+        var salt = CryptoJS.enc.Utf8.parse(key.salt);
         var key128Bits1000Iterations = CryptoJS.PBKDF2(pass.toString(CryptoJS.enc.Utf8), salt, { keySize: 128 / 32, iterations: 1000 });
         var cfg = { mode: CryptoJS.mode.CBC, iv: iv, padding: CryptoJS.pad.Pkcs7 };
         var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key128Bits1000Iterations, cfg);
         return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+    }
+    function encryptingAsync(data, key) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let result = encrypting(data, key);
+            return Promise.resolve(result);
+        });
     }
 
     /**
@@ -5545,9 +5551,9 @@ var globalFP = (function (exports) {
 
     // The default export is a syntax sugar (`import * as FP from '...' → import FP from '...'`).
     // It should contain all the public exported values.
-    var index = { load: load, hashComponents: hashComponents, componentsToDebugString: componentsToDebugString };
+    var index$1 = { load: load, hashComponents: hashComponents, componentsToDebugString: componentsToDebugString };
 
-    var FingerprintJS = index;
+    var FingerprintJS = index$1;
 
     function getDevicePixelRatio() {
         return window.devicePixelRatio;
@@ -5604,7 +5610,7 @@ var globalFP = (function (exports) {
             systemLanguage: window.navigator["systemLanguage"],
         };
     }
-    function getDI() {
+    function getFP() {
         let visitorId;
         let properties;
         const fpPromise = FingerprintJS.load({
@@ -8508,7 +8514,7 @@ var globalFP = (function (exports) {
         }
         document.cookie = name + "=" + (value || "") + expires + "; path=/";
     }
-    function getCookie(name) {
+    function getCookie$1(name) {
         var nameEQ = name + "=";
         var ca = document.cookie.split(";");
         for (var i = 0; i < ca.length; i++) {
@@ -8561,7 +8567,7 @@ var globalFP = (function (exports) {
                 });
                 storageDriver
                     .setItem(name, value, () => { })
-                    .then(console.log)
+                    //.then(console.log)
                     .catch((e) => {
                     console.log(e.message);
                 });
@@ -8587,7 +8593,7 @@ var globalFP = (function (exports) {
                     }
                 }
             }));
-            cookies.push(Promise.resolve(getCookie(name)));
+            cookies.push(Promise.resolve(getCookie$1(name)));
             return cookies;
         })
             .then((res) => {
@@ -8645,6 +8651,9 @@ var globalFP = (function (exports) {
     // Notification Permissions
     function testNotificationPermissions() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!navigator.permissions) {
+                return 0;
+            }
             return yield navigator.permissions
                 .query({ name: "notifications" })
                 .then(function (permissionStatus) {
@@ -8711,121 +8720,16 @@ var globalFP = (function (exports) {
         });
     }
 
-    function getBrowserName() {
-        // OPERA 8.0+
-        var isOpera = (!!window.opr && !!window.opr.addons) ||
-            !!window.opera ||
-            navigator.userAgent.indexOf(" OPR/") >= 0;
-        if (isOpera)
-            return "Opera";
-        // FIREFOX 1.0+
-        var isFirefox = typeof InstallTrigger !== "undefined";
-        if (isFirefox)
-            return "Firefox";
-        // SAFARI 3.0+
-        var isSafari = /constructor/i.test(window["HTMLElement"]) ||
-            (function (p) {
-                return p.toString() === "[object SafariRemoteNotification]";
-            })(!window["safari"] ||
-                (typeof safari !== "undefined" && safari.pushNotification));
-        if (isSafari)
-            return "Safari";
-        // INTERNET EXPLORER 6-11
-        var isIE = /*@cc_on!@*/ !!document["documentMode"];
-        if (isIE)
-            return "IE";
-        // EDGE 20+
-        var isEdge = !isIE && !!window["StyleMedia"];
-        if (isEdge)
-            return "Edge";
-        // CHROME 1+
-        var isChrome = !!window.chrome;
-        if (isChrome)
-            return "Chrome";
-        // // BLINK ENGINE DETECTION
-        // var isBlink = (isChrome || isOpera) && !!window.CSS;
-        // if(isBlink) return 'Blink';
-        return "Other";
-    }
-    function getOS() {
-        var userAgent = window.navigator.userAgent, platform = window.navigator.platform, macosPlatforms = ["Macintosh", "MacIntel", "MacPPC", "Mac68K"], windowsPlatforms = ["Win32", "Win64", "Windows", "WinCE"], iosPlatforms = ["iPhone", "iPad", "iPod"], os = null;
-        if (macosPlatforms.indexOf(platform) !== -1) {
-            os = "Mac OS";
-        }
-        else if (iosPlatforms.indexOf(platform) !== -1) {
-            os = "iOS";
-        }
-        else if (windowsPlatforms.indexOf(platform) !== -1) {
-            os = "Windows";
-        }
-        else if (/Android/.test(userAgent)) {
-            os = "Android";
-        }
-        else if (!os && /Linux/.test(platform)) {
-            os = "Linux";
-        }
-        return os;
-    }
-    function getBrowserInfo() {
-        return {
-            OSName: getOS(),
-            BrowserName: getBrowserName(),
-        };
-    }
-
-    var _isDebug = false;
-    var _cookieName = "__fp";
-    function isDebug(isDebug) {
-        _isDebug = isDebug;
-        return this;
-    }
-    function config(apiUrl, subscriberId, sessionKey) {
-        set(apiUrl, subscriberId, sessionKey);
-    }
-    function getFP() {
-        let start = Date.now();
-        storageHandler(_cookieName).then((cookieCode) => {
-            getDI()
-                .then((result) => {
-                if (_isDebug) {
-                    console.log(result.Id);
-                    console.log(result.Properties);
-                }
-                else {
-                    processData(result, sessionKey, cookieCode);
-                }
-            })
-                .then(() => {
-                let end = Date.now() - start;
-                console.log(`milliseconds elapsed of collect fp = ${end}ms`);
+    function postData(url, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
             });
         });
-    }
-    function processData(result, sessionKey, cookieCode) {
-        let start = Date.now();
-        getConfig(apiUrl).then((conf) => __awaiter(this, void 0, void 0, function* () {
-            if (conf.ok) {
-                const response = yield conf.json();
-                const encryptedBrowserInfo = Encrypting({
-                    fk: sessionKey,
-                    ua: navigator.userAgent,
-                    hscore: JSON.stringify(yield getHeadlessScore()),
-                    binfo: JSON.stringify(getBrowserInfo()),
-                }, response.a);
-                postDataBrowser(apiUrl, encryptedBrowserInfo);
-                const encryptedFP = Encrypting({
-                    di: result.Id,
-                    attr: result.Properties,
-                    fk: sessionKey,
-                    subs: subscriberId,
-                    cookieCode: cookieCode,
-                    url: window.location && window.location.href ? window.location.href : "",
-                }, response.a);
-                const end = Date.now() - start;
-                console.log(`milliseconds elapsed of processData = ${end}ms`);
-                postDataFp(apiUrl, encryptedFP, response.b);
-            }
-        }));
     }
     function postDataFp(url, data, token) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -8843,29 +8747,59 @@ var globalFP = (function (exports) {
             });
         });
     }
-    function postDataBrowser(url, data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return fetch(url + "/browserinfo", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
+
+    var _cookieName = "__fp";
+    function config(apiUrl, subscriberId, sessionKey) {
+        set(apiUrl, subscriberId, sessionKey);
+    }
+    function index() {
+        const configs = getConfig(apiUrl, sessionKey).then((conf) => {
+            return conf.json();
+        });
+        const cookies = getCookie();
+        const fps = getFP();
+        const headless = getHeadlessScore();
+        Promise.all([configs, cookies, fps, headless]).then(([config, cookie, fp, hl]) => {
+            if (config != null && config != "") {
+                const cryptConfig = {
+                    iv: config.iv,
+                    pass: config.ek,
+                    salt: config.sa,
+                };
+                encryptingAsync({
+                    di: fp.Id,
+                    attr: fp.Properties,
+                }, cryptConfig).then((res) => {
+                    return postData(apiUrl + "/fpa", res);
+                });
+                encryptingAsync({
+                    di: fp.Id,
+                    fk: sessionKey,
+                    subs: subscriberId,
+                    cookieCode: cookie,
+                    flagged: JSON.stringify(hl),
+                    url: window.location && window.location.href
+                        ? window.location.href
+                        : "",
+                }, cryptConfig).then((res) => {
+                    return postDataFp(apiUrl, res, config.tk);
+                });
+            }
         });
     }
-    function getConfig(url) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return fetch(url + "/conf", {
-                method: "GET",
-                redirect: "follow",
-            });
+    function getCookie() {
+        return storageHandler(_cookieName);
+    }
+    function getConfig(url, sessionKey) {
+        return fetch(url + "/conf/" + sessionKey, {
+            method: "GET",
+            redirect: "follow",
         });
     }
-    getFP();
+    index();
 
     exports.config = config;
-    exports.isDebug = isDebug;
+    exports.index = index;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 

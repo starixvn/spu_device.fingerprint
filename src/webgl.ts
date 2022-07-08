@@ -1,4 +1,4 @@
-import { HashMD5 } from "./crypt";
+import { hashMD5 } from "./crypt";
 
 export default function webglId(): string {
   var canvas,
@@ -62,5 +62,5 @@ export default function webglId(): string {
   ctx.readPixels(0, 0, width, height, ctx.RGBA, ctx.UNSIGNED_BYTE, n);
   m = JSON.stringify(n).replace(/,?"[0-9]+":/g, "");
 
-  return HashMD5(m);
+  return hashMD5(m);
 }

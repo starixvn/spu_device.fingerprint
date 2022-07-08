@@ -4,7 +4,7 @@ interface Key {
   pass: string;
   salt: string;
 }
-export function Encrypting(data: {}, key: Key): string {
+export function encrypting(data: {}, key: Key): string {
   var iv = CryptoJS.enc.Hex.parse(key.iv);
   var pass = CryptoJS.enc.Utf8.parse(key.pass);
   var salt = CryptoJS.enc.Utf8.parse(key.salt);
@@ -23,12 +23,12 @@ export function Encrypting(data: {}, key: Key): string {
   return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
 }
 
-export async function EncryptingAsync(data: {}, key: Key): Promise<string> {
-  let result = Encrypting(data, key);
+export async function encryptingAsync(data: {}, key: Key): Promise<string> {
+  let result = encrypting(data, key);
 
   return Promise.resolve(result);
 }
 
-export function HashMD5(data: string): string {
+export function hashMD5(data: string): string {
   return CryptoJS.MD5(data).toString();
 }
