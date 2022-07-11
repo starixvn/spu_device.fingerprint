@@ -1,6 +1,13 @@
 import { hashMD5 } from "./crypt";
 
-export default function webglId(): string {
+interface componentObject {
+  value: {};
+  duration: number;
+}
+
+export default function webglId(): componentObject {
+  const start = Date.now();
+
   var canvas,
     ctx,
     width = 256,

@@ -42,6 +42,8 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
             ua: navigator.userAgent,
             uad: JSON.stringify(navigator.userAgentData),
             hscore: JSON.stringify(hl),
+          cv: result.CheckCanvasDefender,
+          gl: result.CheckWebGLDefender,
             binfo: JSON.stringify(bi),
           },
           {

@@ -3,6 +3,8 @@ import FingerprintJS, {
   loadSources,
   UnknownComponents,
 } from "@fingerprintjs/fingerprintjs";
+import { checkFnCanvasDefender, checkFnWebGLDefender } from "./detectAddonDefender";
+import webglId from "./webgl";
 
 interface fpResult {
   Id: string;
@@ -12,6 +14,14 @@ interface CanvasFingerprint {
   winding: boolean;
   geometry: string;
   text: string;
+}
+interface componentObjectCanvas {
+  value: CanvasFingerprint;
+  duration: number;
+}
+interface componentObject {
+  value: {};
+  duration: number;
 }
 
 function getDevicePixelRatio(): number {
@@ -27,110 +37,27 @@ function getPixelDepth(): number {
   return screen.pixelDepth;
 }
 
-function getScreenPrint(): {} {
-  return {
+function getScreenPrint(): componentObject {
+  const start = Date.now();
+
+  const result = {
     currentResolution: getCurrentResolution(),
     pixelDepth: getPixelDepth(),
   };
+
+  return { value: result, duration: Date.now() - start };
 }
 
-async function getCanvas(): Promise<CanvasFingerprint> {
-  var _a = makeCanvasContext(), canvas = _a[0], context = _a[1];
+async function getCanvas(): Promise<componentObjectCanvas> {
+  const start = Date.now();
 
-  if (!isSupported(canvas, context)) {
-    return { winding: false, geometry: "", text: "" };
-  }
-  return {
-      winding: doesSupportWinding(context),
-      geometry: await makeGeometryImage(canvas, context),
-      text: ""
+  let canvas = sources.canvas();
+  const result = {
+    winding: canvas.winding,
+    geometry: canvas.geometry,
+    text: "",
   };
-}
-function makeCanvasContext() {
-  var canvas = document.createElement('canvas');
-  canvas.width = 1;
-  canvas.height = 1;
-  return [canvas, canvas.getContext('2d')];
-}
-
-function isSupported(canvas, context) {
-// const xfunction = cloneFunction(canvas.toDataURL);
-// return !!(context && xfunction);
-return !!(context && canvas.toDataURL);
-}
-
-function doesSupportWinding(context) {
-  context.rect(0, 0, 10, 10);
-  context.rect(2, 2, 6, 6);
-  return !context.isPointInPath(5, 5, 'evenodd');
-}
-
-async function makeGeometryImage(canvas, context) : Promise<string> {
-  canvas.width = 122;
-  canvas.height = 110;
-  context.globalCompositeOperation = 'multiply';
-
-  for (var _i = 0, _a = [
-      ['#f2f', 40, 40],
-      ['#2ff', 80, 40],
-      ['#ff2', 60, 80],
-  ]; _i < _a.length; _i++) {
-      var _b = _a[_i], color = _b[0], x = _b[1], y = _b[2];
-      context.fillStyle = color;
-      context.beginPath();
-      context.arc(x, y, 40, 0, Math.PI * 2, true);
-      context.closePath();
-      context.fill();
-  }
-  
-  context.fillStyle = '#f9c';
-  context.arc(60, 60, 60, 0, Math.PI * 2, true);
-  context.arc(60, 60, 20, 0, Math.PI * 2, true);
-  context.fill('evenodd');
-  return save(canvas);
-}
-
-async function save(canvas) : Promise<string> {
-  return canvas.toDataURL("image/jpg");
-  // return canvas.toDataURL();
-  // const arrayToBuffer = canvasToArrayBuffer(canvas, 'image/png');
-  // const result = await arrayToBuffer.then(async (data) => {
-  //   return await arrayBufferToBase64(data);
-  // });
-  // return result;
-}
-
-async function canvasToArrayBuffer(canvas: HTMLCanvasElement, mime: string): Promise<ArrayBuffer> {
-  return await new Promise((resolve, reject) => canvas.toBlob(async (d) => {
-    if (d) {
-      const r = new FileReader();
-      r.addEventListener('loadend', e => {
-        const ab = r.result;
-        if (ab) {
-          resolve(ab as ArrayBuffer);
-        }
-        else {
-          reject(new Error('Expected FileReader result'));
-        }
-      }); r.addEventListener('error', e => {
-        reject(e)
-      });
-      r.readAsArrayBuffer(d);
-    }
-    else {
-      reject(new Error('Expected toBlob() to be defined'));
-    }
-  }, mime));
-}
-
-function arrayBufferToBase64(buffer) : string {
-  var binary = '';
-  var bytes = new Uint8Array(buffer);
-  var len = bytes.byteLength;
-  for (var i = 0; i < len; i++) {
-      binary += String.fromCharCode(bytes[i]);
-  }
-  return window.btoa(binary);
+  return { value: result, duration: Date.now() - start };
 }
 
 function componentsToCanonicalString(components: UnknownComponents): {} {
@@ -149,9 +76,11 @@ function componentsToCanonicalString(components: UnknownComponents): {} {
   return `[${result}}]`;
 }
 
-async function getFontPreference(): Promise<Record<string, number>> {
-  let font = await sources.fontPreferences();
-  return {
+async function getFontPreference(): Promise<componentObject> {
+  const start = Date.now();
+  
+  const font = await sources.fontPreferences();
+  const result = {
     default: font["default"],
     apple: font["apple"],
     serif: font["serif"],
@@ -159,45 +88,59 @@ async function getFontPreference(): Promise<Record<string, number>> {
     min: font["min"],
     system: font["system"],
   };
+  return { value: result, duration: Date.now() - start };
 }
 
-function getLanguages(): {} {
-  return {
+function getLanguages(): componentObject {
+  const start = Date.now();
+  const result = {
     language: window.navigator.language,
     languages: window.navigator.languages.join(","),
     userLanguage: window.navigator["userLanguage"],
     browserLanguage: window.navigator["browserLanguage"],
     systemLanguage: window.navigator["systemLanguage"],
   };
+  return { value: result, duration: Date.now() - start };
 }
 
 export function getFP(): Promise<fpResult> {
   let visitorId: string;
   let properties: {};
 
-  const fpPromise = loadSources(sources, {}, ["screenResolution", "screenFrame", "canvas", "fontPreferences", "languages"])();
+  const fpPromise = loadSources(sources, {}, [
+    "screenResolution",
+    "screenFrame",
+    "canvas",
+    "fontPreferences",
+    "languages",
+  ])();
 
-  return fpPromise
-    .then(async (components) => {
+  return fpPromise.then(async (components) => {
+    const customComponents = {
+      ...components,
+      screenPrint: getScreenPrint(),
+      fontPreferencePrint: await getFontPreference(),
+      languagesPrint: getLanguages()
+    };
 
-      const customComponents = {
-        ...components,
-        screenPrint: { value: getScreenPrint(), duration: 0 },
-        canvasPrint: { value: await getCanvas(), duration: 0 },
-        fontPreferencePrint: {
-          value: await getFontPreference(),
-          duration: 0,
-        },
-        languagesPrint: {
-          value: getLanguages(),
-          duration: 0,
-        },
-      };
+    const checkCanvasDefender = await checkFnCanvasDefender();
+    const checkWebGLDefender = await checkFnWebGLDefender();
+    
+    if(!checkCanvasDefender){
+      customComponents['canvasPrint'] = await getCanvas();
+    }
+    else if(!checkWebGLDefender){
+      customComponents['webglId'] = webglId();
+    }
 
-      visitorId = FingerprintJS.hashComponents(customComponents);
+    visitorId = FingerprintJS.hashComponents(customComponents);
+    properties = componentsToCanonicalString(customComponents);
 
-      properties = componentsToCanonicalString(customComponents);
-
-      return Promise.resolve({ Id: visitorId, Properties: properties });
+    return Promise.resolve({ 
+      Id: visitorId, 
+      Properties: properties, 
+      CheckCanvasDefender: checkCanvasDefender, 
+      CheckWebGLDefender: checkWebGLDefender
     });
+  });
 }
