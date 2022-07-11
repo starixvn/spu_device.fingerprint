@@ -83,7 +83,7 @@ export function index() {
   );
 }
 
-function getCookie() {
+function getCookie() : Promise<string> {
   return storageHandler(_cookieName);
 }
 

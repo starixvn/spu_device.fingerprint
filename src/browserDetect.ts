@@ -9,7 +9,7 @@ function getEngineBrowser() {
   console.log(prefix);
 }
 
-function getBrowserName() {
+function getBrowserName() : string {
   // OPERA 8.0+
   var isOpera =
     (!!window.opr && !!window.opr.addons) ||
@@ -72,7 +72,13 @@ function getOS(): string {
   return os;
 }
 
-export function getBrowserInfo() {
+
+interface biResult {
+  OSName: string;
+  BrowserName: string;
+}
+
+export function getBrowserInfo() : biResult {
   return {
     OSName: getOS(),
     BrowserName: getBrowserName(),
