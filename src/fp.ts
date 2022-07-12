@@ -3,20 +3,23 @@ import FingerprintJS, {
   loadSources,
   UnknownComponents,
 } from "@fingerprintjs/fingerprintjs";
-import { checkFnCanvasDefender, checkFnWebGLDefender } from "./detectAddonDefender";
+import {
+  isFnCanvasDefender,
+  isFnWebGLDefender,
+} from "./addonDefenderDetection";
 import webglId from "./webgl";
 
 interface fpResult {
   Id: string;
   Properties: {};
 }
-interface CanvasFingerprint {
+interface canvasFingerprint {
   winding: boolean;
   geometry: string;
   text: string;
 }
 interface componentObjectCanvas {
-  value: CanvasFingerprint;
+  value: canvasFingerprint;
   duration: number;
 }
 interface componentObject {
@@ -48,15 +51,30 @@ function getScreenPrint(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
-async function getCanvas(): Promise<componentObjectCanvas> {
+function getCanvas(): componentObjectCanvas {
   const start = Date.now();
+  let result;
 
-  let canvas = sources.canvas();
-  const result = {
-    winding: canvas.winding,
-    geometry: canvas.geometry,
-    text: "",
-  };
+  if (!isFnCanvasDefender()) {
+    let canvas = sources.canvas();
+    result = {
+      winding: canvas.winding,
+      geometry: canvas.geometry,
+      text: "",
+    };
+  }
+
+  return { value: result, duration: Date.now() - start };
+}
+
+function getWebGL(): componentObject {
+  const start = Date.now();
+  let result = "undefined";
+
+  if (!isFnWebGLDefender()) {
+    result = webglId();
+  }
+
   return { value: result, duration: Date.now() - start };
 }
 
@@ -65,12 +83,15 @@ function componentsToCanonicalString(components: UnknownComponents): {} {
   for (const componentKey of Object.keys(components).sort()) {
     const component = components[componentKey];
     const value = component.error ? "error" : JSON.stringify(component.value);
-
-    const duration = component.error ? "error" : JSON.stringify(component.duration);
+    const duration = component.error
+      ? "error"
+      : JSON.stringify(component.duration);
     result += `${result ? "},{" : "{"}${`"${componentKey}"`.replace(
       /([:|\\])/g,
       "\\$1"
-    )}:${value == undefined ? `"undefined"` : `${value},"duration":${duration}`}`;
+    )}:${
+      value == undefined ? `"undefined"` : `${value},"duration":${duration}`
+    }`;
   }
 
   return `[${result}}]`;
@@ -78,7 +99,7 @@ function componentsToCanonicalString(components: UnknownComponents): {} {
 
 async function getFontPreference(): Promise<componentObject> {
   const start = Date.now();
-  
+
   const font = await sources.fontPreferences();
   const result = {
     default: font["default"],
@@ -120,27 +141,21 @@ export function getFP(): Promise<fpResult> {
       ...components,
       screenPrint: getScreenPrint(),
       fontPreferencePrint: await getFontPreference(),
-      languagesPrint: getLanguages()
+      languagesPrint: getLanguages(),
+      canvasPrint: getCanvas(),
+      webglPrint: isFnCanvasDefender()
+        ? getWebGL()
+        : { value: "undefined", duration: 0 },
     };
-
-    const checkCanvasDefender = await checkFnCanvasDefender();
-    const checkWebGLDefender = await checkFnWebGLDefender();
-    
-    if(!checkCanvasDefender){
-      customComponents['canvasPrint'] = await getCanvas();
-    }
-    else if(!checkWebGLDefender){
-      customComponents['webglId'] = webglId();
-    }
 
     visitorId = FingerprintJS.hashComponents(customComponents);
     properties = componentsToCanonicalString(customComponents);
 
-    return Promise.resolve({ 
-      Id: visitorId, 
-      Properties: properties, 
-      CheckCanvasDefender: checkCanvasDefender, 
-      CheckWebGLDefender: checkWebGLDefender
+    return Promise.resolve({
+      Id: visitorId,
+      Properties: properties,
+      CheckCanvasDefender: isFnCanvasDefender(),
+      CheckWebGLDefender: isFnWebGLDefender(),
     });
   });
 }
