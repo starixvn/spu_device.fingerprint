@@ -13,7 +13,7 @@ function testWebdriver() {
   let webdriver = navigator.webdriver;
   return webdriver ? 1 : 0;
 }
-
+ 
 // User Agent
 function testUserAgent() {
   if (/Headless/.test(window.navigator.userAgent)) {

@@ -22,14 +22,7 @@ function getBrowserName() : string {
   if (isFirefox) return "Firefox";
 
   // SAFARI 3.0+
-  var isSafari =
-    /constructor/i.test(window["HTMLElement"]) ||
-    (function (p) {
-      return p.toString() === "[object SafariRemoteNotification]";
-    })(
-      !window["safari"] ||
-        (typeof safari !== "undefined" && safari.pushNotification)
-    );
+  var isSafari = /apple/i.test(navigator.vendor) || !!window["safari"];
   if (isSafari) return "Safari";
 
   // INTERNET EXPLORER 6-11
