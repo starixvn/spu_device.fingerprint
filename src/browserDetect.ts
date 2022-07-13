@@ -1,5 +1,4 @@
 declare const InstallTrigger: any;
-declare const safari: any;
 
 function getEngineBrowser() {
   var prefix = Array.prototype.slice
@@ -11,10 +10,7 @@ function getEngineBrowser() {
 
 function getBrowserName() : string {
   // OPERA 8.0+
-  var isOpera =
-    (!!window.opr && !!window.opr.addons) ||
-    !!window.opera ||
-    navigator.userAgent.indexOf(" OPR/") >= 0;
+  var isOpera = (!!window.opr || !!window.opera);
   if (isOpera) return "Opera";
 
   // FIREFOX 1.0+
