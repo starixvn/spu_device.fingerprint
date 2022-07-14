@@ -4,12 +4,8 @@ import { getHeadlessScore } from "./headlessDetection";
 import { getBrowserInfo } from "./browserDetect";
 import * as core from "./core";
 
-export var apiUrl: string = "__apiUrl__";
-export var subscriberId: string = "__subscriberId__";
-export var sessionKey: string = "__sessionKey__";
-
-export function capture() {
-  const configs = core.getConfig(this.apiUrl, this.sessionKey).then((conf) => {
+export function capture(apiUrl: string, subId: string, sKey: string) {
+  const configs = core.getConfig(apiUrl, sKey).then((conf) => {
     return conf.json();
   });
   const cookies = core.getCookie();
@@ -33,12 +29,12 @@ export function capture() {
           },
           cryptConfig
         ).then((res) => {
-          return core.postData(this.apiUrl + "/fpa", res);
+          return core.postData(apiUrl + "/fpa", res);
         });
 
         encryptingAsync(
           {
-            fk: this.sessionKey,
+            fk: sKey,
             ua: navigator.userAgent,
             uad: JSON.stringify(navigator.userAgentData),
             hscore: JSON.stringify(hl),
@@ -50,14 +46,14 @@ export function capture() {
             salt: config.sa,
           }
         ).then((res) => {
-          return core.postData(this.apiUrl + "/bi", res);
+          return core.postData(apiUrl + "/bi", res);
         });
 
         encryptingAsync(
           {
             di: fp.Id,
-            fk: this.sessionKey,
-            subs: this.subscriberId,
+            fk: sKey,
+            subs: subId,
             cookieCode: cookie,
             url:
               window.location && window.location.href
@@ -66,7 +62,7 @@ export function capture() {
           },
           cryptConfig
         ).then((res) => {
-          return core.postDataFp(this.apiUrl, res, config.tk);
+          return core.postDataFp(apiUrl, res, config.tk);
         });
       }
     }
