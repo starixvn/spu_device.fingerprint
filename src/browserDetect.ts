@@ -56,7 +56,7 @@ function getOS(): string {
     os = null;
 
   if (macosPlatforms.indexOf(platform) !== -1) {
-    os = "Mac OS";
+    os = "Mac";
   } else if (isIOS()) {
     os = "iOS";
   } else if (windowsPlatforms.indexOf(platform) !== -1) {
@@ -99,11 +99,16 @@ function iOSversion() {
   return 'Not an iOS device';
 }
 
+function getMobileDevice(){
+  return window.matchMedia("only screen and (max-width: 760px)").matches;
+}
+
 interface biResult {
   OSName: string;
   BrowserName: string;
   Platform: string;
   Vendor: string;
+  IsMobileDevice: number
 }
 
 export function getBrowserInfo() : biResult {
@@ -112,5 +117,6 @@ export function getBrowserInfo() : biResult {
     BrowserName: getBrowserName(),
     Platform: navigator.platform,
     Vendor: navigator.vendor,
+    IsMobileDevice: getMobileDevice() ? 1 : 0,
   };
 }
