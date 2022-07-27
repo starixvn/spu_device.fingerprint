@@ -12,6 +12,8 @@ import webglId from "./webgl";
 interface fpResult {
   Id: string;
   Properties: {};
+  CheckCanvasDefender: boolean,
+  CheckWebGLDefender: boolean
 }
 interface canvasFingerprint {
   winding: boolean;
