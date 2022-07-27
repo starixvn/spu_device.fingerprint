@@ -1,5 +1,7 @@
 import * as globalFP from "../src/index";
 
-globalFP
-  .isDebug(false)
-  .config("http://localhost:5007/api", "2", "5e4e700a9b0a46c093bab8463e675ff2");
+globalFP.capture(
+  "http://localhost:5007/api",
+  "2",
+  "7e7cadf52022063078a798b50a064af39978731ae5f33672040007ae251597"
+);

@@ -1,86 +1,74 @@
-import { Encrypting, EncryptingAsync } from "./crypt";
-import { getDI } from "./fp";
-import * as appConfig from "./appConfig";
-import { storageHandler } from "./cookie";
-import { getHeadlessScore } from "./headlessdetection";
+import { encryptingAsync } from "./crypt";
+import * as fp from "./fp";
+import { getHeadlessScore } from "./headlessDetection";
+import { getBrowserInfo } from "./browserDetect";
 import * as core from "./core";
 
-var _isDebug: boolean = false;
-var _cookieName: string = "__fp";
-
-export function isDebug(isDebug: boolean) {
-  _isDebug = isDebug;
-  return this;
+export async function getFPID() {
+  return await fp.getFP();
 }
 
-export function config(
-  apiUrl: string,
-  subscriberId: string,
-  sessionKey: string
-) {
-  appConfig.set(apiUrl, subscriberId, sessionKey);
-}
-
-function getFP() {
-  let start = Date.now();
-
-  storageHandler(_cookieName).then((cookieCode) => {
-    getDI()
-      .then((result) => {
-        if (_isDebug) {
-          console.log(result.Id);
-          console.log(result.Properties);
-        } else {
-          processData(result, appConfig.sessionKey, cookieCode);
-        }
-      })
-      .then(() => {
-        let end = Date.now() - start;
-        console.log(`milliseconds elapsed of collect fp = ${end}ms`);
-      });
+export function capture(apiUrl: string, subId: string, sKey: string) {
+  const configs = core.getConfig(apiUrl, sKey).then((conf) => {
+    return conf.json();
   });
-}
+  const cookies = core.getCookie();
+  const fps = fp.getFP();
+  const headless = getHeadlessScore();
+  const browserInfo = getBrowserInfo();
 
-function processData(result, sessionKey: string, cookieCode: string) {
-  getConfig(appConfig.apiUrl).then(async (conf) => {
-    if (conf.ok) {
-      const response = await conf.json();
+  Promise.all([configs, cookies, fps, headless, browserInfo]).then(
+    ([config, cookie, fp, hl, bi]) => {
+      if (config != null && config != "") {
+        const cryptConfig = {
+          iv: config.iv,
+          pass: config.ek,
+          salt: config.sa,
+        };
 
-      const fingerPrintAttribute = EncryptingAsync(
-        {
-          di: result.Id,
-          attr: result.Properties,
-        },
-        response.a
-      ).then((res) => {
-        return core.postData(appConfig.apiUrl + "/fpa", res);
-      });
+        encryptingAsync(
+          {
+            di: fp.Id,
+            attr: fp.Properties,
+          },
+          cryptConfig
+        ).then((res) => {
+          return core.postData(apiUrl + "/fpa", res);
+        });
 
-      const transaction = EncryptingAsync(
-        {
-          di: result.Id,
-          fk: sessionKey,
-          subs: appConfig.subscriberId,
-          cookieCode: cookieCode,
-          flagged: JSON.stringify(await getHeadlessScore()),
-          url:
-            window.location && window.location.href ? window.location.href : "",
-        },
-        response.a
-      ).then((res) => {
-        return core.postDataFp(appConfig.apiUrl, res, response.b);
-      });
+        encryptingAsync(
+          {
+            fk: sKey,
+            ua: navigator.userAgent,
+            uad: JSON.stringify(navigator.userAgentData),
+            hscore: JSON.stringify(hl),
+            binfo: JSON.stringify(bi),
+          },
+          {
+            iv: config.iv,
+            pass: config.ek,
+            salt: config.sa,
+          }
+        ).then((res) => {
+          return core.postData(apiUrl + "/bi", res);
+        });
 
-      Promise.all([fingerPrintAttribute, transaction]);
+        encryptingAsync(
+          {
+            di: fp.Id,
+            fk: sKey,
+            subs: subId,
+            cookieCode: cookie,
+            url:
+              window.location && window.location.href
+                ? window.location.href
+                : "",
+          },
+          cryptConfig
+        ).then((res) => {
+          return core.postDataFp(apiUrl, res, config.tk);
+        });
+      }
     }
-  });
+  );
 }
-
-function getConfig(url: string): Promise<Response> {
-  return fetch(url + "/conf", {
-    method: "GET",
-    redirect: "follow",
-  });
-}
-
-getFP();

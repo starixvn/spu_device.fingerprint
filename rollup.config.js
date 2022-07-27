@@ -3,7 +3,6 @@ import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from "rollup-plugin-terser";
 import json from "@rollup/plugin-json";
-import {dependencies} from "./package.json";
 
 const commonTerser = terser(require('./terser.config.js'))
 
@@ -37,20 +36,5 @@ export default [{
       }    
     ],   
     external: ['moment']
-  },
-  {
-    ...commonInput, 
-    output: [{
-    ...commonOutput,
-      file: 'dist/gfp.cjs.js',
-      format: 'cjs'
-    },
-    {
-      ...commonOutput,
-        file: 'dist/gfp.es.js',
-        format: 'es'
-      }     
-    ],   
-    external: Object.keys(dependencies)
   }
   ];

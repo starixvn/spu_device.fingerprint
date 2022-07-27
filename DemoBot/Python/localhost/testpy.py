@@ -67,6 +67,9 @@ def Process(driver, username, password):
         time.sleep(config["inputDelay"])
     driver.find_element(by=By.NAME, value="Password").send_keys(password)
     
+    # js = "var uad = navigator.userAgentData; Object.defineProperty(uad, 'platform', { value: 'Linux' }); Object.defineProperty(navigator, 'userAgentData', {get() {return uad;}});"
+    # driver.execute_script(js)
+
     if config["inputDelay"] > 0:
         time.sleep(config["inputDelay"])
     print(colorRed.format('Click on button login!'))
@@ -77,7 +80,9 @@ def Process(driver, username, password):
     WebDriverWait(driver, 10).until(
                 EC.title_is('Home Page - My ASP.NET Application')
             )
-
+    
+    # js = "var uad = navigator.userAgentData; Object.defineProperty(uad, 'platform', { value: 'Linux' }); Object.defineProperty(navigator, 'userAgentData', {get() {return uad;}});"
+    # driver.execute_script(js)
 
     if config["turnOffWebdriver"] == 1:
         print(colorRed.format('Change Webdriver'))
@@ -117,17 +122,29 @@ def getDriver(args):
         op = webdriver.EdgeOptions()
     else:
         op = webdriver.ChromeOptions()
-        
-    if config["closeBrowser"] == 0 and args.browser != "firefox":
-        op.add_experimental_option("detach", True)
+    
+    if args.browser == "firefox":
+        if config["changeUA"] == 1:
+            print(colorRed.format('Change User-agent'))
+            userAgent = arrayUA[random.randint(0, len(arrayUA)-1)]
+            op.set_preference("general.useragent.override", userAgent)
+    else:
+        if config["closeBrowser"] == 0:
+            op.add_experimental_option("detach", True)
+
+        if config["changeUA"] == 1:
+            print(colorRed.format('Change User-agent'))
+            userAgent = arrayUA[random.randint(0, len(arrayUA)-1)]
+            # op.add_argument("user-agent="+'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36')
+            op.add_argument("user-agent="+userAgent)
+            
+
+    # sec_ch_ua = '"Examplary Browser"; v="73", ";Not?A.Brand"; v="27"' # for example
+    # op.add_argument(f'--sec-ch-ua={sec_ch_ua}')
+    # op.add_argument(f'--sec-ch-ua-platform=Linux1')
 
     if config["headless"] == 1:
         op.add_argument("--headless")
-
-    if config["changeUA"] == 1:
-        print(colorRed.format('Change User-agent'))
-        userAgent = arrayUA[random.randint(0, len(arrayUA)-1)]
-        op.add_argument("user-agent="+userAgent)
 
     if args and args.browser == "chrome":
         print(colorRed.format('Return chromedriver'))
@@ -162,6 +179,8 @@ def undetectBots(driver):
     # ua = ua.replace("Headless", "")
     # js = "Object.defineProperty(navigator, 'userAgent', {get: () => "+ua+"})"
     # driver.execute_script(js)
+
+    
     
     return driver
 

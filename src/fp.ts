@@ -51,13 +51,14 @@ function componentsToCanonicalString(components: UnknownComponents): {} {
     const component = components[componentKey];
     const value = component.error ? "error" : JSON.stringify(component.value);
 
-    result += `${result ? "," : ""}${componentKey.replace(
+    const duration = component.error ? "error" : JSON.stringify(component.duration);
+    result += `${result ? "},{" : "{"}${`"${componentKey}"`.replace(
       /([:|\\])/g,
       "\\$1"
-    )}:${value}`;
+    )}:${value == undefined ? `"undefined"` : `${value},"duration":${duration}`}`;
   }
 
-  return "{" + result + "}";
+  return `[${result}}]`;
 }
 
 async function getFontPreference(): Promise<Record<string, number>> {
@@ -82,7 +83,7 @@ function getLanguages(): {} {
   };
 }
 
-export function getDI(): Promise<fpResult> {
+export function getFP(): Promise<fpResult> {
   let visitorId: string;
   let properties: {};
 

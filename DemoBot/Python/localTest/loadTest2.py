@@ -35,14 +35,16 @@ def async_execute():
     driver = getDriver(args)
     driver.maximize_window()
 
-    file = open("./Constant/fileLogin2.txt","r")
-    text = file.readline() 
-    while text != "":
-        print(text)
-        Process(driver, text, '1234aa')
-        if config["logout"] == 1:
-            Logout(driver)
-        text = file.readline()
+    for i in range(config["loop"]):
+        print(colorGreen.format('Loop: ' + str(i+1)))
+        file = open("./Constant/fileLogin2.txt","r")
+        text = file.readline() 
+        while text != "":
+            print(text)
+            Process(driver, text, '1234aa')
+            if config["logout"] == 1:
+                Logout(driver)
+            text = file.readline()
     
 def Logout(driver):
     if config["inputDelay"] > 0:

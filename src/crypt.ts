@@ -1,9 +1,13 @@
 import CryptoJS from "../override/crypto-js";
-
-export function Encrypting(data: {}, key: string): string {
-  var iv = CryptoJS.enc.Hex.parse("c3eef06037e837f4ee390bda69c05023");
-  var pass = CryptoJS.enc.Utf8.parse(key);
-  var salt = CryptoJS.enc.Utf8.parse("234292a9fce031f2");
+interface Key {
+  iv: string;
+  pass: string;
+  salt: string;
+}
+export function encrypting(data: {}, key: Key): string {
+  var iv = CryptoJS.enc.Hex.parse(key.iv);
+  var pass = CryptoJS.enc.Utf8.parse(key.pass);
+  var salt = CryptoJS.enc.Utf8.parse(key.salt);
   var key128Bits1000Iterations = CryptoJS.PBKDF2(
     pass.toString(CryptoJS.enc.Utf8),
     salt,
@@ -19,12 +23,12 @@ export function Encrypting(data: {}, key: string): string {
   return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
 }
 
-export async function EncryptingAsync(data: {}, key: string): Promise<string> {
-  let result = Encrypting(data, key);
+export async function encryptingAsync(data: {}, key: Key): Promise<string> {
+  let result = encrypting(data, key);
 
   return Promise.resolve(result);
 }
 
-export function HashMD5(data: string): string {
+export function hashMD5(data: string): string {
   return CryptoJS.MD5(data).toString();
 }

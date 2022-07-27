@@ -3,14 +3,14 @@ const config = {
     incognito: false,
     turnOffWebdriver: false,
     redirect: false,
-    changeUA: false,
+    changeUA: true,
     closeBrowser: false,
     waitingTime: 2000
 };
   
 const loginInfo = {
     url: "http://localhost:44392/Login/Index",
-    username: "test",
+    username: "test1",
     password: "1234aa"
 };
 

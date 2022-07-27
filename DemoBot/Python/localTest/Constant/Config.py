@@ -1,6 +1,6 @@
 config = {
-    "changeUA": 0,
-    "closeBrowser": 0,
+    "changeUA": 1,
+    "closeBrowser": 1,
     "headless": 1,
     "incognito": 0,
     "inputDelay": 0.2,
