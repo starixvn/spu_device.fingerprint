@@ -4,6 +4,10 @@ import { getHeadlessScore } from "./headlessDetection";
 import { getBrowserInfo } from "./browserDetect";
 import * as core from "./core";
 
+export async function getFPID() {
+  return await fp.getFP();
+}
+
 export function capture(apiUrl: string, subId: string, sKey: string) {
   const configs = core.getConfig(apiUrl, sKey).then((conf) => {
     return conf.json();
