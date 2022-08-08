@@ -6,6 +6,8 @@ import FingerprintJS, {
 import {
   isFnCanvasDefender,
   isFnWebGLDefender,
+  isFnFontDefender,
+  isFnAudioContextDefender,
 } from "./addonDefenderDetection";
 import webglId from "./webgl";
 
@@ -13,7 +15,9 @@ interface fpResult {
   Id: string;
   Properties: {};
   CheckCanvasDefender: boolean,
-  CheckWebGLDefender: boolean
+  CheckWebGLDefender: boolean,
+  CheckFontDefender: boolean,
+  CheckAudioContextDefender: boolean
 }
 interface canvasFingerprint {
   winding: boolean;
@@ -158,6 +162,8 @@ export function getFP(): Promise<fpResult> {
       Properties: properties,
       CheckCanvasDefender: isFnCanvasDefender(),
       CheckWebGLDefender: isFnWebGLDefender(),
+      CheckFontDefender: isFnFontDefender(),
+      CheckAudioContextDefender: isFnAudioContextDefender()
     });
   });
 }

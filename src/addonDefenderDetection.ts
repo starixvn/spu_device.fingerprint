@@ -23,3 +23,12 @@ export function isFnWebGLDefender(): boolean {
     checkFunctionCode(WebGL2RenderingContext.prototype.bufferData, "bufferData")
   );
 }
+
+export function isFnFontDefender(): boolean {
+  return false;
+}
+
+export function isFnAudioContextDefender(): boolean {
+  return checkFunctionCode(AudioBuffer.prototype.getChannelData, "getChannelData")
+      || checkFunctionCode(BaseAudioContext.prototype.createAnalyser, "createAnalyser");
+}
