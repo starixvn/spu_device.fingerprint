@@ -40,7 +40,6 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
           {
             fk: sKey,
             ua: navigator.userAgent,
-            uad: JSON.stringify(navigator.userAgentData),
             hscore: JSON.stringify(hl),
             binfo: JSON.stringify(bi),
           },
@@ -52,7 +51,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
         ).then((res) => {
           return core.postData(apiUrl + "/bi", res);
         });
-
+        
         encryptingAsync(
           {
             di: fp.Id,
@@ -63,6 +62,12 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
               window.location && window.location.href
                 ? window.location.href
                 : "",
+            da: {
+              cv: fp.CheckCanvasDefender,
+              gl: fp.CheckWebGLDefender,
+              fd: fp.CheckFontDefender,
+              ac: fp.CheckAudioContextDefender
+            }
           },
           cryptConfig
         ).then((res) => {
