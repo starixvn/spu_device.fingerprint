@@ -39,7 +39,6 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
         encryptingAsync(
           {
             fk: sKey,
-            ua: navigator.userAgent,
             hscore: JSON.stringify(hl),
             binfo: JSON.stringify(bi),
           },
