@@ -13,12 +13,12 @@ export async function postData(url: string, data: string): Promise<Response> {
   });
 }
 
-export async function postDataFp(
+export async function postDataAuthorization(
   url: string,
   data: string,
   token: string
 ): Promise<Response> {
-  return fetch(url + "/fp", {
+  return fetch(url, {
     method: "POST",
     headers: {
       Accept: "application/json",

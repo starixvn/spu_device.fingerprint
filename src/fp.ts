@@ -103,6 +103,23 @@ function componentsToCanonicalString(components: UnknownComponents): {} {
   return `[${result}}]`;
 }
 
+function componentsToJsonString(components: UnknownComponents): {} {
+  let result = "";
+  for (const componentKey of Object.keys(components).sort()) {
+    const component = components[componentKey];
+    const value = component.error ? "error" : JSON.stringify(component.value);
+    
+    result += `${result ? "," : "{"}${`"${componentKey}"`.replace(
+      /([:|\\])/g,
+      "\\$1"
+    )}:${
+      value == undefined ? `"undefined"` : `${value}`
+    }`;
+  }
+
+  return `${result}}`;
+}
+
 async function getFontPreference(): Promise<componentObject> {
   const start = Date.now();
 
@@ -133,6 +150,7 @@ function getLanguages(): componentObject {
 export function getFP(): Promise<fpResult> {
   let visitorId: string;
   let properties: {};
+  let jsonString: {};
 
   const fpPromise = loadSources(sources, {}, [
     "screenResolution",
@@ -155,7 +173,7 @@ export function getFP(): Promise<fpResult> {
     };
 
     visitorId = FingerprintJS.hashComponents(customComponents);
-    properties = componentsToCanonicalString(customComponents);
+    properties = componentsToJsonString(customComponents);
 
     return Promise.resolve({
       Id: visitorId,
