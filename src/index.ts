@@ -32,9 +32,11 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
             attr: fp.Properties,
           },
           cryptConfig
-        ).then((res) => {
-          return core.postData(apiUrl + "/fpa", res);
-        });
+        )
+          .then((res) => {
+            return core.postData(apiUrl + "/fpa", res);
+          })
+          .catch((error) => core.postData(apiUrl + "/cle", error.message));
 
         encryptingAsync(
           {
@@ -47,10 +49,12 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
             pass: config.ek,
             salt: config.sa,
           }
-        ).then((res) => {
-          return core.postData(apiUrl + "/bi", res);
-        });
-        
+        )
+          .then((res) => {
+            return core.postData(apiUrl + "/bi", res);
+          })
+          .catch((error) => core.postData(apiUrl + "/cle", error.message));
+
         encryptingAsync(
           {
             di: fp.Id,
@@ -65,13 +69,15 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
               cv: fp.CheckCanvasDefender,
               gl: fp.CheckWebGLDefender,
               fd: fp.CheckFontDefender,
-              ac: fp.CheckAudioContextDefender
-            }
+              ac: fp.CheckAudioContextDefender,
+            },
           },
           cryptConfig
-        ).then((res) => {
-          return core.postDataFp(apiUrl, res, config.tk);
-        });
+        )
+          .then((res) => {
+            return core.postDataFp(apiUrl, res, config.tk);
+          })
+          .catch((error) => core.postData(apiUrl + "/cle", error.message));
       }
     }
   );
