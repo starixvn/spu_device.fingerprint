@@ -84,6 +84,20 @@ function getWebGL(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
+function getDoNotTrack() {
+  const start = Date.now();
+  let result = navigator.doNotTrack;
+  return { value: result, duration: Date.now() - start };
+}
+
+function getWebGLRenderer() {
+  const start = Date.now();
+  const canvas = document.createElement("canvas");
+  const gl = canvas.getContext("webgl");
+  let result = gl.getParameter(gl.getExtension("WEBGL_debug_renderer_info").UNMASKED_RENDERER_WEBGL);
+  return { value: result, duration: Date.now() - start };
+}
+
 function componentsToCanonicalString(components: UnknownComponents): {} {
   let result = "";
   for (const componentKey of Object.keys(components).sort()) {
@@ -170,6 +184,8 @@ export function getFP(): Promise<fpResult> {
       webglPrint: isFnCanvasDefender()
         ? getWebGL()
         : { value: "undefined", duration: 0 },
+      doNotTrack: getDoNotTrack(),
+      webglRenderer: getWebGLRenderer()
     };
 
     visitorId = FingerprintJS.hashComponents(customComponents);
