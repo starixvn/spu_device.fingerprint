@@ -13,7 +13,13 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
     return conf.json();
   });
   const cookies = core.getCookie();
-  const fps = fp.getFP();
+  const fps = fp.getFP().catch((error) => {
+    var data = {
+      function: "FingerPrint",
+      exception: error.message,
+    };
+    core.postData(apiUrl + "/cle", JSON.stringify(data));
+  });
   const headless = getHeadlessScore();
   const browserInfo = getBrowserInfo();
 
@@ -28,8 +34,8 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
 
         encryptingAsync(
           {
-            di: fp.Id,
-            attr: fp.Properties,
+            di: fp && fp.Id,
+            attr: fp && fp.Properties,
           },
           cryptConfig
         )
@@ -39,7 +45,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
           .catch((error) => {
             var data = {
               function: "FingerPrint Attribute",
-              exception: error,
+              exception: error.message,
             };
             core.postData(apiUrl + "/cle", JSON.stringify(data));
           });
@@ -62,14 +68,14 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
           .catch((error) => {
             var data = {
               function: "Browser Info",
-              exception: error,
+              exception: error.message,
             };
             core.postData(apiUrl + "/cle", JSON.stringify(data));
           });
 
         encryptingAsync(
           {
-            di: fp.Id,
+            di: fp && fp.Id,
             fk: sKey,
             subs: subId,
             cookieCode: cookie,
@@ -78,10 +84,10 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
                 ? window.location.href
                 : "",
             da: {
-              cv: fp.CheckCanvasDefender,
-              gl: fp.CheckWebGLDefender,
-              fd: fp.CheckFontDefender,
-              ac: fp.CheckAudioContextDefender,
+              cv: fp && fp.CheckCanvasDefender,
+              gl: fp && fp.CheckWebGLDefender,
+              fd: fp && fp.CheckFontDefender,
+              ac: fp && fp.CheckAudioContextDefender,
             },
           },
           cryptConfig
@@ -92,7 +98,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
           .catch((error) => {
             var data = {
               function: "FingerPrint",
-              exception: error,
+              exception: error.message,
             };
             core.postData(apiUrl + "/cle", JSON.stringify(data));
           });
