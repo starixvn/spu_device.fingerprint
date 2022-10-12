@@ -15,6 +15,7 @@ export function isFnCanvasDefender(): boolean {
 }
 
 export function isFnWebGLDefender(): boolean {
+  return false;
   return (
     checkFunctionCode(
       WebGLRenderingContext.prototype.bufferData,
@@ -29,6 +30,12 @@ export function isFnFontDefender(): boolean {
 }
 
 export function isFnAudioContextDefender(): boolean {
-  return checkFunctionCode(AudioBuffer.prototype.getChannelData, "getChannelData")
-      || checkFunctionCode(BaseAudioContext.prototype.createAnalyser, "createAnalyser");
+  return false;
+  return (
+    checkFunctionCode(AudioBuffer.prototype.getChannelData, "getChannelData") ||
+    checkFunctionCode(
+      BaseAudioContext.prototype.createAnalyser,
+      "createAnalyser"
+    )
+  );
 }

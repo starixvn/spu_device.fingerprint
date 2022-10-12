@@ -14,10 +14,10 @@ import webglId from "./webgl";
 interface fpResult {
   Id: string;
   Properties: {};
-  CheckCanvasDefender: boolean,
-  CheckWebGLDefender: boolean,
-  CheckFontDefender: boolean,
-  CheckAudioContextDefender: boolean
+  CheckCanvasDefender: boolean;
+  CheckWebGLDefender: boolean;
+  CheckFontDefender: boolean;
+  CheckAudioContextDefender: boolean;
 }
 interface canvasFingerprint {
   winding: boolean;
@@ -163,7 +163,7 @@ export function getFP(): Promise<fpResult> {
       CheckCanvasDefender: isFnCanvasDefender(),
       CheckWebGLDefender: isFnWebGLDefender(),
       CheckFontDefender: isFnFontDefender(),
-      CheckAudioContextDefender: isFnAudioContextDefender()
+      CheckAudioContextDefender: isFnAudioContextDefender(),
     });
   });
 }

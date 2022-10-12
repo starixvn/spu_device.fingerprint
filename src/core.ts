@@ -19,14 +19,10 @@ export async function postDataFp(
 ): Promise<Response> {
   return fetch(url + "/fp", {
     method: "POST",
-    cache: "no-cache",
-    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    redirect: "follow",
-    referrerPolicy: "no-referrer",
     body: JSON.stringify(data),
   });
 }
