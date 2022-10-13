@@ -15,7 +15,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
   const cookies = core.getCookie();
   const fps = fp.getFP().catch((error) => {
     var data = {
-      function: "FingerPrint",
+      function: "FingerPrint Capturing",
       exception: error.message,
     };
     core.postData(apiUrl + "/cle", JSON.stringify(data));
@@ -40,7 +40,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
           cryptConfig
         )
           .then((res) => {
-            return core.postData(apiUrl + "/fpa", res);
+            core.postData(apiUrl + "/fpa", JSON.stringify(res));
           })
           .catch((error) => {
             var data = {
@@ -63,7 +63,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
           }
         )
           .then((res) => {
-            return core.postData(apiUrl + "/bi", res);
+            core.postData(apiUrl + "/bi", JSON.stringify(res));
           })
           .catch((error) => {
             var data = {
@@ -93,7 +93,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
           cryptConfig
         )
           .then((res) => {
-            return core.postDataFp(apiUrl, res, config.tk);
+            core.postDataFp(apiUrl, JSON.stringify(res), config.tk);
           })
           .catch((error) => {
             var data = {

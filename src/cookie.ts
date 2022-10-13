@@ -56,7 +56,8 @@ function setCookie(name: string, value: string, days: number) {
     expires = "; expires=" + date.toUTCString();
   }
 
-  document.cookie = name + "=" + (value || "") + expires + "; path=/";
+  document.cookie =
+    name + "=" + (value || "") + expires + "; SameSite=None; Secure; path=/";
 }
 
 function getCookie(name: string): string {

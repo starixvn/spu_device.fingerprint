@@ -6,9 +6,10 @@ export async function postData(url: string, data: string): Promise<Response> {
   return fetch(url, {
     method: "POST",
     headers: {
+      Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data),
+    body: data,
   });
 }
 
@@ -20,10 +21,11 @@ export async function postDataFp(
   return fetch(url + "/fp", {
     method: "POST",
     headers: {
+      Accept: "application/json",
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    body: JSON.stringify(data),
+    body: data,
   });
 }
 
