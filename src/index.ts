@@ -36,11 +36,14 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
           {
             di: fp && fp.Id,
             attr: fp && fp.Properties,
+            acpt: config.acpt,
+            enc: config.enc,
+            hk: config.hk,
           },
           cryptConfig
         )
           .then((res) => {
-            core.postDataAuthorization(apiUrl + "/fpa", res, config.tk);
+            core.postDataAuthorization(apiUrl + "/fpa", JSON.stringify(res), config.tk);
           })
           .catch((error) => {
             var data = {
@@ -63,7 +66,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
           }
         )
           .then((res) => {
-            core.postDataAuthorization(apiUrl + "/bi", res, config.tk);
+            core.postDataAuthorization(apiUrl + "/bi", JSON.stringify(res), config.tk);
           })
           .catch((error) => {
             var data = {
@@ -93,7 +96,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
           cryptConfig
         )
           .then((res) => {
-            core.postDataAuthorization(apiUrl + "/fp", res, config.tk);
+            core.postDataAuthorization(apiUrl + "/fp", JSON.stringify(res), config.tk);
           })
           .catch((error) => {
             var data = {
