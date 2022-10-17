@@ -10,13 +10,14 @@ import {
   isFnFontDefender,
   isFnAudioContextDefender,
 } from "./addonDefenderDetection";
-import webglId from "./webgl";
+import {webglId, getGLRenderer} from "./webgl";
 
 import { getCanvas } from "./canvas";
 
 interface fpResult {
   Id: string;
   Properties: {};
+  ErrorValue: string;
   CheckCanvasDefender: boolean;
   CheckWebGLDefender: boolean;
   CheckFontDefender: boolean;
@@ -54,7 +55,7 @@ function getScreenPrint(): componentObject {
 
 function getWebGL(): componentObject {
   const start = Date.now();
-  let result = "undefined";
+  let result;
 
   if (!isFnWebGLDefender()) {
     result = webglId();
@@ -63,28 +64,26 @@ function getWebGL(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
-function getDoNotTrack() {
+function getDoNotTrack(): componentObject {
   const start = Date.now();
   let result = navigator.doNotTrack;
   return { value: result, duration: Date.now() - start };
 }
 
-function getWebGLRenderer() {
+function getWebGLRenderer(webgl: componentObject): componentObject {
   const start = Date.now();
-  const canvas = document.createElement("canvas");
-  const gl = canvas.getContext("webgl");
-  let result = "";
-  if (gl && typeof gl.getExtension === "function" && gl.getExtension("WEBGL_debug_renderer_info") != null) {
-    result = gl.getParameter(gl.getExtension("WEBGL_debug_renderer_info").UNMASKED_RENDERER_WEBGL);
+  if(webgl && webgl.value == undefined){
+    return { value: undefined, duration: Date.now() - start };
   }
-  return { value: result, duration: Date.now() - start };
+
+  return { value: getGLRenderer(), duration: Date.now() - start };
 }
 
 function componentsToCanonicalString(components: UnknownComponents): {} {
   let result = "";
   for (const componentKey of Object.keys(components).sort()) {
     const component = components[componentKey];
-    const value = component.error ? "error" : JSON.stringify(component.value);
+    const value = component.error ? "error" : component.value;
     const duration = component.error
       ? "error"
       : JSON.stringify(component.duration);
@@ -92,27 +91,32 @@ function componentsToCanonicalString(components: UnknownComponents): {} {
       /([:|\\])/g,
       "\\$1"
     )}:${
-      value == undefined ? `"undefined"` : `${value},"duration":${duration}`
+      value == undefined ? `"undefined"` : `${JSON.stringify(value)},"duration":${duration}`
     }`;
   }
 
   return `[${result}}]`;
 }
 
-function componentsToJsonString(components: UnknownComponents): {} {
+function componentsToJsonString(components: UnknownComponents):string {
   let result = "";
+  let err: string;
   for (const componentKey of Object.keys(components).sort()) {
     const component = components[componentKey];
-    const value = component.error ? "error" : JSON.stringify(component.value);
+    const value = component.error ? "error" : component.value;
+
+    if(component.error){
+      err += `${componentKey}: ${component.error.message},`;
+    }
     
     result += `${result ? "," : "{"}${`"${componentKey}"`.replace(
       /([:|\\])/g,
       "\\$1"
     )}:${
-      value == undefined ? `"undefined"` : `${value}`
+      `${JSON.stringify(value == undefined ? `undefined` : value)}`
     }`;
   }
-
+  
   return `${result}}`;
 }
 
@@ -152,7 +156,6 @@ function getPromise(): Promise<unknown>{
 
 export function getFP(): Promise<fpResult> {
   let visitorId: string;
-  let properties: {};
 
   const fpPromise = loadSources(sources, {}, [
     "screenResolution",
@@ -163,6 +166,7 @@ export function getFP(): Promise<fpResult> {
   ])();
 
   const canvas = getCanvas();
+  const webgl = getWebGL();
 
   return fpPromise.then(async (components) => {
     const customComponents = {
@@ -171,20 +175,21 @@ export function getFP(): Promise<fpResult> {
       fontPreferencePrint: await getFontPreference(),
       languagesPrint: getLanguages(),
       canvasPrint: canvas,
-      doNotTrack: getDoNotTrack(),
-      webglRenderer: getWebGLRenderer()
+      webglRenderer: getWebGLRenderer(webgl),
+      doNotTrack: getDoNotTrack()
     };
 
     if(canvas && canvas.value == undefined){
-      customComponents["webglPrint"] = getWebGL();
+      customComponents["webglPrint"] = webgl;
     }
 
     visitorId = FingerprintJS.hashComponents(customComponents);
-    properties = componentsToJsonString(customComponents);
+    let properties = componentsToJsonString(customComponents);
 
     return Promise.resolve({
       Id: visitorId,
       Properties: properties,
+      ErrorValue: "",
       CheckCanvasDefender: isFnCanvasDefender(),
       CheckWebGLDefender: isFnWebGLDefender(),
       CheckFontDefender: isFnFontDefender(),
