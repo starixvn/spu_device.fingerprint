@@ -16,7 +16,7 @@ function testWebdriver() {
  
 // User Agent
 function testUserAgent() {
-  if (/Headless/.test(window.navigator.userAgent)) {
+  if (/Headless/.test(navigator.userAgent)) {
     // Headless
     return 1;
   } else {
@@ -38,29 +38,29 @@ function testChromeWindow() {
 
 // Notification Permissions
 async function testNotificationPermissions() {
-  if (!navigator.permissions) {
-    return 0;
+  if (navigator.permissions && typeof navigator.permissions.query === 'function') {
+    return await navigator.permissions
+      .query({ name: "notifications" })
+      .then(function (permissionStatus) {
+        if (
+          Notification && Notification.permission === "denied" &&
+          permissionStatus.state === "prompt"
+        ) {
+          // Headless
+          return 0.5;
+        } else {
+          // Not Headless
+          return 0;
+        }
+      });
   }
+  return 0;
   
-  return await navigator.permissions
-    .query({ name: "notifications" })
-    .then(function (permissionStatus) {
-      if (
-        Notification.permission === "denied" &&
-        permissionStatus.state === "prompt"
-      ) {
-        // Headless
-        return 0.5;
-      } else {
-        // Not Headless
-        return 0;
-      }
-    });
 }
 
 // No Plugins
 function testPlugins() {
-  let length = navigator.plugins.length;
+  let length = navigator.plugins ? navigator.plugins.length : 0;
 
   return length === 0 ? 1 : 0;
 }
