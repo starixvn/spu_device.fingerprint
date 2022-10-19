@@ -38,24 +38,24 @@ function testChromeWindow() {
 
 // Notification Permissions
 async function testNotificationPermissions() {
-  if (!navigator.permissions) {
-    return 0;
+  if (navigator.permissions && typeof navigator.permissions.query === 'function') {
+    return await navigator.permissions
+      .query({ name: "notifications" })
+      .then(function (permissionStatus) {
+        if (
+          Notification.permission === "denied" &&
+          permissionStatus.state === "prompt"
+        ) {
+          // Headless
+          return 0.5;
+        } else {
+          // Not Headless
+          return 0;
+        }
+      });
   }
-  
-  return await navigator.permissions
-    .query({ name: "notifications" })
-    .then(function (permissionStatus) {
-      if (
-        Notification.permission === "denied" &&
-        permissionStatus.state === "prompt"
-      ) {
-        // Headless
-        return 0.5;
-      } else {
-        // Not Headless
-        return 0;
-      }
-    });
+
+  return 0;
 }
 
 // No Plugins

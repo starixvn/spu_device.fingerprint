@@ -18,7 +18,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
       function: "FingerPrint Capturing",
       exception: error.message,
     };
-    core.postData(apiUrl + "/cle", JSON.stringify(data));
+    core.postData(apiUrl + "/cle", JSON.stringify(JSON.stringify(data)));
   });
   const headless = getHeadlessScore();
   const browserInfo = getBrowserInfo();
@@ -36,18 +36,28 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
           {
             di: fp && fp.Id,
             attr: fp && fp.Properties,
+            acpt: config.acpt,
+            enc: config.enc,
+            hk: config.hk,
           },
           cryptConfig
         )
           .then((res) => {
-            core.postData(apiUrl + "/fpa", JSON.stringify(res));
+            core.postDataAuthorization(
+              apiUrl + "/fpa",
+              JSON.stringify(res),
+              config.tk
+            );
           })
           .catch((error) => {
             var data = {
               function: "FingerPrint Attribute",
               exception: error.message,
             };
-            core.postData(apiUrl + "/cle", JSON.stringify(data));
+            core.postData(
+              apiUrl + "/cle",
+              JSON.stringify(JSON.stringify(data))
+            );
           });
 
         encryptingAsync(
@@ -63,14 +73,21 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
           }
         )
           .then((res) => {
-            core.postData(apiUrl + "/bi", JSON.stringify(res));
+            core.postDataAuthorization(
+              apiUrl + "/bi",
+              JSON.stringify(res),
+              config.tk
+            );
           })
           .catch((error) => {
             var data = {
               function: "Browser Info",
               exception: error.message,
             };
-            core.postData(apiUrl + "/cle", JSON.stringify(data));
+            core.postData(
+              apiUrl + "/cle",
+              JSON.stringify(JSON.stringify(data))
+            );
           });
 
         encryptingAsync(
@@ -78,7 +95,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
             di: fp && fp.Id,
             fk: sKey,
             subs: subId,
-            cookieCode: cookie,
+            ckc: cookie,
             url:
               window.location && window.location.href
                 ? window.location.href
@@ -93,15 +110,30 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
           cryptConfig
         )
           .then((res) => {
-            core.postDataFp(apiUrl, JSON.stringify(res), config.tk);
+            core.postDataAuthorization(
+              apiUrl + "/fp",
+              JSON.stringify(res),
+              config.tk
+            );
           })
           .catch((error) => {
             var data = {
               function: "FingerPrint",
               exception: error.message,
             };
-            core.postData(apiUrl + "/cle", JSON.stringify(data));
+            core.postData(
+              apiUrl + "/cle",
+              JSON.stringify(JSON.stringify(data))
+            );
           });
+
+        if (fp && fp.ErrorValue != "") {
+          var data = {
+            function: "FingerPrint Attributes Merge",
+            exception: fp.ErrorValue,
+          };
+          core.postData(apiUrl + "/cle", JSON.stringify(JSON.stringify(data)));
+        }
       }
     }
   );

@@ -3,30 +3,25 @@ import FingerprintJS, {
   loadSources,
   UnknownComponents,
 } from "@fingerprintjs/fingerprintjs";
+
 import {
   isFnCanvasDefender,
   isFnWebGLDefender,
   isFnFontDefender,
   isFnAudioContextDefender,
 } from "./addonDefenderDetection";
-import webglId from "./webgl";
+import {webglId, getGLRenderer} from "./webgl";
+
+import { getCanvas } from "./canvas";
 
 interface fpResult {
   Id: string;
   Properties: {};
+  ErrorValue: string;
   CheckCanvasDefender: boolean;
   CheckWebGLDefender: boolean;
   CheckFontDefender: boolean;
   CheckAudioContextDefender: boolean;
-}
-interface canvasFingerprint {
-  winding: boolean;
-  geometry: string;
-  text: string;
-}
-interface componentObjectCanvas {
-  value: canvasFingerprint;
-  duration: number;
 }
 interface componentObject {
   value: {};
@@ -57,25 +52,10 @@ function getScreenPrint(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
-function getCanvas(): componentObjectCanvas {
-  const start = Date.now();
-  let result;
-
-  if (!isFnCanvasDefender()) {
-    let canvas = sources.canvas();
-    result = {
-      winding: canvas.winding,
-      geometry: canvas.geometry,
-      text: "",
-    };
-  }
-
-  return { value: result, duration: Date.now() - start };
-}
 
 function getWebGL(): componentObject {
   const start = Date.now();
-  let result = "undefined";
+  let result;
 
   if (!isFnWebGLDefender()) {
     result = webglId();
@@ -84,11 +64,26 @@ function getWebGL(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
+function getDoNotTrack(): componentObject {
+  const start = Date.now();
+  let result = navigator.doNotTrack;
+  return { value: result, duration: Date.now() - start };
+}
+
+function getWebGLRenderer(webgl: componentObject): componentObject {
+  const start = Date.now();
+  if(webgl && webgl.value == undefined){
+    return { value: undefined, duration: Date.now() - start };
+  }
+
+  return { value: getGLRenderer(), duration: Date.now() - start };
+}
+
 function componentsToCanonicalString(components: UnknownComponents): {} {
   let result = "";
   for (const componentKey of Object.keys(components).sort()) {
     const component = components[componentKey];
-    const value = component.error ? "error" : JSON.stringify(component.value);
+    const value = component.error ? "error" : component.value;
     const duration = component.error
       ? "error"
       : JSON.stringify(component.duration);
@@ -96,11 +91,33 @@ function componentsToCanonicalString(components: UnknownComponents): {} {
       /([:|\\])/g,
       "\\$1"
     )}:${
-      value == undefined ? `"undefined"` : `${value},"duration":${duration}`
+      value == undefined ? `"undefined"` : `${JSON.stringify(value)},"duration":${duration}`
     }`;
   }
 
   return `[${result}}]`;
+}
+
+function componentsToJsonString(components: UnknownComponents):string {
+  let result = "";
+  let err: string;
+  for (const componentKey of Object.keys(components).sort()) {
+    const component = components[componentKey];
+    const value = component.error ? "error" : component.value;
+
+    if(component.error){
+      err += `${componentKey}: ${component.error.message},`;
+    }
+    
+    result += `${result ? "," : "{"}${`"${componentKey}"`.replace(
+      /([:|\\])/g,
+      "\\$1"
+    )}:${
+      `${JSON.stringify(value == undefined ? `undefined` : value)}`
+    }`;
+  }
+  
+  return `${result}}`;
 }
 
 async function getFontPreference(): Promise<componentObject> {
@@ -130,17 +147,26 @@ function getLanguages(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
+function getPromise(): Promise<unknown>{
+  const promise = new Promise((resolve) => {
+    resolve(333);
+  });
+  return promise;
+}
+
 export function getFP(): Promise<fpResult> {
   let visitorId: string;
-  let properties: {};
 
   const fpPromise = loadSources(sources, {}, [
     "screenResolution",
     "screenFrame",
     "canvas",
     "fontPreferences",
-    "languages",
+    "languages"
   ])();
+
+  const canvas = getCanvas();
+  const webgl = getWebGL();
 
   return fpPromise.then(async (components) => {
     const customComponents = {
@@ -148,18 +174,22 @@ export function getFP(): Promise<fpResult> {
       screenPrint: getScreenPrint(),
       fontPreferencePrint: await getFontPreference(),
       languagesPrint: getLanguages(),
-      canvasPrint: getCanvas(),
-      webglPrint: isFnCanvasDefender()
-        ? getWebGL()
-        : { value: "undefined", duration: 0 },
+      canvasPrint: canvas,
+      webglRenderer: getWebGLRenderer(webgl),
+      doNotTrack: getDoNotTrack()
     };
 
+    if(canvas && canvas.value == undefined){
+      customComponents["webglPrint"] = webgl;
+    }
+
     visitorId = FingerprintJS.hashComponents(customComponents);
-    properties = componentsToCanonicalString(customComponents);
+    let properties = componentsToJsonString(customComponents);
 
     return Promise.resolve({
       Id: visitorId,
       Properties: properties,
+      ErrorValue: "",
       CheckCanvasDefender: isFnCanvasDefender(),
       CheckWebGLDefender: isFnWebGLDefender(),
       CheckFontDefender: isFnFontDefender(),
