@@ -18,7 +18,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
       function: "FingerPrint Capturing",
       exception: error.message,
     };
-    core.postData(apiUrl + "/cle", JSON.stringify(JSON.stringify(data)));
+    core.postData(apiUrl + "/cle", JSON.stringify(data));
   });
   const headless = getHeadlessScore();
   const browserInfo = getBrowserInfo();
@@ -54,10 +54,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
               function: "FingerPrint Attribute",
               exception: error.message,
             };
-            core.postData(
-              apiUrl + "/cle",
-              JSON.stringify(JSON.stringify(data))
-            );
+            core.postData(apiUrl + "/cle", JSON.stringify(data));
           });
 
         encryptingAsync(
@@ -84,10 +81,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
               function: "Browser Info",
               exception: error.message,
             };
-            core.postData(
-              apiUrl + "/cle",
-              JSON.stringify(JSON.stringify(data))
-            );
+            core.postData(apiUrl + "/cle", JSON.stringify(data));
           });
 
         encryptingAsync(
@@ -121,19 +115,16 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
               function: "FingerPrint",
               exception: error.message,
             };
-            core.postData(
-              apiUrl + "/cle",
-              JSON.stringify(JSON.stringify(data))
-            );
+            core.postData(apiUrl + "/cle", JSON.stringify(data));
           });
 
-        if (fp && fp.ErrorValue != "") {
-          var data = {
-            function: "FingerPrint Attributes Merge",
-            exception: fp.ErrorValue,
-          };
-          core.postData(apiUrl + "/cle", JSON.stringify(JSON.stringify(data)));
-        }
+        // if (fp && fp.ErrorValue != "") {
+        //   var data = {
+        //     function: "FingerPrint Attributes Merge",
+        //     exception: fp.ErrorValue,
+        //   };
+        //   core.postData(apiUrl + "/cle", JSON.stringify(JSON.stringify(data)));
+        // }
       }
     }
   );
