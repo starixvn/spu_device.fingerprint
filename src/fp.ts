@@ -2,6 +2,13 @@ import FingerprintJS, {
   sources,
   loadSources,
   UnknownComponents,
+  isWebKit,
+  isDesktopSafari,
+  isAndroid,
+  isChromium,
+  isGecko,
+  isEdgeHTML,
+  isTrident,
 } from "@fingerprintjs/fingerprintjs";
 
 import {
@@ -10,7 +17,7 @@ import {
   isFnFontDefender,
   isFnAudioContextDefender,
 } from "./addonDefenderDetection";
-import {webglId, getGLRenderer} from "./webgl";
+import { webglId, getGLRenderer } from "./webgl";
 
 import { getCanvas } from "./canvas";
 
@@ -52,7 +59,6 @@ function getScreenPrint(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
-
 function getWebGL(): componentObject {
   const start = Date.now();
   let result;
@@ -72,7 +78,7 @@ function getDoNotTrack(): componentObject {
 
 function getWebGLRenderer(webgl: componentObject): componentObject {
   const start = Date.now();
-  if(webgl && webgl.value == undefined){
+  if (webgl && webgl.value == undefined) {
     return { value: undefined, duration: Date.now() - start };
   }
 
@@ -91,32 +97,32 @@ function componentsToCanonicalString(components: UnknownComponents): {} {
       /([:|\\])/g,
       "\\$1"
     )}:${
-      value == undefined ? `"undefined"` : `${JSON.stringify(value)},"duration":${duration}`
+      value == undefined
+        ? `"undefined"`
+        : `${JSON.stringify(value)},"duration":${duration}`
     }`;
   }
 
   return `[${result}}]`;
 }
 
-function componentsToJsonString(components: UnknownComponents):string {
+function componentsToJsonString(components: UnknownComponents): string {
   let result = "";
   let err: string;
   for (const componentKey of Object.keys(components).sort()) {
     const component = components[componentKey];
     const value = component.error ? "error" : component.value;
 
-    if(component.error){
+    if (component.error) {
       err += `${componentKey}: ${component.error.message},`;
     }
-    
+
     result += `${result ? "," : "{"}${`"${componentKey}"`.replace(
       /([:|\\])/g,
       "\\$1"
-    )}:${
-      `${JSON.stringify(value == undefined ? `undefined` : value)}`
-    }`;
+    )}:${`${JSON.stringify(value == undefined ? `undefined` : value)}`}`;
   }
-  
+
   return `${result}}`;
 }
 
@@ -147,11 +153,26 @@ function getLanguages(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
-function getPromise(): Promise<unknown>{
+function getPromise(): Promise<unknown> {
   const promise = new Promise((resolve) => {
     resolve(333);
   });
   return promise;
+}
+
+export function getAudio(): number | (() => Promise<number>) {
+  return sources.audio();
+}
+
+export function getBrowserSupport(): {} {
+  return {
+    isWebKit: isWebKit,
+    isDesktopSafari: isDesktopSafari,
+    isAndroid: isAndroid,
+    isChromium: isChromium,
+    isGecko: isGecko,
+    isTrident: isTrident,
+  };
 }
 
 export function getFP(): Promise<fpResult> {
@@ -162,7 +183,7 @@ export function getFP(): Promise<fpResult> {
     "screenFrame",
     "canvas",
     "fontPreferences",
-    "languages"
+    "languages",
   ])();
 
   const canvas = getCanvas();
@@ -176,10 +197,10 @@ export function getFP(): Promise<fpResult> {
       languagesPrint: getLanguages(),
       canvasPrint: canvas,
       webglRenderer: getWebGLRenderer(webgl),
-      doNotTrack: getDoNotTrack()
+      doNotTrack: getDoNotTrack(),
     };
 
-    if(canvas && canvas.value == undefined){
+    if (canvas && canvas.value == undefined) {
       customComponents["webglPrint"] = webgl;
     }
 

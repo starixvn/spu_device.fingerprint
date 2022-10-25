@@ -115,12 +115,7 @@ function setStorage(name: string, value: string) {
         storeName: "ec",
       });
 
-      storageDriver
-        .setItem(name, value, () => {})
-        //.then(console.log)
-        .catch((e) => {
-          console.log(e.message);
-        });
+      storageDriver.setItem(name, value, () => {});
 
       setCookie(name, value, 30);
     });

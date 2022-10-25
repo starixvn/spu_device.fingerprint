@@ -13,7 +13,7 @@ function testWebdriver() {
   let webdriver = navigator.webdriver;
   return webdriver ? 1 : 0;
 }
- 
+
 // User Agent
 function testUserAgent() {
   if (/Headless/.test(navigator.userAgent)) {
@@ -36,14 +36,37 @@ function testChromeWindow() {
   }
 }
 
+function isIOS() {
+  const arrDevice = [
+    "iPad Simulator",
+    "iPhone Simulator",
+    "iPod Simulator",
+    "iPad",
+    "iPhone",
+    "iPod",
+  ];
+  const platform = navigator.platform;
+  return (
+    (!!platform && !!arrDevice.find((v) => platform.includes(v))) ||
+    // iPad on iOS 13 detection
+    (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+  );
+}
+
 // Notification Permissions
 async function testNotificationPermissions() {
-  if (navigator.permissions && typeof navigator.permissions.query === 'function') {
+  if (isIOS()) return 0;
+
+  if (
+    navigator.permissions &&
+    typeof navigator.permissions.query === "function"
+  ) {
     return await navigator.permissions
       .query({ name: "notifications" })
       .then(function (permissionStatus) {
         if (
-          typeof Notification != "undefined" && Notification.permission === "denied" &&
+          typeof Notification != "undefined" &&
+          Notification.permission === "denied" &&
           permissionStatus.state === "prompt"
         ) {
           // Headless
