@@ -14,11 +14,7 @@ export function debugBrowserSupport() {
   return fp.getBrowserSupport();
 }
 
-export function capture(
-  apiUrl: string,
-  subId: string,
-  sKey: string
-): Promise<void> {
+export function capture(apiUrl: string, subId: string, sKey: string) {
   const configs = core.getConfig(apiUrl, sKey).then((conf) => {
     return conf.json();
   });
@@ -27,7 +23,7 @@ export function capture(
   const headless = getHeadlessScore();
   const browserInfo = getBrowserInfo();
 
-  return Promise.all([configs, cookies, fps, headless, browserInfo]).then(
+  Promise.all([configs, cookies, fps, headless, browserInfo]).then(
     ([config, cookie, fp, hl, bi]) => {
       if (config != null && config != "") {
         const cryptConfig = {

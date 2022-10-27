@@ -36,6 +36,13 @@ function testChromeWindow() {
   }
 }
 
+function macOS() {
+  const macosPlatforms = ["Macintosh", "MacIntel", "MacPPC", "Mac68K"];
+  const platform = navigator.platform;
+
+  return macosPlatforms.indexOf(platform) !== -1;
+}
+
 function isIOS() {
   const arrDevice = [
     "iPad Simulator",
@@ -55,7 +62,7 @@ function isIOS() {
 
 // Notification Permissions
 async function testNotificationPermissions() {
-  if (isIOS()) return 0;
+  if (isIOS() || macOS()) return 0;
 
   if (
     navigator.permissions &&
