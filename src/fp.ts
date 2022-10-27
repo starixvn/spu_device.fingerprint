@@ -20,6 +20,7 @@ import {
 import { webglId, getGLRenderer } from "./webgl";
 
 import { getCanvas } from "./canvas";
+import { hashMD5 } from "./crypt";
 
 interface fpResult {
   Id: string;
@@ -138,7 +139,9 @@ async function getFontPreference(): Promise<componentObject> {
     min: font["min"],
     system: font["system"],
   };
-  return { value: result, duration: Date.now() - start };
+  
+  const hash = hashMD5(JSON.stringify(result));
+  return { value: hash, duration: Date.now() - start };
 }
 
 function getLanguages(): componentObject {
@@ -200,7 +203,7 @@ export function getFP(): Promise<fpResult> {
       doNotTrack: getDoNotTrack(),
     };
 
-    if (canvas && canvas.value == undefined) {
+    if (canvas && (canvas.value == undefined || canvas.value == "unstable")) {
       customComponents["webglPrint"] = webgl;
     }
 

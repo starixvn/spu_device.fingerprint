@@ -313,11 +313,11 @@ export function webglId(): string {
       return hash1;
     }
 
-    return undefined;
+    return "unstable";
   }
   catch(error){
     console.log('error', error);
-    return undefined;
+    return 'error';
   };
 }
 

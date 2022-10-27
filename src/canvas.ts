@@ -1,3 +1,5 @@
+import { hashMD5 } from "./crypt";
+
 interface CanvasFingerprint {
   winding: boolean;
   geometry: string;
@@ -5,7 +7,7 @@ interface CanvasFingerprint {
 }
 
 interface componentObjectCanvas {
-  value: CanvasFingerprint;
+  value: string;
   duration: number;
 }
 
@@ -16,12 +18,13 @@ export function getCanvas(): componentObjectCanvas {
 
   if (!isFnCanvasDefender()) {
     let result = getCanvasFingerprint();
-    if (result.geometry != "") {
-      return { value: result, duration: Date.now() - start };
+    if (result.geometry != "unstable") {
+      const hash = hashMD5(JSON.stringify(result));
+      return { value: hash, duration: Date.now() - start };
     }
   }
 
-  return { value: undefined, duration: Date.now() - start };
+  return { value: "unstable", duration: Date.now() - start };
 }
 
 function getCanvasFingerprint(): CanvasFingerprint {
@@ -42,7 +45,7 @@ function getCanvasFingerprint(): CanvasFingerprint {
     if (textImage1 !== textImage2) {
       geometry = text = 'unstable'
     } else {
-      text = textImage1
+      // text = textImage1
 
       renderGeometryImage(canvas, context)
       geometry = canvasToString(canvas)
@@ -117,7 +120,5 @@ function renderGeometryImage(canvas: HTMLCanvasElement, context: CanvasRendering
 }
 
 function canvasToString(canvas: HTMLCanvasElement) {
-  var url1 = canvas.toDataURL();
-  var url2 = canvas.toDataURL();
-  return url1 == url2 ? url1 : "";
+  return canvas.toDataURL();
 }
