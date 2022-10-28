@@ -320,12 +320,3 @@ export function webglId(): string {
     return 'error';
   };
 }
-
-export function getGLRenderer(): string {
-  const gl = getWebglCanvas();
-  if (!gl) {
-    return undefined;
-  }
-
-  return gl.getParameter(gl.RENDERER);
-}

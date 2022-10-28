@@ -17,7 +17,7 @@ import {
   isFnFontDefender,
   isFnAudioContextDefender,
 } from "./addonDefenderDetection";
-import { webglId, getGLRenderer } from "./webgl";
+import { webglId } from "./webgl";
 
 import { getCanvas } from "./canvas";
 import { hashMD5 } from "./crypt";
@@ -35,6 +35,8 @@ interface componentObject {
   value: {};
   duration: number;
 }
+
+	const listAttributeHash: string[] = ["math", "fontPreferencePrint"];																
 
 function getDevicePixelRatio(): number {
   return window.devicePixelRatio;
@@ -79,11 +81,20 @@ function getDoNotTrack(): componentObject {
 
 function getWebGLRenderer(webgl: componentObject): componentObject {
   const start = Date.now();
-  if (webgl && webgl.value == undefined) {
-    return { value: undefined, duration: Date.now() - start };
+  if (webgl && webgl.value == 'unstable') {
+    return { value: 'unstable', duration: Date.now() - start };
   }
 
   return { value: getGLRenderer(), duration: Date.now() - start };
+}
+
+function getGLRenderer(){
+  const canvas = document.createElement("canvas");
+  const gl = canvas.getContext("webgl");
+  if (gl && typeof gl.getExtension === "function" && gl.getExtension("WEBGL_debug_renderer_info") != null) {
+    return gl.getParameter(gl.getExtension("WEBGL_debug_renderer_info").UNMASKED_RENDERER_WEBGL);
+  }
+  return "";
 }
 
 function componentsToCanonicalString(components: UnknownComponents): {} {
@@ -112,7 +123,11 @@ function componentsToJsonString(components: UnknownComponents): string {
   let err: string;
   for (const componentKey of Object.keys(components).sort()) {
     const component = components[componentKey];
-    const value = component.error ? "error" : component.value;
+    let value = component.error ? "error" : JSON.stringify(component.value == undefined ? `undefined` : component.value);
+
+    if(listAttributeHash.indexOf(componentKey) > -1){
+      value = JSON.stringify(hashMD5(value));
+    }
 
     if (component.error) {
       err += `${componentKey}: ${component.error.message},`;
@@ -121,11 +136,11 @@ function componentsToJsonString(components: UnknownComponents): string {
     result += `${result ? "," : "{"}${`"${componentKey}"`.replace(
       /([:|\\])/g,
       "\\$1"
-    )}:${`${JSON.stringify(value == undefined ? `undefined` : value)}`}`;
+    )}:${value}`;
   }
 
   return `${result}}`;
-}
+}				  
 
 async function getFontPreference(): Promise<componentObject> {
   const start = Date.now();
@@ -139,9 +154,8 @@ async function getFontPreference(): Promise<componentObject> {
     min: font["min"],
     system: font["system"],
   };
-  
-  const hash = hashMD5(JSON.stringify(result));
-  return { value: hash, duration: Date.now() - start };
+  								   
+  return { value: result, duration: Date.now() - start };
 }
 
 function getLanguages(): componentObject {
@@ -154,13 +168,6 @@ function getLanguages(): componentObject {
     systemLanguage: window.navigator["systemLanguage"],
   };
   return { value: result, duration: Date.now() - start };
-}
-
-function getPromise(): Promise<unknown> {
-  const promise = new Promise((resolve) => {
-    resolve(333);
-  });
-  return promise;
 }
 
 export function getAudio(): number | (() => Promise<number>) {
@@ -199,14 +206,11 @@ export function getFP(): Promise<fpResult> {
       fontPreferencePrint: await getFontPreference(),
       languagesPrint: getLanguages(),
       canvasPrint: canvas,
+      webglPrint: webgl,
       webglRenderer: getWebGLRenderer(webgl),
       doNotTrack: getDoNotTrack(),
     };
-
-    if (canvas && (canvas.value == undefined || canvas.value == "unstable")) {
-      customComponents["webglPrint"] = webgl;
-    }
-
+    
     visitorId = FingerprintJS.hashComponents(customComponents);
     let properties = componentsToJsonString(customComponents);
 
