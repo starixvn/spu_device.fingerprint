@@ -20,6 +20,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
   });
   const cookies = core.getCookie();
   const fps = fp.getFP();
+  const platform = fp.getPlatform();
   const headless = getHeadlessScore();
   const browserInfo = getBrowserInfo();
 
@@ -39,6 +40,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
             acpt: config.acpt,
             enc: config.enc,
             hk: config.hk,
+            pf: platform
           },
           cryptConfig
         ).then((res) => {

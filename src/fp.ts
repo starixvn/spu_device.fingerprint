@@ -185,6 +185,10 @@ export function getBrowserSupport(): {} {
   };
 }
 
+export function getPlatform(): string{
+  return sources.platform();
+}
+
 export function getFP(): Promise<fpResult> {
   let visitorId: string;
 
