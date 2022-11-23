@@ -29,6 +29,18 @@ export async function encryptingAsync(data: {}, key: Key): Promise<string> {
   return Promise.resolve(result);
 }
 
+export async function encryptingWithKey(data: {}): Promise<string> {
+  var keyValue: Key = {
+    iv: "__keyIV__",
+    salt: "__keySalt__",
+    pass: "__keyPass__",
+  };
+
+  let result = encrypting(data, keyValue);
+
+  return Promise.resolve(result);
+}
+
 export function hashMD5(data: string): string {
   return CryptoJS.MD5(data).toString();
 }
