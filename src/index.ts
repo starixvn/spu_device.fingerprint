@@ -78,12 +78,7 @@ export function capture(apiUrl: string, subId: string, sKey: string) {
               window.location && window.location.href
                 ? window.location.href
                 : "",
-            da: {
-              cv: fp && fp.CheckCanvasDefender,
-              gl: fp && fp.CheckWebGLDefender,
-              fd: fp && fp.CheckFontDefender,
-              ac: fp && fp.CheckAudioContextDefender,
-            },
+            da: {},
           },
           cryptConfig
         ).then((res) => {

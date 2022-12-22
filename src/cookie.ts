@@ -111,8 +111,8 @@ function setStorage(name: string, value: string) {
     drivers.forEach((drive) => {
       var storageDriver = localForage.createInstance({
         driver: drive,
-        name: drive + "-EC",
-        storeName: "ec",
+        name: "LS",
+        storeName: "ls",
       });
 
       storageDriver.setItem(name, value, () => {});
@@ -130,8 +130,8 @@ export function storageHandler(name: string): Promise<string> {
           try {
             var storageDriver = localForage.createInstance({
               driver: drive,
-              name: drive + "-EC",
-              storeName: "ec",
+              name: drive + "LS",
+              storeName: "ls",
             });
             return await storageDriver.getItem<string>(name, () => {});
           } catch {

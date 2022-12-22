@@ -25,18 +25,13 @@ import { hashMD5 } from "./crypt";
 interface fpResult {
   Id: string;
   Properties: {};
-  ErrorValue: string;
-  CheckCanvasDefender: boolean;
-  CheckWebGLDefender: boolean;
-  CheckFontDefender: boolean;
-  CheckAudioContextDefender: boolean;
 }
 interface componentObject {
   value: {};
   duration: number;
 }
 
-	const listAttributeHash: string[] = ["math", "fontPreferencePrint"];																
+const listAttributeHash: string[] = ["math", "fontPreferencePrint"];
 
 function getDevicePixelRatio(): number {
   return window.devicePixelRatio;
@@ -81,18 +76,24 @@ function getDoNotTrack(): componentObject {
 
 function getWebGLRenderer(webgl: componentObject): componentObject {
   const start = Date.now();
-  if (webgl && webgl.value == 'unstable') {
-    return { value: 'unstable', duration: Date.now() - start };
+  if (webgl && webgl.value == "unstable") {
+    return { value: "unstable", duration: Date.now() - start };
   }
 
   return { value: getGLRenderer(), duration: Date.now() - start };
 }
 
-function getGLRenderer(){
+function getGLRenderer() {
   const canvas = document.createElement("canvas");
   const gl = canvas.getContext("webgl");
-  if (gl && typeof gl.getExtension === "function" && gl.getExtension("WEBGL_debug_renderer_info") != null) {
-    return gl.getParameter(gl.getExtension("WEBGL_debug_renderer_info").UNMASKED_RENDERER_WEBGL);
+  if (
+    gl &&
+    typeof gl.getExtension === "function" &&
+    gl.getExtension("WEBGL_debug_renderer_info") != null
+  ) {
+    return gl.getParameter(
+      gl.getExtension("WEBGL_debug_renderer_info").UNMASKED_RENDERER_WEBGL
+    );
   }
   return "";
 }
@@ -123,9 +124,15 @@ function componentsToJsonString(components: UnknownComponents): string {
   let err: string;
   for (const componentKey of Object.keys(components).sort()) {
     const component = components[componentKey];
-    let value = component.error ? "error" : JSON.stringify(component.value == undefined ? `undefined` : component.value);
+    let value = JSON.stringify(
+      component.error
+        ? "error"
+        : component.value == undefined
+        ? `undefined`
+        : component.value
+    );
 
-    if(listAttributeHash.indexOf(componentKey) > -1){
+    if (listAttributeHash.indexOf(componentKey) > -1) {
       value = JSON.stringify(hashMD5(value));
     }
 
@@ -140,7 +147,7 @@ function componentsToJsonString(components: UnknownComponents): string {
   }
 
   return `${result}}`;
-}				  
+}
 
 async function getFontPreference(): Promise<componentObject> {
   const start = Date.now();
@@ -154,7 +161,7 @@ async function getFontPreference(): Promise<componentObject> {
     min: font["min"],
     system: font["system"],
   };
-  								   
+
   return { value: result, duration: Date.now() - start };
 }
 
@@ -210,18 +217,13 @@ export function getFP(): Promise<fpResult> {
       webglRenderer: getWebGLRenderer(webgl),
       doNotTrack: getDoNotTrack(),
     };
-    
+
     visitorId = FingerprintJS.hashComponents(customComponents);
     let properties = componentsToJsonString(customComponents);
 
     return Promise.resolve({
       Id: visitorId,
       Properties: properties,
-      ErrorValue: "",
-      CheckCanvasDefender: isFnCanvasDefender(),
-      CheckWebGLDefender: isFnWebGLDefender(),
-      CheckFontDefender: isFnFontDefender(),
-      CheckAudioContextDefender: isFnAudioContextDefender(),
     });
   });
 }
