@@ -58,14 +58,10 @@ function getScreenPrint(): componentObject {
 }
 
 function getWebGL(): componentObject {
-  const start = Date.now();
-  let result;
+  const start:Date = new Date();
+  const result = webglId();
 
-  if (!isFnWebGLDefender()) {
-    result = webglId();
-  }
-
-  return { value: result, duration: Date.now() - start };
+  return { value: result, duration: (new Date()).getMilliseconds() - start.getMilliseconds() };
 }
 
 function getDoNotTrack(): componentObject {
@@ -200,7 +196,7 @@ export function getFP(): Promise<fpResult> {
     "screenFrame",
     "canvas",
     "fontPreferences",
-    "languages",
+    "languages"
   ])();
 
   const canvas = getCanvas();

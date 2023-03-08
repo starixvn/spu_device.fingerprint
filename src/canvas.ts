@@ -14,17 +14,17 @@ interface componentObjectCanvas {
 import { isFnCanvasDefender } from "./addonDefenderDetection";
 
 export function getCanvas(): componentObjectCanvas {
-  const start = Date.now();
+  const start:Date = new Date();
 
   if (!isFnCanvasDefender()) {
     let result = getCanvasFingerprint();
     if (result.geometry != "unstable") {
       const hash = hashMD5(JSON.stringify(result));
-      return { value: hash, duration: Date.now() - start };
+      return { value: hash, duration: (new Date()).getMilliseconds() - start.getMilliseconds() };
     }
   }
 
-  return { value: "unstable", duration: Date.now() - start };
+  return { value: "unstable", duration: (new Date()).getMilliseconds() - start.getMilliseconds() };
 }
 
 function getCanvasFingerprint(): CanvasFingerprint {

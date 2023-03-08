@@ -34,6 +34,20 @@ const cookieInput={
     json()
 ]}
 
+const newCookieOutPut={
+  name:'fpNewCookie',
+  export: 'named'
+}
+
+const newCookieInput={
+  input: 'src/newCookie.ts', 
+  plugins: [
+    typescript({module: "ESNext"}),
+    nodeResolve({ preferBuiltins: false }), // or `true`
+    commonjs(),
+    json()
+]}
+
 const headlessInput={
   input: 'src/headlessDetection.ts', 
   plugins: [
@@ -101,6 +115,19 @@ export default [{
     },{
       ...cookieOutPut,
       file:'dist/cookie.min.js',
+      format: 'iife',
+      plugins: [commonTerser]
+    }]
+  },
+  {
+    ...newCookieInput,
+    output:[{
+      ...newCookieOutPut,
+      file:'dist/newCookie.js',
+      format: 'iife'
+    },{
+      ...newCookieOutPut,
+      file:'dist/newCookie.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]

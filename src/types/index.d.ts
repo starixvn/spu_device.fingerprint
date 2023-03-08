@@ -9,6 +9,10 @@ declare global {
       addons: string
     };
     openDatabase: string;
+    mozIndexedDB?: IDBFactory;
+    webkitIndexedDB?: IDBFactory;
+    msIndexedDB?: IDBFactory;
+    shimIndexedDB?: IDBFactory;
   };
   interface document {
     documentMode: string;
