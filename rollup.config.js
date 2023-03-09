@@ -20,20 +20,6 @@ const commonInput={
     json()     
 ]}
 
-const cookieOutPut={
-  name:'fpCookie',
-  export: 'named'
-}
-
-const cookieInput={
-  input: 'src/cookie.ts', 
-  plugins: [
-    typescript({module: "ESNext"}),
-    nodeResolve({ preferBuiltins: false }), // or `true`
-    commonjs(),
-    json()
-]}
-
 const newCookieOutPut={
   name:'fpNewCookie',
   export: 'named'
@@ -105,19 +91,6 @@ export default [{
       }    
     ],   
     external: ['moment']
-  },
-  {
-    ...cookieInput,
-    output:[{
-      ...cookieOutPut,
-      file:'dist/cookie.js',
-      format: 'iife'
-    },{
-      ...cookieOutPut,
-      file:'dist/cookie.min.js',
-      format: 'iife',
-      plugins: [commonTerser]
-    }]
   },
   {
     ...newCookieInput,
