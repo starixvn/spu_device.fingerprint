@@ -10,3 +10,4 @@ DemoBot/Python/localTest/geckodriver.log
 DemoBot/Python/localTest/Constant/__pycache__/*
 
 /copy.bat
+/dist/
