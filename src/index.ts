@@ -3,6 +3,7 @@ import * as fp from "./fp";
 import { getHeadlessScore } from "./headlessDetection";
 import { getBrowserInfo } from "./browserDetect";
 import * as core from "./core";
+import * as protocolDetector from "./protocolDetector";
 
 export async function debugFP() {
   return await fp.getFP();
@@ -12,6 +13,10 @@ export async function debugAudio() {
 }
 export function debugBrowserSupport() {
   return fp.getBrowserSupport();
+}
+
+export function debugProtocolDetector(){
+  return protocolDetector.invokedWithFrame("__fpsIframe__");
 }
 
 export function capture(apiUrl: string, subId: string, sKey: string) {

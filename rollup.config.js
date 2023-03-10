@@ -76,6 +76,21 @@ const cryptOutPut={
   export: 'named'
 }
 
+
+const protocolInput={
+  input: 'src/protocolDetector.ts', 
+  plugins: [
+    typescript({module: "ESNext"}),
+    nodeResolve({ preferBuiltins: false }), // or `true`
+    commonjs(),
+    json()
+]}
+
+const protocolOutPut={
+  name:'protocolDetector',
+  export: 'named'
+}
+
 export default [{
     ...commonInput, 
     output: [{
@@ -140,6 +155,19 @@ export default [{
     },{
       ...cryptOutPut,
       file:'dist/crypt.min.js',
+      format: 'iife',
+      plugins: [commonTerser]
+    }]
+  },
+  {
+    ...protocolInput,
+    output:[{
+      ...protocolOutPut,
+      file:'dist/protocol.js',
+      format: 'iife'
+    },{
+      ...protocolOutPut,
+      file:'dist/protocol.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]
