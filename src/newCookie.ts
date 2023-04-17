@@ -21,7 +21,6 @@ function getSetLocalStorage(key: string, value: string | null): Promise<string |
             }
         }
     } catch (exception: any) {
-        console.log('getSetLocalStorage: ', exception);
     }
 }
 
@@ -53,22 +52,55 @@ function getSetIndexedDb(dbName: string, storeName: string, key: any, value: any
             request.onsuccess = function (event: IDBVersionChangeEvent) {
                 const db: IDBDatabase = (event.target as IDBOpenDBRequest).result;
                 if (db) {
-                    const transaction: IDBTransaction = db.transaction(storeName, 'readwrite');
-                    if (transaction.db.objectStoreNames.contains(storeName)) {
-                        const store: IDBObjectStore = transaction.objectStore(storeName);
-                        store.get(key).onsuccess = function (innerEvent: Event) {
-                            if (isSet) {
-                                store.put(value, key);
-                                resolve(null);
-                            } else {
-                                const data: any = (innerEvent.target as IDBRequest).result;
-                                if (data) {
-                                    resolve(data);
-                                } else {
+                    if (!db.objectStoreNames.contains(storeName)) {
+                        db.close();
+                        indexedDB.deleteDatabase(dbName);
+                        const request2: IDBOpenDBRequest = indexedDB.open(dbName, 1);
+
+                        request2.onupgradeneeded = function (event: IDBVersionChangeEvent) {
+                            const db2: IDBDatabase = (event.target as IDBOpenDBRequest).result;
+                            db2.createObjectStore(storeName);
+                        };
+
+                        request2.onsuccess = function (event: Event) {
+                            const db2: IDBDatabase = (event.target as IDBOpenDBRequest).result;
+                            const transaction: IDBTransaction = db2.transaction(storeName, "readwrite");
+                            const store: IDBObjectStore = transaction.objectStore(storeName);
+                            store.get(key).onsuccess = function (innerEvent: Event) {
+                                if (isSet) {
+                                    store.put(value, key);
                                     resolve(null);
                                 }
-                            }
+                                else {
+                                    const data: any = (innerEvent.target as IDBRequest).result;
+                                    if (data) {
+                                        resolve(data);
+                                    }
+                                    else {
+                                        resolve(null);
+                                    }
+                                }
+                            };
                         };
+                    }
+                    else {
+                        const transaction: IDBTransaction = db.transaction(storeName, 'readwrite');
+                        if (transaction.db.objectStoreNames.contains(storeName)) {
+                            const store: IDBObjectStore = transaction.objectStore(storeName);
+                            store.get(key).onsuccess = function (innerEvent: Event) {
+                                if (isSet) {
+                                    store.put(value, key);
+                                    resolve(null);
+                                } else {
+                                    const data: any = (innerEvent.target as IDBRequest).result;
+                                    if (data) {
+                                        resolve(data);
+                                    } else {
+                                        resolve(null);
+                                    }
+                                }
+                            };
+                        }
                     }
                 }
             };
@@ -110,7 +142,6 @@ function getSetCookie(key: string, value: string | null): Promise<string | null>
                 resolve(cookie);
             }
         } catch (exception) {
-            console.log('getSetCookie: ', exception);
         }
     });
 }
@@ -138,7 +169,6 @@ function getSetWindowName(key: string, value: string | any): Promise<string | nu
                 resolve(value);
             }
         } catch (exception) {
-            console.log('getSetWindowName: ', exception);
         }
     });
 }
@@ -229,14 +259,12 @@ function get() {
                 resolve(handler(cookieKey, null));
             });
         });
-        console.log('get', promises);
         return waitAllWithTimeout(promises).then((cookies) => {
             return getFirstMaxCountValue(cookies).then((cookieValue) => {
                 return Promise.resolve(cookieValue);
             });
         });
     } catch (exception) {
-        console.log('Get error: ', exception);
     }
 }
 
@@ -247,7 +275,6 @@ function set(value: string) {
             handler(cookieKey, value);
         });
     } catch (exception) {
-        console.log('Set error: ', exception);
     }
 }
 

@@ -185,7 +185,6 @@ export function storageHandler(name: string): Promise<string> {
         })
         .then((res) => {
             return promiseAllWithTimeout(res, 500).then((cookies) => {
-                console.log("cookies", cookies);
                 var latestCookie: string = getFirstMaxCountValue(cookies);
                 return cookieHandler(latestCookie).then(
                     (cookieValue: string) => {

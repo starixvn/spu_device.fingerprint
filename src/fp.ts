@@ -11,12 +11,6 @@ import FingerprintJS, {
   isTrident,
 } from "@fingerprintjs/fingerprintjs";
 
-import {
-  isFnCanvasDefender,
-  isFnWebGLDefender,
-  isFnFontDefender,
-  isFnAudioContextDefender,
-} from "./addonDefenderDetection";
 import { webglId } from "./webgl";
 
 import { getCanvas } from "./canvas";
