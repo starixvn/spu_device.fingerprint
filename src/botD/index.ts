@@ -1,7 +1,9 @@
 import { load } from '@fps/botd';
 
 export function loadBotD() {
-    const botdPromise = load();
+    const botdPromise = load({
+        monitoring: false
+    });
     return botdPromise
         .then((botd) => {
             var result = botd.detect();

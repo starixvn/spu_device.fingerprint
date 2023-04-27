@@ -19,6 +19,7 @@
     "localforage": "^1.10.0",
     "localforage-driver-memory": "^1.0.5",
     "ts-loader": "^9.2.6",
+    "tslib": "^2.5.0",
     "typescript": "^4.4.4"
   },
   "devDependencies": {

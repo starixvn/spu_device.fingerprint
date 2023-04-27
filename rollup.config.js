@@ -101,11 +101,12 @@ const botDInput={
 ]}
 
 const botDOutPut={
-  name:'botD',
+  name:'BotD',
   export: 'named'
 }
 
-export default [{
+export default [
+  {
     ...commonInput, 
     output: [{
     ...commonOutput,
@@ -190,13 +191,8 @@ export default [{
     ...botDInput,
     output:[{
       ...botDOutPut,
-      file:'dist/botD.js',
+      file:'dist/BotD.js',
       format: 'iife'
-    },{
-      ...botDOutPut,
-      file:'dist/botD.min.js',
-      format: 'iife',
-      plugins: [commonTerser]
     }]
   }
   ];
