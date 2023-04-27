@@ -1,4 +1,4 @@
-import { hashMD5 } from "./crypt";
+//import { hashMD5 } from "./crypt";
 
 interface CanvasFingerprint {
   winding: boolean;
@@ -13,13 +13,13 @@ interface componentObjectCanvas {
 
 import { isFnCanvasDefender } from "./addonDefenderDetection";
 
-export function getCanvas(): componentObjectCanvas {
+export function getCanvas(callback): componentObjectCanvas {
   const start:Date = new Date();
 
   if (!isFnCanvasDefender()) {
     let result = getCanvasFingerprint();
     if (result.geometry != "unstable") {
-      const hash = hashMD5(JSON.stringify(result));
+      const hash = callback(JSON.stringify(result));
       return { value: hash, duration: (new Date()).getMilliseconds() - start.getMilliseconds() };
     }
   }

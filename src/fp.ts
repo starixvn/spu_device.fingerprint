@@ -14,7 +14,8 @@ import FingerprintJS, {
 import { webglId } from "./webgl";
 
 import { getCanvas } from "./canvas";
-import { hashMD5 } from "./crypt";
+
+//import {CryptoJS} from "../override/crypto-js";
 
 interface fpResult {
   Id: string;
@@ -51,9 +52,9 @@ function getScreenPrint(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
-function getWebGL(): componentObject {
+function getWebGL(callback): componentObject {
   const start:Date = new Date();
-  const result = webglId();
+  const result = webglId(callback);
 
   return { value: result, duration: (new Date()).getMilliseconds() - start.getMilliseconds() };
 }
@@ -109,7 +110,7 @@ function componentsToCanonicalString(components: UnknownComponents): {} {
   return `[${result}}]`;
 }
 
-function componentsToJsonString(components: UnknownComponents): string {
+function componentsToJsonString(components: UnknownComponents, callback): string {
   let result = "";
   let err: string;
   for (const componentKey of Object.keys(components).sort()) {
@@ -123,7 +124,7 @@ function componentsToJsonString(components: UnknownComponents): string {
     );
 
     if (listAttributeHash.indexOf(componentKey) > -1) {
-      value = JSON.stringify(hashMD5(value));
+      value = JSON.stringify(callback(value));
     }
 
     if (component.error) {
@@ -182,7 +183,7 @@ export function getBrowserSupport(): {} {
   };
 }
 
-export function getFP(): Promise<fpResult> {
+export function getFP(callback): Promise<fpResult> {
   let visitorId: string;
 
   const fpPromise = loadSources(sources, {}, [
@@ -193,8 +194,8 @@ export function getFP(): Promise<fpResult> {
     "languages"
   ])();
 
-  const canvas = getCanvas();
-  const webgl = getWebGL();
+  const canvas = getCanvas(callback);
+  const webgl = getWebGL(callback);
 
   return fpPromise.then(async (components) => {
     const customComponents = {
@@ -209,7 +210,7 @@ export function getFP(): Promise<fpResult> {
     };
 
     visitorId = FingerprintJS.hashComponents(customComponents);
-    let properties = componentsToJsonString(customComponents);
+    let properties = componentsToJsonString(customComponents, callback);
 
     return Promise.resolve({
       Id: visitorId,

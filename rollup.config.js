@@ -17,12 +17,13 @@ const commonInput={
     typescript({module: "ESNext"}),
     nodeResolve({ preferBuiltins: false }), // or `true`
     commonjs(),
-    json()     
-]}
+    json()
+  ]
+}
 
 const newCookieOutPut={
   name:'fpNewCookie',
-  export: 'named'
+  exports: 'named'
 }
 
 const newCookieInput={
@@ -45,7 +46,7 @@ const headlessInput={
 
 const headlessOutPut={
   name:'fpHeadless',
-  export: 'named'
+  exports: 'named'
 }
 
 const browserInfoInput={
@@ -59,7 +60,7 @@ const browserInfoInput={
 
 const browserInfoOutPut={
   name:'fpBrowserDetect',
-  export: 'named'
+  exports: 'named'
 }
 
 const cryptInput={
@@ -73,7 +74,7 @@ const cryptInput={
 
 const cryptOutPut={
   name:'crypt',
-  export: 'named'
+  exports: 'named'
 }
 
 export default [{

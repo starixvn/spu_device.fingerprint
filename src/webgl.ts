@@ -299,15 +299,15 @@ function getWebglFp() {
 
   return result.join("~");
 }
-export function webglId(): string {
+export function webglId(callback): string {
   try{
     const n1 = getWebglFp();
     const m1 = JSON.stringify(n1).replace(/,?"[0-9]+":/g, "");
-    const hash1 = hashMD5(m1);
+    const hash1 = callback(m1);
     
     const n2 = getWebglFp();
     const m2 = JSON.stringify(n2).replace(/,?"[0-9]+":/g, "");
-    const hash2 = hashMD5(m2);
+    const hash2 = callback(m2);
 
     if(hash1 == hash2){
       return hash1;
