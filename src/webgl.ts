@@ -1,5 +1,3 @@
-import { hashMD5 } from "./crypt";
-
 function getWebglCanvas() {
   var canvas = document.createElement("canvas");
   var gl = null;

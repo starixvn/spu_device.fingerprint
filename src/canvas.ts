@@ -1,5 +1,3 @@
-//import { hashMD5 } from "./crypt";
-
 interface CanvasFingerprint {
   winding: boolean;
   geometry: string;

@@ -1,4 +1,5 @@
-import * as globalFP from "../src/fp";
-import * as cryptoJs from "../override/crypto-js"
+import * as crypto from "../src/subtleCrypto"
 
-globalFP.getFP(cryptoJs.MD5);
+crypto.encryptData("abc").then(res=>{
+    console.log(res);
+});

@@ -10,12 +10,8 @@ import FingerprintJS, {
   isEdgeHTML,
   isTrident,
 } from "@fingerprintjs/fingerprintjs";
-
 import { webglId } from "./webgl";
-
 import { getCanvas } from "./canvas";
-
-//import {CryptoJS} from "../override/crypto-js";
 
 interface fpResult {
   Id: string;
@@ -87,27 +83,6 @@ function getGLRenderer() {
     );
   }
   return "";
-}
-
-function componentsToCanonicalString(components: UnknownComponents): {} {
-  let result = "";
-  for (const componentKey of Object.keys(components).sort()) {
-    const component = components[componentKey];
-    const value = component.error ? "error" : component.value;
-    const duration = component.error
-      ? "error"
-      : JSON.stringify(component.duration);
-    result += `${result ? "},{" : "{"}${`"${componentKey}"`.replace(
-      /([:|\\])/g,
-      "\\$1"
-    )}:${
-      value == undefined
-        ? `"undefined"`
-        : `${JSON.stringify(value)},"duration":${duration}`
-    }`;
-  }
-
-  return `[${result}}]`;
 }
 
 function componentsToJsonString(components: UnknownComponents, callback): string {

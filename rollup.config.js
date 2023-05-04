@@ -77,6 +77,20 @@ const cryptOutPut={
   exports: 'named'
 }
 
+const subtleCryptInput={
+  input: 'src/subtleCrypto.ts', 
+  plugins: [
+    typescript({module: "ESNext"}),
+    nodeResolve({ preferBuiltins: false }), // or `true`
+    commonjs(),
+    json()
+]}
+
+const subtleCryptOutPut={
+  name:'subtleCrypto',
+  exports: 'named'
+}
+
 export default [{
     ...commonInput, 
     output: [{
@@ -141,6 +155,19 @@ export default [{
     },{
       ...cryptOutPut,
       file:'dist/crypt.min.js',
+      format: 'iife',
+      plugins: [commonTerser]
+    }]
+  },
+  {
+    ...subtleCryptInput,
+    output:[{
+      ...subtleCryptOutPut,
+      file:'dist/subtleCrypt.js',
+      format: 'iife'
+    },{
+      ...cryptOutPut,
+      file:'dist/subtleCrypt.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]
