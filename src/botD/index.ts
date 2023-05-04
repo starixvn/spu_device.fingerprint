@@ -1,12 +1,17 @@
-import { load } from '@fps/botd';
+import { load, BotDetectionResult } from '@fps/botd';
 
-export function loadBotD() {
+interface BotDResult{
+    result: BotDetectionResult;
+    detection: string;
+}
+
+export function loadBotD(): Promise<void | BotDResult> {
     const botdPromise = load({
         monitoring: false
     });
     return botdPromise
         .then((botd) => {
-            var result = botd.detect();
+            var result: BotDetectionResult = botd.detect();
             return {
                 result: result,
                 detection: JSON.stringify(botd.getDetections())
