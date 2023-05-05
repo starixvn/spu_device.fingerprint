@@ -5,17 +5,18 @@ interface BotDResult{
     detection: string;
 }
 
-export function loadBotD(): Promise<void | BotDResult> {
-    const botdPromise = load({
-        monitoring: false
-    });
-    return botdPromise
-        .then((botd) => {
-            var result: BotDetectionResult = botd.detect();
-            return {
-                result: result,
-                detection: JSON.stringify(botd.getDetections())
-            };
-        })
-        .catch((error) => console.error(error));
+export async function loadBotD(): Promise<BotDResult | undefined> {
+    try {
+        const botd = await load({
+            monitoring: false
+        });
+        var resultDetect: BotDetectionResult = botd.detect();
+        return {
+            result: resultDetect,
+            detection: JSON.stringify(botd.getDetections())
+        };
+    } catch (error) {
+        console.error(error);
+        return undefined;
+    }
 }

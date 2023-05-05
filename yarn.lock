@@ -61,10 +61,10 @@
   dependencies:
     tslib "^2.0.1"
 
-"@fps/botd@^1.1.0":
-  version "1.1.0"
-  resolved "http://npm.nexdev.net/@fps%2fbotd/-/botd-1.1.0.tgz"
-  integrity sha512-UgTI0KyIVtbpfVG6TH4Sox2Cch5YDHgf9EyBp2+JdVm/ZukN50rMyDBag7vWt2MrhSq+CFPJ0KlU5nFDZ4ivvQ==
+"@fps/botd@^1.1.1":
+  version "1.1.1"
+  resolved "http://npm.nexdev.net/@fps%2fbotd/-/botd-1.1.1.tgz"
+  integrity sha512-fFWojsWIEa2eTjd48LKrd8Ao3R3eMwC/V7ENzGVh5enWvTH1AuegQPEyBj3e/MCfBqC7OB+TjjptIcNKvqMUeQ==
   dependencies:
     tslib "^2.4.0"
 
