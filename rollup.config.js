@@ -7,169 +7,147 @@ import json from "@rollup/plugin-json";
 const commonTerser = terser(require('./terser.config.js'))
 
 const commonOutput = {
-    name: 'globalFP',
-    exports: 'named',
-  }
+  name: 'globalFP',
+  exports: 'named',
+}
 
-const commonInput={
-  input: 'src/fp.ts', 
+const commonInput = {
+  input: 'src/fp.ts',
   plugins: [
-    typescript({module: "ESNext"}),
+    typescript({ module: "ESNext" }),
     nodeResolve({ preferBuiltins: false }), // or `true`
     commonjs(),
     json()
   ]
 }
 
-const newCookieOutPut={
-  name:'fpNewCookie',
+const newCookieOutPut = {
+  name: 'fpNewCookie',
   exports: 'named'
 }
 
-const newCookieInput={
-  input: 'src/newCookie.ts', 
+const newCookieInput = {
+  input: 'src/newCookie.ts',
   plugins: [
-    typescript({module: "ESNext"}),
+    typescript({ module: "ESNext" }),
     nodeResolve({ preferBuiltins: false }), // or `true`
     commonjs(),
     json()
-]}
+  ]
+}
 
-const headlessInput={
-  input: 'src/headlessDetection.ts', 
+const headlessInput = {
+  input: 'src/headlessDetection.ts',
   plugins: [
-    typescript({module: "ESNext"}),
+    typescript({ module: "ESNext" }),
     nodeResolve({ preferBuiltins: false }), // or `true`
     commonjs(),
     json()
-]}
+  ]
+}
 
-const headlessOutPut={
-  name:'fpHeadless',
+const headlessOutPut = {
+  name: 'fpHeadless',
   exports: 'named'
 }
 
-const browserInfoInput={
-  input: 'src/browserDetect.ts', 
+const browserInfoInput = {
+  input: 'src/browserDetect.ts',
   plugins: [
-    typescript({module: "ESNext"}),
+    typescript({ module: "ESNext" }),
     nodeResolve({ preferBuiltins: false }), // or `true`
     commonjs(),
     json()
-]}
+  ]
+}
 
-const browserInfoOutPut={
-  name:'fpBrowserDetect',
+const browserInfoOutPut = {
+  name: 'fpBrowserDetect',
   exports: 'named'
 }
 
-const cryptInput={
-  input: 'src/crypt.ts', 
+const cryptInput = {
+  input: 'src/subtleCrypto.ts',
   plugins: [
-    typescript({module: "ESNext"}),
+    typescript({ module: "ESNext" }),
     nodeResolve({ preferBuiltins: false }), // or `true`
     commonjs(),
     json()
-]}
+  ]
+}
 
-const cryptOutPut={
-  name:'crypt',
+const cryptOutPut = {
+  name: 'crypt',
   exports: 'named'
 }
 
-const subtleCryptInput={
-  input: 'src/subtleCrypto.ts', 
-  plugins: [
-    typescript({module: "ESNext"}),
-    nodeResolve({ preferBuiltins: false }), // or `true`
-    commonjs(),
-    json()
-]}
-
-const subtleCryptOutPut={
-  name:'subtleCrypto',
-  exports: 'named'
-}
-
-export default [{
-    ...commonInput, 
+export default [
+  {
+    ...commonInput,
     output: [{
-    ...commonOutput,
+      ...commonOutput,
       file: 'dist/gfp.js',
       format: 'iife'
     },
     {
       ...commonOutput,
-        file: 'dist/gfp.min.js', 
-        format: 'iife',
-        plugins: [commonTerser]
-      }    
-    ],   
+      file: 'dist/gfp.min.js',
+      format: 'iife',
+      plugins: [commonTerser]
+    }
+    ],
     external: ['moment']
   },
   {
     ...newCookieInput,
-    output:[{
+    output: [{
       ...newCookieOutPut,
-      file:'dist/newCookie.js',
+      file: 'dist/newCookie.js',
       format: 'iife'
-    },{
+    }, {
       ...newCookieOutPut,
-      file:'dist/newCookie.min.js',
+      file: 'dist/newCookie.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]
   },
   {
     ...headlessInput,
-    output:[{
+    output: [{
       ...headlessOutPut,
-      file:'dist/headlessBrowser.js',
+      file: 'dist/headlessBrowser.js',
       format: 'iife'
-    },{
+    }, {
       ...headlessOutPut,
-      file:'dist/headlessBrowser.min.js',
+      file: 'dist/headlessBrowser.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]
   },
   {
     ...browserInfoInput,
-    output:[{
+    output: [{
       ...browserInfoOutPut,
-      file:'dist/browserInfo.js',
+      file: 'dist/browserInfo.js',
       format: 'iife'
-    },{
+    }, {
       ...browserInfoOutPut,
-      file:'dist/browserInfo.min.js',
+      file: 'dist/browserInfo.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]
   },
   {
     ...cryptInput,
-    output:[{
+    output: [{
       ...cryptOutPut,
-      file:'dist/crypt.js',
+      file: 'dist/crypt.js',
       format: 'iife'
-    },{
+    }, {
       ...cryptOutPut,
-      file:'dist/crypt.min.js',
-      format: 'iife',
-      plugins: [commonTerser]
-    }]
-  },
-  {
-    ...subtleCryptInput,
-    output:[{
-      ...subtleCryptOutPut,
-      file:'dist/subtleCrypt.js',
-      format: 'iife'
-    },{
-      ...cryptOutPut,
-      file:'dist/subtleCrypt.min.js',
+      file: 'dist/crypt.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]
   }
-  ];
+];
