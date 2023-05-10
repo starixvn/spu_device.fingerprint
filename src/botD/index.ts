@@ -3,18 +3,23 @@ import { load, BotDetectionResult } from '@fps/botd';
 interface BotDResult{
     result: BotDetectionResult;
     detection: string;
+    component: any
 }
 
-export async function loadBotD(): Promise<BotDResult | undefined> {
+export function loadBotD(): Promise<BotDResult | undefined> {
     try {
-        const botd = await load({
+        const botdPromise = load({
             monitoring: false
         });
-        var resultDetect: BotDetectionResult = botd.detect();
-        return {
-            result: resultDetect,
-            detection: JSON.stringify(botd.getDetections())
-        };
+        return botdPromise
+            .then((botd) => {
+                var resultDetect: BotDetectionResult = botd.detect();
+                return {
+                    result: resultDetect,
+                    detection: JSON.stringify(botd.getDetections()),
+                    component: JSON.stringify(botd.getComponents())
+                };
+            });
     } catch (error) {
         console.error(error);
         return undefined;
