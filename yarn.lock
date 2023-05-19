@@ -61,11 +61,12 @@
   dependencies:
     tslib "^2.0.1"
 
-"@fps/botd@^1.1.1":
-  version "1.1.1"
-  resolved "http://npm.nexdev.net/@fps%2fbotd/-/botd-1.1.1.tgz"
-  integrity sha512-fFWojsWIEa2eTjd48LKrd8Ao3R3eMwC/V7ENzGVh5enWvTH1AuegQPEyBj3e/MCfBqC7OB+TjjptIcNKvqMUeQ==
+"@fps/botd@^1.1.1", "@fps/botd@^1.1.2":
+  version "1.1.2"
+  resolved "http://npm.nexdev.net/@fps%2fbotd/-/botd-1.1.2.tgz"
+  integrity sha512-WE1Tm/M8lGTOZ+juVFIpPgvTimXhVIZTuE3YVK1uR3Z3iFQpnmKo3vj9rprkr2ug40Oz6og/lyG/TyBrR27HKA==
   dependencies:
+    "@fps/botd" "^1.1.1"
     tslib "^2.4.0"
 
 "@jridgewell/gen-mapping@^0.3.0":
