@@ -6,7 +6,7 @@ interface BotDResult{
     component: any
 }
 
-export function loadBotD(): Promise<BotDResult | undefined> {
+export default function loadBotD(): Promise<BotDResult | undefined> {
     try {
         const botdPromise = load({
             monitoring: false
