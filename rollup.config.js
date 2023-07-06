@@ -91,7 +91,22 @@ const subtleCryptOutPut={
   exports: 'named'
 }
 
-export default [{
+const botDInput={
+  input: 'src/botD/index.ts',
+  plugins: [
+    typescript({module: "ESNext"}),
+    nodeResolve({ preferBuiltins: false }), // or `true`
+    commonjs(),
+    json()
+]}
+
+const botDOutPut={
+  name:'BotD',
+  export: 'named'
+}
+
+export default [
+  {
     ...commonInput, 
     output: [{
     ...commonOutput,
@@ -170,6 +185,14 @@ export default [{
       file:'dist/subtleCrypt.min.js',
       format: 'iife',
       plugins: [commonTerser]
+    }]
+  },
+  {
+    ...botDInput,
+    output:[{
+      ...botDOutPut,
+      file:'dist/BotD.js',
+      format: 'iife'
     }]
   }
   ];
