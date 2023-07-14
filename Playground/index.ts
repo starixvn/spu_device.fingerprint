@@ -1,10 +1,12 @@
-import { load, BotDetectionResult } from '@fps/botd';
-import loadBotD from '../src/botD/index';
+import {isMobile, isDesktop} from '../src/deviceType/index'
 
-(async function() {
-    const botd = await loadBotD();
-    console.log('botd', botd);
-})();
+// import { load, BotDetectionResult } from '@fps/botd';
+// import loadBotD from '../src/botD/index';
+
+// (async function() {
+//     const botd = await loadBotD();
+//     console.log('botd', botd);
+// })();
 
 // (async function() {
 //     const botd = await load({
@@ -20,3 +22,6 @@ import loadBotD from '../src/botD/index';
 //         detection: JSON.stringify(botd.getDetections())
 //     };
 // })();
+
+console.log("Desktop", isDesktop())
+console.log("Mobile", isMobile());
