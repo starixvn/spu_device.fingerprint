@@ -93,45 +93,65 @@ function isIOS()
     ]) >= 3);
 }
 
-export function isMobile()
+export function checking(isDebug = false)
 {
     var isItTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     var isItAndroid = isAndroid();
     var isItIOS = isIOS();
     var screenWidth = window.screen.width;
     var screenHeight = window.screen.height; 
-    
-    var isItResult = (countTruthy([
-        isItAndroid,
-        isItIOS,
+    var isItTrident = isTrident();
+
+    var isItMobile = (countTruthy([
+        isItAndroid || isItIOS,        
         isItTouchDevice,
         (screenWidth <= 1024 && screenHeight <= 1024),
         (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.platform))
-    ]) >= 3)
-    
-    return {
-        result : isItResult,
-        isItTouchDevice: isItTouchDevice,
-        isItAndroid: isItAndroid,
-        isItIOS: isItIOS,
-        screenWidth: screenWidth,
-        screenHeight: screenHeight,
-        platform: navigator.platform
-    };     
-}
+    ]) >= 3);
 
-export function isDesktop()
-{
-    var isItTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    var screenWidth = window.screen.width;
-    var screenHeight = window.screen.height;
-    var isItTrident = isTrident();
+    var isItTablet = (countTruthy([
+        isItAndroid || isItIOS,
+        isItTouchDevice,
+        (screenWidth > 1024 || screenHeight > 1024),
+        (/Android|iPad|tablet/i.test(navigator.platform))
+    ]) >= 3);
+
+    let result = 'Unknown';
+
+    if(isItMobile || isItTablet)
+    {
+        result = 'Mobile';       
+    }
+    else
+    {
+        var isItDesktop = (countTruthy([
+            !isItAndroid && !isItIOS,            
+            !isItTouchDevice,
+            (screenWidth > 1024 || screenHeight > 1024),
+            (/Win|Mac|Linux/i.test(navigator.platform))
+        ]) >= 3);
+
+        if(isItDesktop || isItTrident)
+        {
+            result = 'Desktop';           
+        }        
+    }
+
     return {
-        result: !isMobile().result || (!isItTouchDevice && (screenWidth > 1024 || screenHeight > 1024)) || isItTrident,
-        isItTouchDevice: isItTouchDevice,
-        screenWidth: screenWidth,
-        screenHeight: screenHeight,
-        isItTrident: isItTrident
-    };
+        device: result,
+        debugInfo:isDebug ? {
+            isItMobile : isItMobile,
+            isItTablet : isItTablet,
+            isItDesktop : isItDesktop,
+            isItTouchDevice: isItTouchDevice,
+            isItAndroid: isItAndroid,
+            isItIOS: isItIOS,
+            isItTrident: isItTrident,
+            screenWidth: screenWidth,
+            screenHeight: screenHeight,
+            platform: navigator.platform
+        }:{}
+    } 
+    
 }
 

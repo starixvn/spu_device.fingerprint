@@ -1,4 +1,4 @@
-import {isMobile, isDesktop} from '../src/deviceType/index'
+import {checking} from '../src/deviceType/index'
 
 // import { load, BotDetectionResult } from '@fps/botd';
 // import loadBotD from '../src/botD/index';
@@ -23,5 +23,4 @@ import {isMobile, isDesktop} from '../src/deviceType/index'
 //     };
 // })();
 
-console.log("Desktop", isDesktop())
-console.log("Mobile", isMobile());
+console.log("Mobile", checking().device);

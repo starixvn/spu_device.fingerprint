@@ -115,7 +115,7 @@ const deviceTypeInput={
 ]}
 
 const deviceTypeOutPut={
-  name:'devicetype',
+  name:'deviceType',
   export: 'named'
 }
 
