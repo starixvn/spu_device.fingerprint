@@ -105,6 +105,20 @@ const botDOutPut={
   export: 'named'
 }
 
+const deviceTypeInput={
+  input: 'src/deviceType/index.ts',
+  plugins: [
+    typescript({module: "ESNext"}),
+    nodeResolve({ preferBuiltins: false }), // or `true`
+    commonjs(),
+    json()
+]}
+
+const deviceTypeOutPut={
+  name:'deviceType',
+  export: 'named'
+}
+
 export default [
   {
     ...commonInput, 
@@ -193,6 +207,19 @@ export default [
       ...botDOutPut,
       file:'dist/BotD.js',
       format: 'iife'
+    }]
+  },
+  {
+    ...deviceTypeInput,
+    output:[{
+      ...deviceTypeOutPut,
+      file:'dist/deviceType.js',
+      format: 'iife'
+    },{
+      ...deviceTypeOutPut,
+      file:'dist/deviceType.min.js',
+      format: 'iife',
+      plugins: [commonTerser]
     }]
   }
   ];
