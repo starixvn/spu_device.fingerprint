@@ -6,6 +6,7 @@ const firefox = require('selenium-webdriver/firefox');
 // https://github.com/operasoftware/operachromiumdriver/releases
 // Firefox
 // https://github.com/mozilla/geckodriver/releases
+// https://ftp.mozilla.org/pub/firefox/releases/?_gl=1*1mkh5kz*_ga*MTEwOTkwMDk3Ny4xNjc4ODY3MTQ3*_ga_2VC139B3XV*MTY5NDU3Mjc0MS4xLjEuMTY5NDU3MjgxMy4wLjAuMA..
 // Chrome
 // http://chromedriver.chromium.org/downloads
 // Internet Explorer
