@@ -15,19 +15,10 @@ export default function loadBotD(): Promise<BotDResult | undefined> {
             .then((botd) => {
                 var resultDetect: BotDetectionResult = botd.detect();
 
-                var component = botd.getComponents();
-                const componentOrdered = Object.keys(component).sort().reduce(
-                    (obj, key) => {
-                        obj[key] = component[key];
-                        return obj;
-                    },
-                    {}
-                );
-
                 return {
                     result: resultDetect,
                     detection: JSON.stringify(botd.getDetections()),
-                    component: JSON.stringify(componentOrdered)
+                    component: JSON.stringify(botd.getComponents())
                 };
             });
     } catch (error) {
