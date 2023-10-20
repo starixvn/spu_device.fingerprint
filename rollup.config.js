@@ -134,6 +134,21 @@ const md5OutPut={
   exports: 'named'
 }
 
+const newFpInput={
+  input: 'src/newFp.js', 
+  plugins: [
+    typescript({module: "ESNext"}),
+    nodeResolve({ preferBuiltins: false }), // or `true`
+    commonjs(),
+    json()
+]}
+
+const newFpOutPut={
+  name:'newFp',
+  exports: 'named'
+}
+
+
 export default [
   {
     ...commonInput, 
@@ -246,6 +261,19 @@ export default [
     },{
       ...md5OutPut,
       file:'dist/md5.min.js',
+      format: 'iife',
+      plugins: [commonTerser]
+    }]
+  },
+  {
+    ...newFpInput,
+    output:[{
+      ...newFpOutPut,
+      file:'dist/newFp.js',
+      format: 'iife'
+    },{
+      ...newFpOutPut,
+      file:'dist/newFp.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]

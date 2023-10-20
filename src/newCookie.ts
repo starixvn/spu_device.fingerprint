@@ -118,12 +118,9 @@ function getSetCookie(key: string, value: string | null): Promise<string | null>
         try {
             if (isSet) {
                 let expires: string = '';
-                const days: number = 30;
-                if (days) {
-                    const date: Date = new Date();
-                    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+                let date = new Date();
+                    date.setFullYear(date.getFullYear() + 1);
                     expires = '; expires=' + date.toUTCString();
-                }
 
                 const setValue = key + '=' + (value || '') + expires + '; SameSite=None; Secure; path=/';
                 document.cookie = setValue;
@@ -155,17 +152,17 @@ function getSetWindowName(key: string, value: string | any): Promise<string | nu
     return new Promise(function (resolve, reject) {
         try {
             if (isSet) {
-                var currentValue = window.name;
+                var currentValue = window[key] || '';
                 if (!isValidObject(currentValue) || validateUUID(currentValue)) {
-                    window.name = value;
+                    window[key] = value;
                 }
                 resolve(null);
-            } else {
-                value = window.name;
+            }
+            else {
+                value = window[key];
                 if (!validateUUID(value)) {
                     value = null;
                 }
-
                 resolve(value);
             }
         } catch (exception) {
@@ -250,13 +247,13 @@ function getFirstMaxCountValue(arr: string | any[]): Promise<string> {
     });
 }
 
-function get() {
+function get(key) {
     try {
         isSet = false;
 
         const promises = storageHandlers.map((handler) => {
             return new Promise((resolve) => {
-                resolve(handler(cookieKey, null));
+                resolve(handler(key, null));
             });
         });
         return waitAllWithTimeout(promises).then((cookies) => {
@@ -268,20 +265,20 @@ function get() {
     }
 }
 
-function set(value: string) {
+function set(key: string, value: string) {
     try {
         isSet = true;
         storageHandlers.forEach(function (handler) {
-            handler(cookieKey, value);
+            handler(key, value);
         });
     } catch (exception) {
     }
 }
 
-export function getStorage(): Promise<string> {
-    return get();
+export function getStorage(key: string = cookieKey): Promise<string> {
+    return get(key);
 }
 
-export function setStorage(value: string) {
-    if (value) set(value);
+export function setStorage(key: string = cookieKey, value: string) {
+    if (key && value) set(key, value);
 }
