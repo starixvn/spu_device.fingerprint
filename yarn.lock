@@ -54,13 +54,6 @@
   resolved "https://registry.npmjs.org/@discoveryjs/json-ext/-/json-ext-0.5.6.tgz"
   integrity sha512-ws57AidsDvREKrZKYffXddNkyaF14iHNHm8VQnZH6t99E8gczjNN0GpvcGny0imC80yQ0tHz1xVUKk/KFQSUyA==
 
-"@fingerprintjs/fingerprintjs@^3.3.6":
-  version "3.3.6"
-  resolved "https://registry.npmjs.org/@fingerprintjs/fingerprintjs/-/fingerprintjs-3.3.6.tgz"
-  integrity sha512-Inh0OoFVzO2PLvrUF8RZhY9NVDdg9DJHQ5YlvXhrGtQxSPzy2smS3TWzLAi+zlHSJNHSvi+1zYayLen2lGxjdA==
-  dependencies:
-    tslib "^2.0.1"
-
 "@fps/botd@^1.1.1", "@fps/botd@^1.1.9":
   version "1.1.9"
   resolved "http://npm.nexdev.net/@fps/botd/-/botd-1.1.9.tgz"
@@ -68,6 +61,14 @@
   dependencies:
     "@fps/botd" "^1.1.1"
     tslib "^2.4.0"
+
+"@fps/fingerprintjs@^1.0.0", "@fps/fingerprintjs@^1.0.1":
+  version "1.0.1"
+  resolved "http://npm.nexdev.net/@fps/fingerprintjs/-/fingerprintjs-1.0.1.tgz"
+  integrity sha512-me9ywSITjUifGJGY4jYHjuxalpIsAK1fU3MQSV/ZYuxMRJmsRqoIGPlatcnn6DT4ij17MCS9+fN3J1NBHKSexA==
+  dependencies:
+    "@fps/fingerprintjs" "^1.0.0"
+    tslib "^2.4.1"
 
 "@jridgewell/gen-mapping@^0.3.0":
   version "0.3.3"
@@ -3643,7 +3644,7 @@ ts-node@^10.3.0:
     make-error "^1.1.1"
     yn "3.1.1"
 
-tslib@*, tslib@^2.0.1, tslib@^2.0.3, tslib@^2.4.0, tslib@^2.5.0:
+tslib@*, tslib@^2.0.3, tslib@^2.4.0, tslib@^2.4.1, tslib@^2.5.0:
   version "2.5.0"
   resolved "https://registry.npmjs.org/tslib/-/tslib-2.5.0.tgz"
   integrity sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==
