@@ -7,8 +7,12 @@ import { load, BotDetectionResult } from '@fps/botd';
     var resultDetect: BotDetectionResult = botd.detect();
     var resultComponent = botd.getComponents();
 
-    console.log('resultDetect', resultDetect);
+    const detections = botd.getDetections();
+    console.log('getDetections', detections);
     console.log('resultComponent', resultComponent);
+    const botKeys = Object.keys(detections).filter(key => detections[key].bot).join(',');
+
+    console.log('getDetections', botKeys);
     return {
         result: resultDetect,
         detection: JSON.stringify(botd.getDetections())
