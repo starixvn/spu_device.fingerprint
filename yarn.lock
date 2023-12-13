@@ -54,10 +54,10 @@
   resolved "https://registry.npmjs.org/@discoveryjs/json-ext/-/json-ext-0.5.6.tgz"
   integrity sha512-ws57AidsDvREKrZKYffXddNkyaF14iHNHm8VQnZH6t99E8gczjNN0GpvcGny0imC80yQ0tHz1xVUKk/KFQSUyA==
 
-"@fps/botd@^1.1.1", "@fps/botd@^1.1.9":
-  version "1.1.9"
-  resolved "http://npm.nexdev.net/@fps/botd/-/botd-1.1.9.tgz"
-  integrity sha512-5rNnONJMwZUdhRjfjrxsl6lw8RLSGumBDLiXSnHQlOFjYVOqFZULo1ttaHoSmPyZn3HtT3m1HeV0CwNmCGmQPA==
+"@fps/botd@^1.1.1", "@fps/botd@^1.1.10":
+  version "1.1.10"
+  resolved "http://npm.nexdev.net/@fps/botd/-/botd-1.1.10.tgz"
+  integrity sha512-9c0yONgXSB1cF9WtSEUKKfRQ7R9jaLshqjUAtOVtxP087PG1u4LlkN0jMG7bBqfE2aLeFBaZ+RSFSr11lQoCVg==
   dependencies:
     "@fps/botd" "^1.1.1"
     tslib "^2.4.0"
