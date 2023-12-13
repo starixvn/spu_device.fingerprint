@@ -6,19 +6,6 @@ interface BotDResult {
     component: any
 }
 
-function getBotDetections(botd: BotDetectorInterface){
-    const detections = botd.getDetections();
-    return Object.keys(detections).filter(key => detections[key].bot).join(',');
-}
-
-function getBotComponents(botd: BotDetectorInterface, resultDetect: BotDetectionResult){
-    if(resultDetect?.bot){
-        return JSON.stringify(botd.getComponents());
-    }
-
-    return null;
-}
-
 export default function loadBotD(): Promise<BotDResult | undefined> {
     try {
         const botdPromise = load({
@@ -26,12 +13,19 @@ export default function loadBotD(): Promise<BotDResult | undefined> {
         });
         return botdPromise
             .then((botd) => {
-                var resultDetect: BotDetectionResult = botd.detect();
+                const resultDetect: BotDetectionResult = botd.detect();
+                const detections = botd.getDetections();
+                const botDetections = Object.keys(detections).filter(key => detections[key].bot).join(',');
+
+                let botComponents = '';
+                if (resultDetect && resultDetect.bot) {
+                    botComponents = JSON.stringify(botd.getComponents());
+                }
 
                 return {
                     result: resultDetect,
-                    detection: getBotDetections(botd),
-                    component: getBotComponents(botd, resultDetect)
+                    detection: botDetections,
+                    component: botComponents
                 };
             });
     } catch (error) {
