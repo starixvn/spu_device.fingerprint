@@ -119,6 +119,36 @@ const deviceTypeOutPut={
   export: 'named'
 }
 
+
+const md5Input={
+  input: 'src/md5.ts', 
+  plugins: [
+    typescript({module: "ESNext"}),
+    nodeResolve({ preferBuiltins: false }), // or `true`
+    commonjs(),
+    json()
+]}
+
+const md5OutPut={
+  name:'md5',
+  exports: 'named'
+}
+
+const newFpInput={
+  input: 'src/newFp.js', 
+  plugins: [
+    typescript({module: "ESNext"}),
+    nodeResolve({ preferBuiltins: false }), // or `true`
+    commonjs(),
+    json()
+]}
+
+const newFpOutPut={
+  name:'newFp',
+  exports: 'named'
+}
+
+
 export default [
   {
     ...commonInput, 
@@ -221,5 +251,31 @@ export default [
       format: 'iife',
       plugins: [commonTerser]
     }]
-  }
+  },
+  {
+    ...md5Input,
+    output:[{
+      ...md5OutPut,
+      file:'dist/md5.js',
+      format: 'iife'
+    },{
+      ...md5OutPut,
+      file:'dist/md5.min.js',
+      format: 'iife',
+      plugins: [commonTerser]
+    }]
+  },
+  {
+    ...newFpInput,
+    output:[{
+      ...newFpOutPut,
+      file:'dist/newFp.js',
+      format: 'iife'
+    },{
+      ...newFpOutPut,
+      file:'dist/newFp.min.js',
+      format: 'iife',
+      plugins: [commonTerser]
+    }]
+  },
   ];

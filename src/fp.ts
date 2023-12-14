@@ -3,13 +3,11 @@ import FingerprintJS, {
   loadSources,
   UnknownComponents,
   isWebKit,
-  isDesktopSafari,
   isAndroid,
   isChromium,
   isGecko,
-  isEdgeHTML,
   isTrident,
-} from "@fingerprintjs/fingerprintjs";
+} from "@fps/fingerprintjs";
 import { webglId } from "./webgl";
 import { getCanvas } from "./canvas";
 
@@ -22,7 +20,7 @@ interface componentObject {
   duration: number;
 }
 
-const listAttributeHash: string[] = ["math", "fontPreferencePrint"];
+const listAttributeHash: string[] = ["math", "fontPreferencePrint", "webGlExtensions"];
 
 function getDevicePixelRatio(): number {
   return window.devicePixelRatio;
@@ -49,7 +47,7 @@ function getScreenPrint(): componentObject {
 }
 
 function getWebGL(callback): componentObject {
-  const start:Date = new Date();
+  const start: Date = new Date();
   const result = webglId(callback);
 
   return { value: result, duration: (new Date()).getMilliseconds() - start.getMilliseconds() };
@@ -86,30 +84,29 @@ function getGLRenderer() {
 }
 
 function componentsToJsonString(components: UnknownComponents, callback): string {
+  const sortedKeys = Object.keys(components).sort();
   let result = "";
-  let err: string;
-  for (const componentKey of Object.keys(components).sort()) {
+  let err = "";
+  for (const componentKey of sortedKeys) {
     const component = components[componentKey];
-    let value = JSON.stringify(
-      component.error
-        ? "error"
-        : component.value == undefined
-        ? `undefined`
-        : component.value
-    );
+    let value: string;
 
-    if (listAttributeHash.indexOf(componentKey) > -1) {
-      value = JSON.stringify(callback(value));
+    if ("error" in component) {
+      value = "error";
+      err += `${componentKey}: ${component.error},`;
+    } else if (component.value === undefined) {
+      value = `"undefined"`;
+    } else {
+      if (listAttributeHash.includes(componentKey)) {
+        value = JSON.stringify(callback(JSON.stringify(component.value)));
+      }
+      else {
+        value = JSON.stringify(component.value);
+      }
     }
 
-    if (component.error) {
-      err += `${componentKey}: ${component.error.message},`;
-    }
-
-    result += `${result ? "," : "{"}${`"${componentKey}"`.replace(
-      /([:|\\])/g,
-      "\\$1"
-    )}:${value}`;
+    const escapedComponentKey = `"${componentKey.replace(/([:|\\])/g, "\\$1")}"`;
+    result += `${result ? "," : "{"}${escapedComponentKey}:${value}`;
   }
 
   return `${result}}`;
@@ -143,14 +140,13 @@ function getLanguages(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
-export function getAudio(): number | (() => Promise<number>) {
+export function getAudio(): Promise<() => number> {
   return sources.audio();
 }
 
 export function getBrowserSupport(): {} {
   return {
     isWebKit: isWebKit,
-    isDesktopSafari: isDesktopSafari,
     isAndroid: isAndroid,
     isChromium: isChromium,
     isGecko: isGecko,
