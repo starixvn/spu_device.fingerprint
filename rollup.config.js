@@ -21,13 +21,13 @@ const commonInput={
   ]
 }
 
-const newCookieOutPut={
-  name:'fpNewCookie',
+const fpCookieOutPut={
+  name:'fpCookie',
   exports: 'named'
 }
 
-const newCookieInput={
-  input: 'src/newCookie.ts', 
+const fpCookieInput={
+  input: 'src/fpCookie.ts', 
   plugins: [
     typescript({module: "ESNext"}),
     nodeResolve({ preferBuiltins: false }), // or `true`
@@ -120,8 +120,8 @@ const deviceTypeOutPut={
 }
 
 
-const md5Input={
-  input: 'src/md5.ts', 
+const encryptInput={
+  input: 'src/encrypt.ts', 
   plugins: [
     typescript({module: "ESNext"}),
     nodeResolve({ preferBuiltins: false }), // or `true`
@@ -129,8 +129,8 @@ const md5Input={
     json()
 ]}
 
-const md5OutPut={
-  name:'md5',
+const encryptOutPut={
+  name:'encrypt',
   exports: 'named'
 }
 
@@ -147,6 +147,15 @@ const newFpOutPut={
   name:'newFp',
   exports: 'named'
 }
+
+const base64Input={
+  input: 'src/base64.ts', 
+  plugins: [
+    typescript({module: "ESNext"}),
+    nodeResolve({ preferBuiltins: false }), // or `true`
+    commonjs(),
+    json()
+]}
 
 
 export default [
@@ -167,14 +176,14 @@ export default [
     external: ['moment']
   },
   {
-    ...newCookieInput,
+    ...fpCookieInput,
     output:[{
-      ...newCookieOutPut,
-      file:'dist/newCookie.js',
+      ...fpCookieOutPut,
+      file:'dist/fpCookie.js',
       format: 'iife'
     },{
-      ...newCookieOutPut,
-      file:'dist/newCookie.min.js',
+      ...fpCookieOutPut,
+      file:'dist/fpCookie.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]
@@ -253,14 +262,14 @@ export default [
     }]
   },
   {
-    ...md5Input,
+    ...encryptInput,
     output:[{
-      ...md5OutPut,
-      file:'dist/md5.js',
+      ...encryptOutPut,
+      file:'dist/encrypt.js',
       format: 'iife'
     },{
-      ...md5OutPut,
-      file:'dist/md5.min.js',
+      ...encryptOutPut,
+      file:'dist/encrypt.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]
