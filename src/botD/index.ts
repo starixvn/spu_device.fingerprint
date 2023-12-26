@@ -25,7 +25,8 @@ export default function loadBotD(): Promise<BotDResult | undefined> {
                 return {
                     result: resultDetect,
                     detection: botDetections,
-                    component: botComponents
+                    component: botComponents,
+                    isVer3: true
                 };
             });
     } catch (error) {
