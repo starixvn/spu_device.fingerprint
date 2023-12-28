@@ -92,8 +92,8 @@ function componentsToJsonString(components: UnknownComponents, callback): string
     let value: string;
 
     if ("error" in component) {
-      value = "error";
-      err += `${componentKey}: ${component.error},`;
+      value = `"error"`;
+      err += `${componentKey}: "${component.error}",`;
     } else if (component.value === undefined) {
       value = `"undefined"`;
     } else {
@@ -185,7 +185,7 @@ export function getFP(callback): Promise<fpResult> {
 
     return Promise.resolve({
       Id: visitorId,
-      Properties: properties,
+      Properties: properties
     });
   });
 }
