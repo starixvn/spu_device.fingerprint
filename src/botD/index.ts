@@ -1,4 +1,4 @@
-import { load, BotDetectionResult } from '@fps/botd';
+import { load, BotDetectionResult, BotDetectorInterface } from '@fps/botd';
 
 interface BotDResult {
     result: BotDetectionResult;
@@ -13,12 +13,20 @@ export default function loadBotD(): Promise<BotDResult | undefined> {
         });
         return botdPromise
             .then((botd) => {
-                var resultDetect: BotDetectionResult = botd.detect();
+                const resultDetect: BotDetectionResult = botd.detect();
+                const detections = botd.getDetections();
+                const botDetections = Object.keys(detections).filter(key => detections[key].bot).join(',');
+
+                let botComponents = '';
+                if (resultDetect && resultDetect.bot) {
+                    botComponents = JSON.stringify(botd.getComponents());
+                }
 
                 return {
                     result: resultDetect,
-                    detection: JSON.stringify(botd.getDetections()),
-                    component: JSON.stringify(botd.getComponents())
+                    detection: botDetections,
+                    component: botComponents,
+                    isVer3: true
                 };
             });
     } catch (error) {

@@ -54,18 +54,18 @@
   resolved "https://registry.npmjs.org/@discoveryjs/json-ext/-/json-ext-0.5.6.tgz"
   integrity sha512-ws57AidsDvREKrZKYffXddNkyaF14iHNHm8VQnZH6t99E8gczjNN0GpvcGny0imC80yQ0tHz1xVUKk/KFQSUyA==
 
-"@fps/botd@^1.1.1", "@fps/botd@^1.1.9":
-  version "1.1.9"
-  resolved "http://npm.nexdev.net/@fps/botd/-/botd-1.1.9.tgz"
-  integrity sha512-5rNnONJMwZUdhRjfjrxsl6lw8RLSGumBDLiXSnHQlOFjYVOqFZULo1ttaHoSmPyZn3HtT3m1HeV0CwNmCGmQPA==
+"@fps/botd@^1.1.1", "@fps/botd@^1.1.10":
+  version "1.1.10"
+  resolved "http://npm.nexdev.net/@fps/botd/-/botd-1.1.10.tgz"
+  integrity sha512-9c0yONgXSB1cF9WtSEUKKfRQ7R9jaLshqjUAtOVtxP087PG1u4LlkN0jMG7bBqfE2aLeFBaZ+RSFSr11lQoCVg==
   dependencies:
     "@fps/botd" "^1.1.1"
     tslib "^2.4.0"
 
-"@fps/fingerprintjs@^1.0.0", "@fps/fingerprintjs@^1.0.1":
-  version "1.0.1"
-  resolved "http://npm.nexdev.net/@fps/fingerprintjs/-/fingerprintjs-1.0.1.tgz"
-  integrity sha512-me9ywSITjUifGJGY4jYHjuxalpIsAK1fU3MQSV/ZYuxMRJmsRqoIGPlatcnn6DT4ij17MCS9+fN3J1NBHKSexA==
+"@fps/fingerprintjs@^1.0.0", "@fps/fingerprintjs@^1.0.2":
+  version "1.0.2"
+  resolved "http://npm.nexdev.net/@fps/fingerprintjs/-/fingerprintjs-1.0.2.tgz"
+  integrity sha512-lU1KmWuwPsdP+FDrfurdHHnMejjOU2dU68/Ot8ZMMGXc4IcdAB8kUfIghQnvm5toVn7e9uffziOHflsfKIA8jw==
   dependencies:
     "@fps/fingerprintjs" "^1.0.0"
     tslib "^2.4.1"
