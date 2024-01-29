@@ -151,6 +151,7 @@ function windowName(key: string, value: string | any): Promise<string | null> {
 function getSetWindowName(key: string, value: string | any): Promise<string | null> {
     return new Promise(function (resolve, reject) {
         try {
+            key = "name";
             if (isSet) {
                 var currentValue = window[key] || '';
                 if (!isValidObject(currentValue) || validateUUID(currentValue)) {
