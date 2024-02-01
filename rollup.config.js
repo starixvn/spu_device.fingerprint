@@ -21,19 +21,20 @@ const commonInput={
   ]
 }
 
-const fpCookieOutPut={
-  name:'fpCookie',
+const newCookieOutPut={
+  name:'fpNewCookie',
   exports: 'named'
 }
 
-const fpCookieInput={
-  input: 'src/fpCookie.ts', 
+const newCookieInput={
+  input: 'src/newCookie.ts', 
   plugins: [
     typescript({module: "ESNext"}),
     nodeResolve({ preferBuiltins: false }), // or `true`
     commonjs(),
     json()
 ]}
+
 
 const headlessInput={
   input: 'src/headlessDetection.ts', 
@@ -176,14 +177,14 @@ export default [
     external: ['moment']
   },
   {
-    ...fpCookieInput,
+    ...newCookieInput,
     output:[{
-      ...fpCookieOutPut,
-      file:'dist/fpCookie.js',
+      ...newCookieOutPut,
+      file:'dist/newCookie.js',
       format: 'iife'
     },{
-      ...fpCookieOutPut,
-      file:'dist/fpCookie.min.js',
+      ...newCookieOutPut,
+      file:'dist/newCookie.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]
