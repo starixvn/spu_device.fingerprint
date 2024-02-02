@@ -3,6 +3,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from "rollup-plugin-terser";
 import json from "@rollup/plugin-json";
+import polyfillNode from 'rollup-plugin-polyfill-node';
 
 const commonTerser = terser(require('./terser.config.js'))
 
@@ -136,12 +137,13 @@ const encryptOutPut={
 }
 
 const newFpInput={
-  input: 'src/newFp.js', 
+  input: 'src/newFp.ts', 
   plugins: [
     typescript({module: "ESNext"}),
     nodeResolve({ preferBuiltins: false }), // or `true`
     commonjs(),
-    json()
+    json(),
+    polyfillNode()
 ]}
 
 const newFpOutPut={
