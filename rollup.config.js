@@ -35,6 +35,7 @@ const newCookieInput={
     json()
 ]}
 
+
 const headlessInput={
   input: 'src/headlessDetection.ts', 
   plugins: [
@@ -120,8 +121,8 @@ const deviceTypeOutPut={
 }
 
 
-const md5Input={
-  input: 'src/md5.ts', 
+const encryptInput={
+  input: 'src/encrypt.ts', 
   plugins: [
     typescript({module: "ESNext"}),
     nodeResolve({ preferBuiltins: false }), // or `true`
@@ -129,8 +130,8 @@ const md5Input={
     json()
 ]}
 
-const md5OutPut={
-  name:'md5',
+const encryptOutPut={
+  name:'encrypt',
   exports: 'named'
 }
 
@@ -147,6 +148,15 @@ const newFpOutPut={
   name:'newFp',
   exports: 'named'
 }
+
+const base64Input={
+  input: 'src/base64.ts', 
+  plugins: [
+    typescript({module: "ESNext"}),
+    nodeResolve({ preferBuiltins: false }), // or `true`
+    commonjs(),
+    json()
+]}
 
 
 export default [
@@ -253,14 +263,14 @@ export default [
     }]
   },
   {
-    ...md5Input,
+    ...encryptInput,
     output:[{
-      ...md5OutPut,
-      file:'dist/md5.js',
+      ...encryptOutPut,
+      file:'dist/encrypt.js',
       format: 'iife'
     },{
-      ...md5OutPut,
-      file:'dist/md5.min.js',
+      ...encryptOutPut,
+      file:'dist/encrypt.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]
