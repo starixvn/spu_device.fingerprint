@@ -5,12 +5,9 @@ var portalAPIUrl = '__portalAPIUrl__';
 var version = '2023042704_beta';
 var key = '__key__';
 
-declare var globalFP: any;
-declare var md5: any;
+declare var globalFP: any; // FingerprintJS 2.1
 declare var fpNewCookie: any;
-declare var fpHeadless: any;
 declare var encrypt: any;
-declare var globalgetFP: any;
 declare var isWebKit: any;
 declare var isDesktopWebKit: any;
 declare var isIPad: any;
@@ -49,7 +46,7 @@ function get(url) {
 function getPlatform() {
     var platform = navigator.platform;
     if (platform === 'MacIntel') {
-        if (typeof isWebKit === 'function' && typeof isDesktopWebKit === 'function') {
+        if (typeof isWebKit === 'function' && typeof isDesktopWebKit === 'function' && typeof isIPad === 'function') {
             if (isWebKit() && !isDesktopWebKit()) {
                 return isIPad() ? 'iPad' : 'iPhone';
             }
@@ -162,7 +159,7 @@ function sendXHR(method, url, jsonData, callback) {
 
 function postFpData(gjt) {
     requireJS(apiUrl + '/s/fp/' + version).then(() => {
-        return globalgetFP(encrypt.hashMD5);
+        return globalFP.getFP(encrypt.hashMD5);
     }).then(res => {
         var data = {
             'Fingerprint': {

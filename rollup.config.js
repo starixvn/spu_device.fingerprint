@@ -65,20 +65,6 @@ const browserInfoOutPut={
   exports: 'named'
 }
 
-const cryptInput={
-  input: 'src/crypt.ts', 
-  plugins: [
-    typescript({module: "ESNext"}),
-    nodeResolve({ preferBuiltins: false }), // or `true`
-    commonjs(),
-    json()
-]}
-
-const cryptOutPut={
-  name:'crypt',
-  exports: 'named'
-}
-
 const subtleCryptInput={
   input: 'src/subtleCrypto.ts', 
   plugins: [
@@ -204,45 +190,32 @@ export default [
       plugins: [commonTerser]
     }]
   },
-  {
-    ...browserInfoInput,
-    output:[{
-      ...browserInfoOutPut,
-      file:'dist/browserInfo.js',
-      format: 'iife'
-    },{
-      ...browserInfoOutPut,
-      file:'dist/browserInfo.min.js',
-      format: 'iife',
-      plugins: [commonTerser]
-    }]
-  },
-  {
-    ...cryptInput,
-    output:[{
-      ...cryptOutPut,
-      file:'dist/crypt.js',
-      format: 'iife'
-    },{
-      ...cryptOutPut,
-      file:'dist/crypt.min.js',
-      format: 'iife',
-      plugins: [commonTerser]
-    }]
-  },
-  {
-    ...subtleCryptInput,
-    output:[{
-      ...subtleCryptOutPut,
-      file:'dist/subtleCrypt.js',
-      format: 'iife'
-    },{
-      ...cryptOutPut,
-      file:'dist/subtleCrypt.min.js',
-      format: 'iife',
-      plugins: [commonTerser]
-    }]
-  },
+  // {
+  //   ...browserInfoInput,
+  //   output:[{
+  //     ...browserInfoOutPut,
+  //     file:'dist/browserInfo.js',
+  //     format: 'iife'
+  //   },{
+  //     ...browserInfoOutPut,
+  //     file:'dist/browserInfo.min.js',
+  //     format: 'iife',
+  //     plugins: [commonTerser]
+  //   }]
+  // },
+  // {
+  //   ...subtleCryptInput,
+  //   output:[{
+  //     ...subtleCryptOutPut,
+  //     file:'dist/subtleCrypt.js',
+  //     format: 'iife'
+  //   },{
+  //     ...cryptOutPut,
+  //     file:'dist/subtleCrypt.min.js',
+  //     format: 'iife',
+  //     plugins: [commonTerser]
+  //   }]
+  // },
   {
     ...botDInput,
     output:[{
@@ -251,19 +224,19 @@ export default [
       format: 'iife'
     }]
   },
-  {
-    ...deviceTypeInput,
-    output:[{
-      ...deviceTypeOutPut,
-      file:'dist/deviceType.js',
-      format: 'iife'
-    },{
-      ...deviceTypeOutPut,
-      file:'dist/deviceType.min.js',
-      format: 'iife',
-      plugins: [commonTerser]
-    }]
-  },
+  // {
+  //   ...deviceTypeInput,
+  //   output:[{
+  //     ...deviceTypeOutPut,
+  //     file:'dist/deviceType.js',
+  //     format: 'iife'
+  //   },{
+  //     ...deviceTypeOutPut,
+  //     file:'dist/deviceType.min.js',
+  //     format: 'iife',
+  //     plugins: [commonTerser]
+  //   }]
+  // },
   {
     ...encryptInput,
     output:[{
