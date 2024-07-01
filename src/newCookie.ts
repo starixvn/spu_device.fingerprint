@@ -119,8 +119,9 @@ function getSetCookie(key: string, value: string | null): Promise<string | null>
             if (isSet) {
                 let expires: string = '';
                 let date = new Date();
-                    date.setFullYear(date.getFullYear() + 1);
-                    expires = '; expires=' + date.toUTCString();
+
+                date.setFullYear(date.getFullYear() + 1);
+                expires = '; expires=' + date.toUTCString();
 
                 const setValue = key + '=' + (value || '') + expires + '; SameSite=None; Secure; path=/';
                 document.cookie = setValue;
@@ -273,6 +274,26 @@ function set(key: string, value: string) {
             handler(key, value);
         });
     } catch (exception) {
+    }
+}
+
+export function getStorages(key: string = cookieKey): Promise<string> {
+    try {
+        isSet = false;
+        var promises = storageHandlers.map(function (handler) {
+            return new Promise(function (resolve) {
+                resolve(handler(key, null));
+            });
+        });
+        return waitAllWithTimeout(promises).then(function (cookies) {
+            const joinedCookies = cookies
+                .filter(cookie => cookie !== undefined)
+                .filter((cookie, index, self) => self.indexOf(cookie) === index)
+                .join(',');
+            return Promise.resolve(joinedCookies);
+        });
+    }
+    catch (exception) {
     }
 }
 

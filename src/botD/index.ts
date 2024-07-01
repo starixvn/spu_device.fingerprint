@@ -1,4 +1,4 @@
-import { load, BotDetectionResult, BotDetectorInterface } from '@fps/botd';
+import { load, BotDetectionResult } from '@fps/botd';
 
 interface BotDResult {
     result: BotDetectionResult;
@@ -30,7 +30,6 @@ export default function loadBotD(): Promise<BotDResult | undefined> {
                 };
             });
     } catch (error) {
-        console.error(error);
-        return undefined;
+        return Promise.resolve(undefined);
     }
 }
