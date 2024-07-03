@@ -11,3 +11,5 @@ DemoBot/Python/localTest/Constant/__pycache__/*
 
 /copy.bat
 /dist/
+/BundleFile/node_modules/
+/BundleFile/dist/
