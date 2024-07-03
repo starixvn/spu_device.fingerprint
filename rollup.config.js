@@ -6,13 +6,8 @@ import json from "@rollup/plugin-json";
 
 const commonTerser = terser(require('./terser.config.js'))
 
-const commonOutput = {
-  name: 'globalFP',
-  exports: 'named',
-}
-
 const commonInput = {
-  input: 'src/fp.ts',
+  input: 'src/fingerprint/index.ts',
   plugins: [
     typescript({ module: "ESNext" }),
     nodeResolve({ preferBuiltins: false }), // or `true`
@@ -60,12 +55,14 @@ export default [
   {
     ...commonInput,
     output: [{
-      ...commonOutput,
+      name: 'gfpCode',
+      exports: 'named',
       file: 'dist/gfp.js',
       format: 'iife'
     },
     {
-      ...commonOutput,
+      name: 'gfpCode',
+      exports: 'named',
       file: 'dist/gfp.min.js',
       format: 'iife',
       plugins: [commonTerser]
