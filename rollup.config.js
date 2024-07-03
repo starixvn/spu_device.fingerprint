@@ -3,264 +3,108 @@ import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from "rollup-plugin-terser";
 import json from "@rollup/plugin-json";
-import polyfillNode from 'rollup-plugin-polyfill-node';
 
 const commonTerser = terser(require('./terser.config.js'))
 
 const commonOutput = {
-    name: 'globalFP',
-    exports: 'named',
-  }
+  name: 'globalFP',
+  exports: 'named',
+}
 
-const commonInput={
-  input: 'src/fp.ts', 
+const commonInput = {
+  input: 'src/fp.ts',
   plugins: [
-    typescript({module: "ESNext"}),
+    typescript({ module: "ESNext" }),
     nodeResolve({ preferBuiltins: false }), // or `true`
     commonjs(),
     json()
   ]
 }
 
-const newCookieOutPut={
-  name:'fpNewCookie',
-  exports: 'named'
-}
-
-const newCookieInput={
-  input: 'src/newCookie.ts', 
+const newCookieInput = {
+  input: 'src/newCookie/index.ts',
   plugins: [
-    typescript({module: "ESNext"}),
+    typescript({ module: "ESNext" }),
     nodeResolve({ preferBuiltins: false }), // or `true`
     commonjs(),
     json()
-]}
-
-
-const headlessInput={
-  input: 'src/headlessDetection.ts', 
-  plugins: [
-    typescript({module: "ESNext"}),
-    nodeResolve({ preferBuiltins: false }), // or `true`
-    commonjs(),
-    json()
-]}
-
-const headlessOutPut={
-  name:'fpHeadless',
-  exports: 'named'
+  ]
 }
 
-const browserInfoInput={
-  input: 'src/browserDetect.ts', 
-  plugins: [
-    typescript({module: "ESNext"}),
-    nodeResolve({ preferBuiltins: false }), // or `true`
-    commonjs(),
-    json()
-]}
-
-const browserInfoOutPut={
-  name:'fpBrowserDetect',
-  exports: 'named'
-}
-
-const subtleCryptInput={
-  input: 'src/subtleCrypto.ts', 
-  plugins: [
-    typescript({module: "ESNext"}),
-    nodeResolve({ preferBuiltins: false }), // or `true`
-    commonjs(),
-    json()
-]}
-
-const subtleCryptOutPut={
-  name:'subtleCrypto',
-  exports: 'named'
-}
-
-const botDInput={
+const botDInput = {
   input: 'src/botD/index.ts',
   plugins: [
-    typescript({module: "ESNext"}),
+    typescript({ module: "ESNext" }),
     nodeResolve({ preferBuiltins: false }), // or `true`
     commonjs(),
     json()
-]}
-
-const botDOutPut={
-  name:'BotD',
-  export: 'named'
+  ]
 }
 
-const deviceTypeInput={
-  input: 'src/deviceType/index.ts',
+const encryptInput = {
+  input: 'src/encrypt.ts',
   plugins: [
-    typescript({module: "ESNext"}),
+    typescript({ module: "ESNext" }),
     nodeResolve({ preferBuiltins: false }), // or `true`
     commonjs(),
     json()
-]}
-
-const deviceTypeOutPut={
-  name:'deviceType',
-  export: 'named'
+  ]
 }
 
-
-const encryptInput={
-  input: 'src/encrypt.ts', 
-  plugins: [
-    typescript({module: "ESNext"}),
-    nodeResolve({ preferBuiltins: false }), // or `true`
-    commonjs(),
-    json()
-]}
-
-const encryptOutPut={
-  name:'encrypt',
+const encryptOutPut = {
+  name: 'encrypt',
   exports: 'named'
 }
-
-const newFpInput={
-  input: 'src/newFp.ts', 
-  plugins: [
-    typescript({module: "ESNext"}),
-    nodeResolve({ preferBuiltins: false }), // or `true`
-    commonjs(),
-    json(),
-    polyfillNode()
-]}
-
-const newFpOutPut={
-  name:'newFp',
-  exports: 'named'
-}
-
-const base64Input={
-  input: 'src/base64.ts', 
-  plugins: [
-    typescript({module: "ESNext"}),
-    nodeResolve({ preferBuiltins: false }), // or `true`
-    commonjs(),
-    json()
-]}
-
 
 export default [
   {
-    ...commonInput, 
+    ...commonInput,
     output: [{
-    ...commonOutput,
+      ...commonOutput,
       file: 'dist/gfp.js',
       format: 'iife'
     },
     {
       ...commonOutput,
-        file: 'dist/gfp.min.js', 
-        format: 'iife',
-        plugins: [commonTerser]
-      }    
-    ],   
+      file: 'dist/gfp.min.js',
+      format: 'iife',
+      plugins: [commonTerser]
+    }
+    ],
     external: ['moment']
   },
   {
     ...newCookieInput,
-    output:[{
-      ...newCookieOutPut,
-      file:'dist/newCookie.js',
+    output: [{
+      name: 'gfpCandy',
+      file: 'dist/newCookie.js',
       format: 'iife'
-    },{
-      ...newCookieOutPut,
-      file:'dist/newCookie.min.js',
+    }, {
+      name: 'gfpCandy',
+      file: 'dist/newCookie.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]
   },
-  {
-    ...headlessInput,
-    output:[{
-      ...headlessOutPut,
-      file:'dist/headlessBrowser.js',
-      format: 'iife'
-    },{
-      ...headlessOutPut,
-      file:'dist/headlessBrowser.min.js',
-      format: 'iife',
-      plugins: [commonTerser]
-    }]
-  },
-  // {
-  //   ...browserInfoInput,
-  //   output:[{
-  //     ...browserInfoOutPut,
-  //     file:'dist/browserInfo.js',
-  //     format: 'iife'
-  //   },{
-  //     ...browserInfoOutPut,
-  //     file:'dist/browserInfo.min.js',
-  //     format: 'iife',
-  //     plugins: [commonTerser]
-  //   }]
-  // },
-  // {
-  //   ...subtleCryptInput,
-  //   output:[{
-  //     ...subtleCryptOutPut,
-  //     file:'dist/subtleCrypt.js',
-  //     format: 'iife'
-  //   },{
-  //     ...cryptOutPut,
-  //     file:'dist/subtleCrypt.min.js',
-  //     format: 'iife',
-  //     plugins: [commonTerser]
-  //   }]
-  // },
   {
     ...botDInput,
-    output:[{
-      ...botDOutPut,
-      file:'dist/BotD.js',
-      format: 'iife'
+    output: [{
+      file: 'dist/Detecas.BotD.js',
+      format: 'iife',
+      banner: "Detecas.BotD = "
     }]
   },
-  // {
-  //   ...deviceTypeInput,
-  //   output:[{
-  //     ...deviceTypeOutPut,
-  //     file:'dist/deviceType.js',
-  //     format: 'iife'
-  //   },{
-  //     ...deviceTypeOutPut,
-  //     file:'dist/deviceType.min.js',
-  //     format: 'iife',
-  //     plugins: [commonTerser]
-  //   }]
-  // },
   {
     ...encryptInput,
-    output:[{
+    output: [{
       ...encryptOutPut,
-      file:'dist/encrypt.js',
+      file: 'dist/encrypt.js',
       format: 'iife'
-    },{
+    }, {
       ...encryptOutPut,
-      file:'dist/encrypt.min.js',
+      file: 'dist/encrypt.min.js',
       format: 'iife',
       plugins: [commonTerser]
     }]
   },
-  {
-    ...newFpInput,
-    output:[{
-      ...newFpOutPut,
-      file:'dist/newFp.js',
-      format: 'iife'
-    },{
-      ...newFpOutPut,
-      file:'dist/newFp.min.js',
-      format: 'iife',
-      plugins: [commonTerser]
-    }]
-  },
-  ];
+];
