@@ -37,7 +37,7 @@ const botDInput = {
 }
 
 const encryptInput = {
-  input: 'src/encrypt.ts',
+  input: 'src/encrypt/index.ts',
   plugins: [
     typescript({ module: "ESNext" }),
     nodeResolve({ preferBuiltins: false }), // or `true`
@@ -46,10 +46,6 @@ const encryptInput = {
   ]
 }
 
-const encryptOutPut = {
-  name: 'encrypt',
-  exports: 'named'
-}
 
 export default [
   {
@@ -94,11 +90,13 @@ export default [
   {
     ...encryptInput,
     output: [{
-      ...encryptOutPut,
+      name: 'gfpMask',
+      exports: 'named',
       file: 'dist/encrypt.js',
       format: 'iife'
     }, {
-      ...encryptOutPut,
+      name: 'gfpMask',
+      exports: 'named',
       file: 'dist/encrypt.min.js',
       format: 'iife',
       plugins: [commonTerser]

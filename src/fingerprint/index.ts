@@ -8,8 +8,8 @@ import FingerprintJS, {
   isGecko,
   isTrident,
 } from "@fps/fingerprintjs";
-import { webglId } from "../webgl";
-import { getCanvas } from "../canvas";
+import { webglId } from "./webgl";
+import { getCanvas } from "./canvas";
 
 interface fpResult {
   Id: string;

@@ -1,5 +1,5 @@
-import MD5 from "../override/crypto-js/md5.js";
-import { encodeBase64 } from './base64';
+import MD5 from "../../override/crypto-js/md5.js";
+import { encodeBase64 } from './base64.js';
 
 export function hashMD5(data: string): string {
     return MD5(data).toString();
