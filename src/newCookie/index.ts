@@ -287,7 +287,7 @@ export function getStorages(key: string = cookieKey): Promise<string> {
         });
         return waitAllWithTimeout(promises).then(function (cookies) {
             const joinedCookies = cookies
-                .filter(cookie => cookie !== undefined)
+                .filter(cookie => cookie !== null && cookie !== undefined)
                 .filter((cookie, index, self) => self.indexOf(cookie) === index)
                 .join(',');
             return Promise.resolve(joinedCookies);
