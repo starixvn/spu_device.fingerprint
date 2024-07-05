@@ -140,7 +140,7 @@ function getLanguages(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
-export function getAudio(): Promise<() => number> {
+export function getAudio(): number | (() => Promise<number>) {
   return sources.audio();
 }
 
