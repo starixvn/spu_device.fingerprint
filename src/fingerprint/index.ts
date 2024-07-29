@@ -19,7 +19,7 @@ interface componentObject {
   duration: number;
 }
 
-const listAttributeHash: string[] = ["math", "fontPreferencePrint", "webGlExtensions", "canvas"];
+const listAttributeHash: string[] = ["canvas", "math", "webGlBasics", "webGlExtensions"];
 
 function getDevicePixelRatio(): number {
   return window.devicePixelRatio;
@@ -156,20 +156,13 @@ export function getBrowserSupport(): {} {
 export function getResult(callback): Promise<fpResult> {
   let visitorId: string;
 
-  const fpPromise = loadSources(sources, {}, [
-    "fontPreferences",
-    "languages"
-  ])();
+  const fpPromise = loadSources(sources, {}, [])();
 
-  const webgl = getWebGL(callback);
+  const webgl = getWebGL(function(){});
 
   return fpPromise.then(async (components) => {
     const customComponents = {
       ...components,
-      fontPreferencePrint: await getFontPreference(),
-      languagesPrint: getLanguages(),
-      webglPrint: webgl,
-      webglRenderer: getWebGLRenderer(webgl),
       doNotTrack: getDoNotTrack(),
     };
 
