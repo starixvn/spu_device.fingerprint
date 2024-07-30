@@ -11,7 +11,6 @@ import FingerprintJS, {
 import { webglId } from "./webgl";
 
 interface fpResult {
-  Id: string;
   Properties: {};
 }
 interface componentObject {
@@ -154,8 +153,6 @@ export function getBrowserSupport(): {} {
 }
 
 export function getResult(callback): Promise<fpResult> {
-  let visitorId: string;
-
   const fpPromise = loadSources(sources, {}, [])();
 
   const webgl = getWebGL(function(){});
@@ -166,13 +163,11 @@ export function getResult(callback): Promise<fpResult> {
       doNotTrack: getDoNotTrack(),
     };
 
-    visitorId = FingerprintJS.hashComponents(customComponents);
     let properties = componentsToJsonString(customComponents, callback);
     
     console.log('properties', properties);
 
     return Promise.resolve({
-      Id: visitorId,
       Properties: properties
     });
   });
