@@ -9,7 +9,6 @@ import FingerprintJS, {
   isTrident,
 } from "@fps/fingerprintjs";
 import { webglId } from "./webgl";
-import { getCanvas } from "./canvas";
 
 interface fpResult {
   Id: string;
@@ -20,7 +19,7 @@ interface componentObject {
   duration: number;
 }
 
-const listAttributeHash: string[] = ["math", "fontPreferencePrint", "webGlExtensions"];
+const listAttributeHash: string[] = ["canvas", "math", "webGlBasics", "webGlExtensions"];
 
 function getDevicePixelRatio(): number {
   return window.devicePixelRatio;
@@ -140,7 +139,7 @@ function getLanguages(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
-export function getAudio(): Promise<() => number> {
+export function getAudio(): number | (() => Promise<number>) {
   return sources.audio();
 }
 
@@ -157,31 +156,20 @@ export function getBrowserSupport(): {} {
 export function getResult(callback): Promise<fpResult> {
   let visitorId: string;
 
-  const fpPromise = loadSources(sources, {}, [
-    "screenResolution",
-    "screenFrame",
-    "canvas",
-    "fontPreferences",
-    "languages"
-  ])();
+  const fpPromise = loadSources(sources, {}, [])();
 
-  const canvas = getCanvas(callback);
-  const webgl = getWebGL(callback);
+  const webgl = getWebGL(function(){});
 
   return fpPromise.then(async (components) => {
     const customComponents = {
       ...components,
-      screenPrint: getScreenPrint(),
-      fontPreferencePrint: await getFontPreference(),
-      languagesPrint: getLanguages(),
-      canvasPrint: canvas,
-      webglPrint: webgl,
-      webglRenderer: getWebGLRenderer(webgl),
       doNotTrack: getDoNotTrack(),
     };
 
     visitorId = FingerprintJS.hashComponents(customComponents);
     let properties = componentsToJsonString(customComponents, callback);
+    
+    console.log('properties', properties);
 
     return Promise.resolve({
       Id: visitorId,

@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@fps/botd": "^1.1.10",
-    "@fps/fingerprintjs": "^1.0.2",
+    "@fps/fingerprintjs": "^1.0.3",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
     "device-detector-js": "^3.0.0",
