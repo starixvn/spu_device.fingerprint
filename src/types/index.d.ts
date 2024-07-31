@@ -17,5 +17,8 @@ declare global {
   interface document {
     documentMode: string;
   };
-  interface InstallTrigger {}
+  interface InstallTrigger {};
+  interface IDBVersionChangeEvent {
+    target: IDBRequest
+  }
 }

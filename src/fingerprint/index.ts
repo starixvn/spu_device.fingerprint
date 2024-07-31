@@ -5,6 +5,7 @@ import  {
   
 } from "@fps/fingerprintjs";
 import { webglId } from "./webgl";
+import {detectIncognito} from '../incognitoDetection/index'
 
 interface fpResult {
   Properties: {};
@@ -28,8 +29,6 @@ function getDoNotTrack(): componentObject {
   let result = navigator.doNotTrack;
   return { value: result, duration: Date.now() - start };
 }
-
-
 
 function componentsToJsonString(components: UnknownComponents, callback): string {
   const sortedKeys = Object.keys(components).sort();
@@ -60,23 +59,24 @@ function componentsToJsonString(components: UnknownComponents, callback): string
   return `${result}}`;
 }
 
-
-
-
-
-
-
-
+function getIncognitoMode(param) {
+  return detectIncognito().then((result) => {
+    return {
+      components: param,
+        incognitoMode: result
+    };
+  });
+}
 
 export function getResult(callback): Promise<fpResult> {
   const fpPromise = loadSources(sources, {}, [])();
 
-  const webgl = getWebGL(function(){});
-
-  return fpPromise.then(async (components) => {
+  return fpPromise.then(async (result) => getIncognitoMode(result))
+  .then((res) => {
     const customComponents = {
-      ...components,
+      ...res.components,
       doNotTrack: getDoNotTrack(),
+      isIncognitoMode: { value: res.incognitoMode },
     };
 
     let properties = componentsToJsonString(customComponents, callback);
