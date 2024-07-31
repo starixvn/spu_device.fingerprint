@@ -1,12 +1,8 @@
-import FingerprintJS, {
+import  {
   sources,
   loadSources,
   UnknownComponents,
-  isWebKit,
-  isAndroid,
-  isChromium,
-  isGecko,
-  isTrident,
+  
 } from "@fps/fingerprintjs";
 import { webglId } from "./webgl";
 
@@ -19,30 +15,6 @@ interface componentObject {
 }
 
 const listAttributeHash: string[] = ["canvas", "math", "webGlBasics", "webGlExtensions"];
-
-function getDevicePixelRatio(): number {
-  return window.devicePixelRatio;
-}
-
-function getCurrentResolution(): string {
-  let ratio = getDevicePixelRatio();
-  return screen.width * ratio + "x" + screen.height * ratio;
-}
-
-function getPixelDepth(): number {
-  return screen.pixelDepth;
-}
-
-function getScreenPrint(): componentObject {
-  const start = Date.now();
-
-  const result = {
-    currentResolution: getCurrentResolution(),
-    pixelDepth: getPixelDepth(),
-  };
-
-  return { value: result, duration: Date.now() - start };
-}
 
 function getWebGL(callback): componentObject {
   const start: Date = new Date();
@@ -57,29 +29,7 @@ function getDoNotTrack(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
-function getWebGLRenderer(webgl: componentObject): componentObject {
-  const start = Date.now();
-  if (webgl && webgl.value == "unstable") {
-    return { value: "unstable", duration: Date.now() - start };
-  }
 
-  return { value: getGLRenderer(), duration: Date.now() - start };
-}
-
-function getGLRenderer() {
-  const canvas = document.createElement("canvas");
-  const gl = canvas.getContext("webgl");
-  if (
-    gl &&
-    typeof gl.getExtension === "function" &&
-    gl.getExtension("WEBGL_debug_renderer_info") != null
-  ) {
-    return gl.getParameter(
-      gl.getExtension("WEBGL_debug_renderer_info").UNMASKED_RENDERER_WEBGL
-    );
-  }
-  return "";
-}
 
 function componentsToJsonString(components: UnknownComponents, callback): string {
   const sortedKeys = Object.keys(components).sort();
@@ -110,47 +60,13 @@ function componentsToJsonString(components: UnknownComponents, callback): string
   return `${result}}`;
 }
 
-async function getFontPreference(): Promise<componentObject> {
-  const start = Date.now();
 
-  const font = await sources.fontPreferences();
-  const result = {
-    default: font["default"],
-    apple: font["apple"],
-    serif: font["serif"],
-    sans: font["sans"],
-    min: font["min"],
-    system: font["system"],
-  };
 
-  return { value: result, duration: Date.now() - start };
-}
 
-function getLanguages(): componentObject {
-  const start = Date.now();
-  const result = {
-    language: window.navigator.language,
-    languages: window.navigator.languages.join(","),
-    userLanguage: window.navigator["userLanguage"],
-    browserLanguage: window.navigator["browserLanguage"],
-    systemLanguage: window.navigator["systemLanguage"],
-  };
-  return { value: result, duration: Date.now() - start };
-}
 
-export function getAudio(): number | (() => Promise<number>) {
-  return sources.audio();
-}
 
-export function getBrowserSupport(): {} {
-  return {
-    isWebKit: isWebKit,
-    isAndroid: isAndroid,
-    isChromium: isChromium,
-    isGecko: isGecko,
-    isTrident: isTrident,
-  };
-}
+
+
 
 export function getResult(callback): Promise<fpResult> {
   const fpPromise = loadSources(sources, {}, [])();
