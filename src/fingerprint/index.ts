@@ -26,8 +26,9 @@ async function getIncognitoMode(): Promise<componentObject> {
   return Promise.resolve({ value: result, duration: Date.now() - start });
 }
 
-function hashPropertyByFunction(property, hashFunction): componentObject {
-  return { value: hashFunction(property.value), duration: property.duration };
+function hashPropertyByFunction(components, propertyName, hashFunction) {
+  components[propertyName].value = hashFunction(components[propertyName].value);
+  return components;
 }
 
 
@@ -59,11 +60,12 @@ export function getResult(callback): Promise<fpResult> {
   const fpPromise = loadSources(sources, {}, [])();
 
   return fpPromise.then(async (components) => {
+    components = hashPropertyByFunction(components, "canvas", callback);
+
     const customComponents = {
       ...components,
       doNotTrack: getDoNotTrack(),
       isIncognitoMode: await getIncognitoMode(),
-      hashCanvas: hashPropertyByFunction(components["canvas"], callback)
     };
 
     let properties = componentsToJsonString(customComponents);
