@@ -6,13 +6,16 @@ import  {
 
 declare global {
   interface Window {
-    detectIncognito: typeof detectIncognito;
+    incognitoMode: typeof incognitoMode;
   }
 }
 
-export async function detectIncognito(): Promise<boolean>{
+export async function incognitoMode(): Promise<boolean>{
   return await new Promise(function (resolve, reject) {
-    function newSafariTest (): void {
+
+    const ONE_GB = 1073741824;
+
+    function safariPrivateTest (): void {
       const tmp_name = String(Math.random())
 
       try {
@@ -51,11 +54,6 @@ export async function detectIncognito(): Promise<boolean>{
       }
     }
 
-    function safariPrivateTest (): void {
-      newSafariTest()
-    }
-
-
     function getChromeQuotaLimit (): number {
       const w = window as any
       if (
@@ -65,10 +63,10 @@ export async function detectIncognito(): Promise<boolean>{
       ) {
         return (performance as any).memory.jsHeapSizeLimit
       }
-      return 1073741824
+      return ONE_GB
     }
 
-    function storageQuotaChromePrivateTest (): void {
+    function chromePrivateTest (): void {
       (navigator as any).webkitTemporaryStorage.queryUsageAndQuota(
         function (_: number, quota: number) {
           const quotaInMib = Math.round(quota / (1024 * 1024))
@@ -79,7 +77,7 @@ export async function detectIncognito(): Promise<boolean>{
         function (e: any) {
           reject(
             new Error(
-              'detectIncognito somehow failed to query storage quota: ' +
+              'incognitoMode somehow failed to query storage quota: ' +
                 e.message
             )
           )
@@ -88,23 +86,15 @@ export async function detectIncognito(): Promise<boolean>{
     }
 
 
-    function chromePrivateTest (): void {
-      storageQuotaChromePrivateTest()
-    }
-
-    function firefoxPrivateTest (): void {
-      resolve(navigator.serviceWorker === undefined)
-    }
-
     function main (): void {
       if (isWebKit()) {
         safariPrivateTest()
       } else if (isChromium()) {
         chromePrivateTest()
       } else if (isGecko()) {
-        firefoxPrivateTest()
+        resolve(navigator.serviceWorker === undefined)
       } else {
-        reject(new Error('detectIncognito cannot determine the browser'))
+        reject(new Error('incognitoMode cannot determine the browser'))
       }
     }
 
@@ -113,7 +103,7 @@ export async function detectIncognito(): Promise<boolean>{
 }
 
 if (typeof window !== 'undefined') {
-  window.detectIncognito = detectIncognito;
+  window.incognitoMode = incognitoMode;
 }
 
-export default detectIncognito;
+export default incognitoMode;

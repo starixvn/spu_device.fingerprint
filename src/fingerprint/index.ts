@@ -4,7 +4,7 @@ import  {
   UnknownComponents,
   
 } from "@fps/fingerprintjs";
-import {detectIncognito} from '../incognitoDetection'
+import {incognitoMode} from '../incognitoMode'
 
 interface fpResult {
   Properties: {};
@@ -22,11 +22,11 @@ function getDoNotTrack(): componentObject {
 
 async function getIncognitoMode(): Promise<componentObject> {
   const start = Date.now();
-  const result = await detectIncognito();
+  const result = await incognitoMode();
   return Promise.resolve({ value: result, duration: Date.now() - start });
 }
 
-function hashPropertyByFunction(components, propertyName, hashFunction) {
+function hashPropertyByFunction(components: any, propertyName: string, hashFunction: any): any {
   components[propertyName].value = hashFunction(components[propertyName].value);
   return components;
 }
