@@ -4,8 +4,7 @@ import  {
   UnknownComponents,
   
 } from "@fps/fingerprintjs";
-import { webglId } from "./webgl";
-import {detectIncognito} from '../incognitoDetection/index'
+import {detectIncognito} from '../incognitoDetection'
 
 interface fpResult {
   Properties: {};
@@ -15,22 +14,24 @@ interface componentObject {
   duration: number;
 }
 
-const listAttributeHash: string[] = ["canvas", "math", "webGlBasics", "webGlExtensions"];
-
-function getWebGL(callback): componentObject {
-  const start: Date = new Date();
-  const result = webglId(callback);
-
-  return { value: result, duration: (new Date()).getMilliseconds() - start.getMilliseconds() };
-}
-
 function getDoNotTrack(): componentObject {
   const start = Date.now();
   let result = navigator.doNotTrack;
   return { value: result, duration: Date.now() - start };
 }
 
-function componentsToJsonString(components: UnknownComponents, callback): string {
+async function getIncognitoMode(): Promise<componentObject> {
+  const start = Date.now();
+  const result = await detectIncognito();
+  return Promise.resolve({ value: result, duration: Date.now() - start });
+}
+
+function hashPropertyByFunction(property, hashFunction): componentObject {
+  return { value: hashFunction(property.value), duration: property.duration };
+}
+
+
+function componentsToJsonString(components: UnknownComponents): string {
   const sortedKeys = Object.keys(components).sort();
   let result = "";
   let err = "";
@@ -44,12 +45,7 @@ function componentsToJsonString(components: UnknownComponents, callback): string
     } else if (component.value === undefined) {
       value = `"undefined"`;
     } else {
-      if (listAttributeHash.includes(componentKey)) {
-        value = JSON.stringify(callback(JSON.stringify(component.value)));
-      }
-      else {
-        value = JSON.stringify(component.value);
-      }
+      value = JSON.stringify(component.value);
     }
 
     const escapedComponentKey = `"${componentKey.replace(/([:|\\])/g, "\\$1")}"`;
@@ -59,27 +55,18 @@ function componentsToJsonString(components: UnknownComponents, callback): string
   return `${result}}`;
 }
 
-function getIncognitoMode(param) {
-  return detectIncognito().then((result) => {
-    return {
-      components: param,
-        incognitoMode: result
-    };
-  });
-}
-
 export function getResult(callback): Promise<fpResult> {
   const fpPromise = loadSources(sources, {}, [])();
 
-  return fpPromise.then(async (result) => getIncognitoMode(result))
-  .then((res) => {
+  return fpPromise.then(async (components) => {
     const customComponents = {
-      ...res.components,
+      ...components,
       doNotTrack: getDoNotTrack(),
-      isIncognitoMode: { value: res.incognitoMode },
+      isIncognitoMode: await getIncognitoMode(),
+      hashCanvas: hashPropertyByFunction(components["canvas"], callback)
     };
 
-    let properties = componentsToJsonString(customComponents, callback);
+    let properties = componentsToJsonString(customComponents);
     
     console.log('properties', properties);
 
