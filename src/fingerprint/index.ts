@@ -22,8 +22,10 @@ function getDoNotTrack(): componentObject {
 
 function getIncognitoMode(): Promise<componentObject> {
   const start = Date.now();
-  const result = incognitoMode();
-  return Promise.resolve({ value: result, duration: Date.now() - start });
+  return incognitoMode().then((result) => {
+    return Promise.resolve({ value: result, duration: Date.now() - start });
+  });
+  
 }
 
 function hashPropertyByFunction(components: any, propertyName: string, hashFunction: any): any {
@@ -62,21 +64,22 @@ export function getResult(callback): Promise<fpResult> {
   return fpPromise.then((components: { isIncognitoMode: componentObject }) => {
     components = hashPropertyByFunction(components, "canvas", callback);
 
-    getIncognitoMode().then(mode => {
+    return getIncognitoMode().then((mode) => {
       components.isIncognitoMode = mode;
+
+      const customComponents = {
+        ...components,
+        doNotTrack: getDoNotTrack()
+      };
+
+      let properties = componentsToJsonString(customComponents);
+      
+      
+      console.log('properties', properties);
+
+      return Promise.resolve({
+        Properties: properties
+      });
     })
-    
-    const customComponents = {
-      ...components,
-      doNotTrack: getDoNotTrack()
-    };
-
-    let properties = componentsToJsonString(customComponents);
-    
-    console.log('properties', properties);
-
-    return Promise.resolve({
-      Properties: properties
-    });
   });
 }
