@@ -86,7 +86,7 @@ export async function incognitoMode(): Promise<boolean>{
     }
 
 
-    function main (): void {
+    (function () {
       if (isWebKit()) {
         safariPrivateTest()
       } else if (isChromium()) {
@@ -96,9 +96,7 @@ export async function incognitoMode(): Promise<boolean>{
       } else {
         reject(new Error('incognitoMode cannot determine the browser'))
       }
-    }
-
-    main()
+    })();
   })
 }
 
