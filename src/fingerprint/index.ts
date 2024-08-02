@@ -20,9 +20,9 @@ function getDoNotTrack(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
-async function getIncognitoMode(): Promise<componentObject> {
+function getIncognitoMode(): Promise<componentObject> {
   const start = Date.now();
-  const result = await incognitoMode();
+  const result = incognitoMode();
   return Promise.resolve({ value: result, duration: Date.now() - start });
 }
 
@@ -59,13 +59,16 @@ function componentsToJsonString(components: UnknownComponents): string {
 export function getResult(callback): Promise<fpResult> {
   const fpPromise = loadSources(sources, {}, [])();
 
-  return fpPromise.then(async (components) => {
+  return fpPromise.then((components: { isIncognitoMode: componentObject }) => {
     components = hashPropertyByFunction(components, "canvas", callback);
 
+    getIncognitoMode().then(mode => {
+      components.isIncognitoMode = mode;
+    })
+    
     const customComponents = {
       ...components,
-      doNotTrack: getDoNotTrack(),
-      isIncognitoMode: await getIncognitoMode(),
+      doNotTrack: getDoNotTrack()
     };
 
     let properties = componentsToJsonString(customComponents);
