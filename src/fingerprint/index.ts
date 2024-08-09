@@ -77,9 +77,6 @@ export function getResult(callback): Promise<fpResult> {
 
       let properties = componentsToJsonString(customComponents);
       
-      
-      console.log('properties', properties);
-
       return Promise.resolve({
         Properties: properties
       });
