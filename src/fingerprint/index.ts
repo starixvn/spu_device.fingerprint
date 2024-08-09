@@ -4,7 +4,8 @@ import  {
   UnknownComponents,
   
 } from "@fps/fingerprintjs";
-import {incognitoMode} from '../incognitoMode'
+import {incognitoMode} from '../incognitoMode';
+import { getNavigator, getBrowser } from "../oldFingerprint";
 
 interface fpResult {
   Properties: {};
@@ -69,7 +70,9 @@ export function getResult(callback): Promise<fpResult> {
 
       const customComponents = {
         ...components,
-        doNotTrack: getDoNotTrack()
+        doNotTrack: getDoNotTrack(),
+        navigator: getNavigator(),
+        browser: getBrowser()
       };
 
       let properties = componentsToJsonString(customComponents);
