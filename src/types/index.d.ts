@@ -13,7 +13,6 @@ declare global {
     webkitIndexedDB?: IDBFactory;
     msIndexedDB?: IDBFactory;
     shimIndexedDB?: IDBFactory;
-    UAParser: any;
   };
   interface document {
     documentMode: string;

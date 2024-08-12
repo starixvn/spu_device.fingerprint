@@ -53,11 +53,3 @@ export function getNavigator(): componentObject {
 
     return { value: result, duration: Date.now() - start };
 }
-
-export function getBrowser(): componentObject {
-    const start = Date.now();
-    var parser = new window.UAParser();
-    var uaResult = parser.getResult();    
-    return { value: uaResult.browser + " " +  uaResult.version, duration: Date.now() - start };
-}
-

@@ -5,7 +5,7 @@ import  {
   
 } from "@fps/fingerprintjs";
 import {incognitoMode} from '../incognitoMode';
-import { getNavigator, getBrowser } from "../oldFingerprint";
+import { getNavigator } from "../oldFingerprint";
 
 interface fpResult {
   Properties: {};
@@ -21,6 +21,12 @@ function getDoNotTrack(): componentObject {
   return { value: result, duration: Date.now() - start };
 }
 
+function getTimezoneOffset(): componentObject {
+  const start = Date.now();
+  const result = new Date().getTimezoneOffset().toString();
+  return { value: result, duration: Date.now() - start };
+}
+
 function getIncognitoMode(): Promise<componentObject> {
   const start = Date.now();
   return incognitoMode().then((result) => {
@@ -33,7 +39,6 @@ function hashPropertyByFunction(components: any, propertyName: string, hashFunct
   components[propertyName].value = hashFunction(components[propertyName].value);
   return components;
 }
-
 
 function componentsToJsonString(components: UnknownComponents): string {
   const sortedKeys = Object.keys(components).sort();
@@ -72,7 +77,7 @@ export function getResult(callback): Promise<fpResult> {
         ...components,
         doNotTrack: getDoNotTrack(),
         navigator: getNavigator(),
-        browser: getBrowser()
+        timezoneOffset: getTimezoneOffset()
       };
 
       let properties = componentsToJsonString(customComponents);
