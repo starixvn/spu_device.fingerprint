@@ -62,10 +62,10 @@
     "@fps/botd" "^1.1.1"
     "tslib" "^2.4.0"
 
-"@fps/fingerprintjs@^1.0.0", "@fps/fingerprintjs@^1.0.3":
-  "integrity" "sha512-dJDSxbxMwaGmrOTciWrL4tc2wr12oVw10zU8ZFyDp/7clmgGJIXdqGV4q2cuZ+Dw5LmDEsfmK5HK+yY8kAr/aQ=="
-  "resolved" "https://npm-k3s.nexdev.net/@fps/fingerprintjs/-/fingerprintjs-1.0.3.tgz"
-  "version" "1.0.3"
+"@fps/fingerprintjs@^1.0.0", "@fps/fingerprintjs@^1.0.4":
+  "integrity" "sha512-2SR+xZY8utZPCAk34r/Ubm1rTKbfregzS22q+NuIxYCNllA5AsjHvkzvPhkArJ3gnE+Jn6y8jctwF6aPBJLsBA=="
+  "resolved" "https://npm-k3s.nexdev.net/@fps/fingerprintjs/-/fingerprintjs-1.0.4.tgz"
+  "version" "1.0.4"
   dependencies:
     "@fps/fingerprintjs" "^1.0.0"
     "tslib" "^2.4.1"
