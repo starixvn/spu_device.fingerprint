@@ -32,11 +32,18 @@ function getIncognitoMode(): Promise<componentObject> {
   return incognitoMode().then((result) => {
     return Promise.resolve({ value: result, duration: Date.now() - start });
   });
-  
 }
 
-function hashPropertyByFunction(components: any, propertyName: string, hashFunction: any): any {
-  components[propertyName].value = hashFunction(components[propertyName].value);
+function applyHashToProperties(components: any, propertyNames: string[], hashFunction: any): any {
+  if (typeof hashFunction == 'function') {
+    for (const propertyName of propertyNames) {
+      if (components.hasOwnProperty(propertyName) && components[propertyName] !== null) {
+        const valueToHash = JSON.stringify(components[propertyName].value);
+        components[propertyName].value = hashFunction(valueToHash);
+      }
+    }
+  }
+
   return components;
 }
 
@@ -64,27 +71,26 @@ function componentsToJsonString(components: UnknownComponents): string {
   return `${result}}`;
 }
 
-export function getResult(callback): Promise<fpResult> {
+export function getResult(callback: any): Promise<fpResult> {
   const fpPromise = loadSources(sources, {}, [])();
 
-  return fpPromise.then((components: { isIncognitoMode: componentObject }) => {
-    components = hashPropertyByFunction(components, "canvas", callback);
+  return fpPromise.then((components: any) => {
+    components = applyHashToProperties(components, ["canvas","webGlExtensions"], callback);
 
-    return getIncognitoMode().then((mode) => {
-      components.isIncognitoMode = mode;
-
+    return getIncognitoMode().then((isIncognitoMode) => {
       const customComponents = {
         ...components,
         doNotTrack: getDoNotTrack(),
         navigator: getNavigator(),
-        timezoneOffset: getTimezoneOffset()
+        timezoneOffset: getTimezoneOffset(),
+        isIncognitoMode: isIncognitoMode
       };
 
       let properties = componentsToJsonString(customComponents);
       
-      return Promise.resolve({
+      return {
         Properties: properties
-      });
+      };
     })
   });
 }
