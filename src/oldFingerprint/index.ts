@@ -2,7 +2,7 @@ interface componentObject {
     value: {};
     duration: number;
 }
-function getNavigatorElementsAsJson(obj, currentDepth = 0, maxDepth = 3) {
+function getNavigatorElementsAsJson(obj, currentDepth = 0, maxDepth = 3): any {
     if (currentDepth >= maxDepth) {
         return null; // Stop if the maximum depth is reached
     }
@@ -49,6 +49,11 @@ function getNavigatorElementsAsJson(obj, currentDepth = 0, maxDepth = 3) {
 export function getNavigator(): componentObject {
     const start = Date.now();
     let navigatorJson = getNavigatorElementsAsJson(navigator);
+    if (typeof navigatorJson.connection === "object") {
+        navigatorJson.connection.downlink = null;
+        navigatorJson.connection.downlinkMax = null;
+        navigatorJson.connection.rtt = null;
+    }
     let result = JSON.stringify(navigatorJson);
 
     return { value: result, duration: Date.now() - start };
