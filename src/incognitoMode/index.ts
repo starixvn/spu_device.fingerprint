@@ -75,15 +75,11 @@ function incognitoModeCallback(callback: (result: boolean) => void): void {
         callback(quotaInMib < quotaLimitInMib);
       },
       function (e: any) {
-        alert(
+        callback(false);
+        console.error(
           'incognitoMode somehow failed to query storage quota: ' +
           e.message
         );
-        // console.log(
-        //   'incognitoMode somehow failed to query storage quota: ' +
-        //   e.message
-        // );
-        callback(false);
       }
     );
   }
