@@ -29,6 +29,7 @@ function getTimezoneOffset(): componentObject {
 
 function getIncognitoMode(): Promise<componentObject> {
   const start = Date.now();
+  
   return incognitoMode().then((result) => {
     return Promise.resolve({ value: result, duration: Date.now() - start });
   });
@@ -86,10 +87,8 @@ export function getResult(callback: any): Promise<fpResult> {
         isIncognitoMode: isIncognitoMode
       };
 
-      let properties = componentsToJsonString(customComponents);
-      
       return {
-        Properties: properties
+        Properties: componentsToJsonString(customComponents)
       };
     })
   });
