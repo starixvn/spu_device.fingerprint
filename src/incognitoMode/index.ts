@@ -90,7 +90,7 @@ function incognitoModeCallback(callback: (result: boolean) => void): void {
     } else if (isChromium()) {
       chromePrivateTest();
     } else if (isGecko()) {
-      callback(navigator.serviceWorker === undefined);
+      window.location.protocol === "https:" ? callback(navigator.serviceWorker === undefined) : callback(false);
     } else {
       callback(false);
       console.error('incognitoMode cannot determine the browser');
