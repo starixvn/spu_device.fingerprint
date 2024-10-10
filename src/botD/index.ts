@@ -1,12 +1,15 @@
-import { load, BotDetectionResult, BotDetectorInterface } from '@fps/botd';
+import { load, BotDetectionResult } from '@fps/botd';
 
 interface BotDResult {
     result: BotDetectionResult;
     detection: string;
     component: any
 }
+interface ErrorResult {
+    error: string
+}
 
-export default function loadBotD(): Promise<BotDResult | undefined> {
+export default function getResult(): Promise<BotDResult | ErrorResult | undefined> {
     try {
         const botdPromise = load({
             monitoring: false
@@ -28,9 +31,12 @@ export default function loadBotD(): Promise<BotDResult | undefined> {
                     component: botComponents,
                     isVer3: true
                 };
+            }).catch(function (error) {
+                return {
+                    error: error.message
+                };
             });
     } catch (error) {
-        console.error(error);
-        return undefined;
+        return Promise.resolve({ error: error.message });
     }
 }

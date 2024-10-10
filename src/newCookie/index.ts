@@ -119,8 +119,9 @@ function getSetCookie(key: string, value: string | null): Promise<string | null>
             if (isSet) {
                 let expires: string = '';
                 let date = new Date();
-                    date.setFullYear(date.getFullYear() + 1);
-                    expires = '; expires=' + date.toUTCString();
+
+                date.setFullYear(date.getFullYear() + 1);
+                expires = '; expires=' + date.toUTCString();
 
                 const setValue = key + '=' + (value || '') + expires + '; SameSite=None; Secure; path=/';
                 document.cookie = setValue;
@@ -148,25 +149,21 @@ function windowName(key: string, value: string | any): Promise<string | null> {
     return result;
 }
 
-function getSetWindowName(key: string, value: string | any): Promise<string | null> {
-    return new Promise(function (resolve, reject) {
+function getSetWindowName(key: string, value?: string): Promise<string | null> {
+    return new Promise((resolve, reject) => {
         try {
             key = "name";
             if (isSet) {
-                var currentValue = window[key] || '';
-                if (!isValidObject(currentValue) || validateUUID(currentValue)) {
+                const currentValue = window[key] || '';
+                if (!isValidObject(currentValue)) {
                     window[key] = value;
                 }
                 resolve(null);
-            }
-            else {
-                value = window[key];
-                if (!validateUUID(value)) {
-                    value = null;
-                }
-                resolve(value);
+            } else {
+                resolve(window[key] || null);
             }
         } catch (exception) {
+            reject(exception);
         }
     });
 }
@@ -175,95 +172,12 @@ function isValidObject(obj: any): boolean {
     return typeof obj !== 'undefined' && !!obj;
 }
 
-function generateUUIDv4(): string {
-    let uuid: string = '';
-
-    for (let i: number = 0; i < 32; i++) {
-        if (i === 8 || i === 12 || i === 16 || i === 20) {
-            uuid += '-';
-        }
-        const random: number = (Math.random() * 16) | 0;
-        if (i === 12) {
-            uuid += '4';
-        } else if (i === 16) {
-            uuid += ((random & 3) | 8).toString(16);
-        } else {
-            uuid += random.toString(16);
-        }
-    }
-
-    return uuid;
-}
-
-function validateUUID(uuid: string): boolean {
-    const uuidRegex: RegExp = /^[a-f\d]{8}-[a-f\d]{4}-4[a-f\d]{3}-[8|9|aA|bB][a-f\d]{3}-[a-f\d]{12}$/i;
-
-    if (!uuidRegex.test(uuid)) {
-        return false;
-    }
-
-    // Kiểm tra phiên bản UUID
-    const versionBits: number = parseInt(uuid.charAt(14), 16);
-    if (versionBits !== 4) {
-        return false;
-    }
-
-    // Kiểm tra trường hợp của ký tự
-    if (uuid !== uuid.toLowerCase()) {
-        return false;
-    }
-
-    return true;
-}
-
 function waitAllWithTimeout(promises: any[]): Promise<any[]> {
     const timeoutPromise: Promise<void> = new Promise((resolve, reject) => {
         setTimeout(() => resolve(), timeout);
     });
 
     return Promise.all(promises.map((p: any) => Promise.race([p, timeoutPromise])));
-}
-
-function getFirstMaxCountValue(arr: string | any[]): Promise<string> {
-    let count = {};
-    let maxCount = 0;
-    let maxValue = null;
-
-    if (arr && Array.isArray(arr) && arr.length > 0) {
-        for (let i = 0; i < arr.length; i++) {
-            if (count[arr[i]] === undefined) {
-                count[arr[i]] = 1;
-            } else {
-                count[arr[i]]++;
-            }
-            if (count[arr[i]] > maxCount && arr[i] != undefined) {
-                maxCount = count[arr[i]];
-                maxValue = arr[i];
-            }
-        }
-    }
-
-    return new Promise((resolve) => {
-        resolve(validateUUID(maxValue) ? maxValue : generateUUIDv4());
-    });
-}
-
-function get(key) {
-    try {
-        isSet = false;
-
-        const promises = storageHandlers.map((handler) => {
-            return new Promise((resolve) => {
-                resolve(handler(key, null));
-            });
-        });
-        return waitAllWithTimeout(promises).then((cookies) => {
-            return getFirstMaxCountValue(cookies).then((cookieValue) => {
-                return Promise.resolve(cookieValue);
-            });
-        });
-    } catch (exception) {
-    }
 }
 
 function set(key: string, value: string) {
@@ -276,8 +190,24 @@ function set(key: string, value: string) {
     }
 }
 
-export function getStorage(key: string = cookieKey): Promise<string> {
-    return get(key);
+export function getStorages(key: string = cookieKey): Promise<string> {
+    try {
+        isSet = false;
+        var promises = storageHandlers.map(function (handler) {
+            return new Promise(function (resolve) {
+                resolve(handler(key, null));
+            });
+        });
+        return waitAllWithTimeout(promises).then(function (cookies) {
+            const joinedCookies = cookies
+                .filter(cookie => cookie !== null && cookie !== undefined)
+                .filter((cookie, index, self) => self.indexOf(cookie) === index)
+                .join(',');
+            return Promise.resolve(joinedCookies);
+        });
+    }
+    catch (exception) {
+    }
 }
 
 export function setStorage(key: string = cookieKey, value: string) {

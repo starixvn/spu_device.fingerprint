@@ -1,5 +1,5 @@
-import { getHeadlessScore } from "../headlessDetection";
-import { getBrowserInfo } from "../browserDetect";
+import { getHeadlessScore } from "./headlessDetection";
+import { getBrowserInfo } from "./browserDetect";
 
 async function robotDetection() {
   let headlessScore = await getHeadlessScore();
