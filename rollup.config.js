@@ -46,6 +46,16 @@ const encryptInput = {
   ]
 }
 
+const uaParserInput = {
+  input: 'src/UAParser/index.ts',
+  plugins: [
+    typescript({ module: "ESNext" }),
+    nodeResolve({ preferBuiltins: false }),
+    commonjs(),
+    json()
+  ]
+}
+
 
 export default [
   {
@@ -102,4 +112,12 @@ export default [
       plugins: [commonTerser]
     }]
   },
+  {
+    ...uaParserInput,
+    output: [{
+      file: 'dist/Detecas.UserAgent.js',
+      format: 'iife',
+      banner: "Detecas.UserAgent = "
+    }]
+  }
 ];

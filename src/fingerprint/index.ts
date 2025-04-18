@@ -86,7 +86,7 @@ export function getResult(callback: any): Promise<fpResult> {
         timezoneOffset: getTimezoneOffset(),
         isIncognitoMode: isIncognitoMode
       };
-
+      
       return {
         Properties: componentsToJsonString(customComponents)
       };

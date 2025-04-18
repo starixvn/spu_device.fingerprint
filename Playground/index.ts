@@ -75,7 +75,7 @@ function getIncognitoMode(): Promise<componentObject> {
         isIncognitoMode: mode,
         navigator: getNavigator()
       };
-      console.log('customComponents: ', customComponents);
+      console.log('customComponents: ', customComponents.screenFrame);
     })
   });
 })();
