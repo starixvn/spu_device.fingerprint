@@ -72,11 +72,11 @@ function componentsToJsonString(components: UnknownComponents): string {
   return `${result}}`;
 }
 
-export function getResult(callback: any): Promise<fpResult> {
+export function getResult(hashFn: any): Promise<fpResult> {
   const fpPromise = loadSources(sources, {}, [])();
 
   return fpPromise.then((components: any) => {
-    components = applyHashToProperties(components, ["canvas","webGlExtensions"], callback);
+    components = applyHashToProperties(components, ["canvas","webGlExtensions"], hashFn);
 
     return getIncognitoMode().then((isIncognitoMode) => {
       const customComponents = {
