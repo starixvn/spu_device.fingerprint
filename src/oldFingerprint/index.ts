@@ -22,6 +22,10 @@ function getNavigatorElementsAsJson(obj, currentDepth = 0, maxDepth = 3): any {
 
 
     for (let key in obj) {
+        if (!key.match(/^[a-zA-Z0-9]+$/)) {
+            continue;
+        }
+
         if (ignoredProperties.has(key)) {
             continue; // Skip the ignored properties
         }
@@ -34,6 +38,9 @@ function getNavigatorElementsAsJson(obj, currentDepth = 0, maxDepth = 3): any {
                 continue; // Skip functions
             } else if (typeof value === 'object' && value !== null && currentDepth + 1 < maxDepth) {
                 result[key] = getNavigatorElementsAsJson(value, currentDepth + 1, maxDepth);
+            } 
+            else if (typeof value === "string") {
+                result[key] = value.replace(/[^\u0000-\u007F]/g, ""); // Remove non-ascii characters
             } else {
                 if (value != null) {
                     result[key] = value;
