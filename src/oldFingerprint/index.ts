@@ -2,7 +2,7 @@ interface componentObject {
     value: {};
     duration: number;
 }
-function getNavigatorElementsAsJson(obj, currentDepth = 0, maxDepth = 3): any {
+function getNavigatorElementsAsJson(obj, isDuckDuckGo,currentDepth = 0, maxDepth = 3): any {
     if (currentDepth >= maxDepth) {
         return null; // Stop if the maximum depth is reached
     }
@@ -22,7 +22,7 @@ function getNavigatorElementsAsJson(obj, currentDepth = 0, maxDepth = 3): any {
 
 
     for (let key in obj) {
-        if (!key.match(/^[a-zA-Z0-9]+$/)) {
+        if (isDuckDuckGo && !key.match(/^[a-zA-Z0-9]+$/)) {
             continue;
         }
 
@@ -37,10 +37,20 @@ function getNavigatorElementsAsJson(obj, currentDepth = 0, maxDepth = 3): any {
             if (typeof value === 'function') {
                 continue; // Skip functions
             } else if (typeof value === 'object' && value !== null && currentDepth + 1 < maxDepth) {
-                result[key] = getNavigatorElementsAsJson(value, currentDepth + 1, maxDepth);
+                if (isDuckDuckGo) {
+                    var element = getNavigatorElementsAsJson(value, currentDepth + 1, maxDepth);
+                    if (element !== null && element !== undefined && Object.keys(element).length > 0)
+                        result[key] = element;
+                }
+                else {
+                    result[key] = getNavigatorElementsAsJson(value, currentDepth + 1, maxDepth);
+                } 
             } 
             else if (typeof value === "string") {
-                result[key] = value.replace(/[^\u0000-\u007F]/g, ""); // Remove non-ascii characters
+                if (isDuckDuckGo)
+                    result[key] = value.replace(/[^\u0000-\u007F]/g, ""); // Remove non-ascii characters
+                else
+                    result[key] = value;
             } else {
                 if (value != null) {
                     result[key] = value;
@@ -53,9 +63,20 @@ function getNavigatorElementsAsJson(obj, currentDepth = 0, maxDepth = 3): any {
 
     return result;
 }
+
+function isDuckDuckGo() {
+    // Check if the current browser is DuckDuckGo
+    if (typeof navigator === 'object' && navigator !== null && navigator.hasOwnProperty('duckDuckGo')) {
+        return true; // Return a specific value for DuckDuckGo
+    }
+    return false;
+}
+
 export function getNavigator(): componentObject {
     const start = Date.now();
-    let navigatorJson = getNavigatorElementsAsJson(navigator);
+    var isDuckDuckGo = isDuckDuckGo();
+
+    let navigatorJson = getNavigatorElementsAsJson(navigator, isDuckDuckGo);
     if (typeof navigatorJson.connection === "object") {
         navigatorJson.connection.downlink = null;
         navigatorJson.connection.downlinkMax = null;
