@@ -2,7 +2,7 @@ interface componentObject {
     value: {};
     duration: number;
 }
-function getNavigatorElementsAsJson(obj, isDuckDuckGo,currentDepth = 0, maxDepth = 3): any {
+function getNavigatorElementsAsJson(obj, isDuckDuckGo, currentDepth = 0, maxDepth = 3): any {
     if (currentDepth >= maxDepth) {
         return null; // Stop if the maximum depth is reached
     }
@@ -37,13 +37,13 @@ function getNavigatorElementsAsJson(obj, isDuckDuckGo,currentDepth = 0, maxDepth
             if (typeof value === 'function') {
                 continue; // Skip functions
             } else if (typeof value === 'object' && value !== null && currentDepth + 1 < maxDepth) {
+                var element = getNavigatorElementsAsJson(value, isDuckDuckGo,currentDepth + 1, maxDepth);
                 if (isDuckDuckGo) {
-                    var element = getNavigatorElementsAsJson(value, currentDepth + 1, maxDepth);
                     if (element !== null && element !== undefined && Object.keys(element).length > 0)
                         result[key] = element;
                 }
                 else {
-                    result[key] = getNavigatorElementsAsJson(value, currentDepth + 1, maxDepth);
+                    result[key] = element;
                 } 
             } 
             else if (typeof value === "string") {
@@ -64,17 +64,20 @@ function getNavigatorElementsAsJson(obj, isDuckDuckGo,currentDepth = 0, maxDepth
     return result;
 }
 
-function isDuckDuckGo() {
+function checkDuckDuckGo() {
+    // Access 'duckduckgo' property using type assertion to avoid TypeScript error
+    var duckduckgo = (navigator as any).duckduckgo;
+
     // Check if the current browser is DuckDuckGo
-    if (typeof navigator === 'object' && navigator !== null && navigator.hasOwnProperty('duckDuckGo')) {
-        return true; // Return a specific value for DuckDuckGo
+    if (duckduckgo != undefined) {
+        return true;
     }
     return false;
 }
 
 export function getNavigator(): componentObject {
     const start = Date.now();
-    var isDuckDuckGo = isDuckDuckGo();
+    let isDuckDuckGo = checkDuckDuckGo();
 
     let navigatorJson = getNavigatorElementsAsJson(navigator, isDuckDuckGo);
     if (typeof navigatorJson.connection === "object") {
